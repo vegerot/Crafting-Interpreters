@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.7.10"
+    kotlin("jvm") version "1.7.21"
     application
 }
 
@@ -18,12 +18,19 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+    this.testLogging {
+        this.showStandardStreams = true
+    }
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = "17"
 }
 
 application {
-    mainClass.set("MainKt")
+    mainClass.set("lox.LoxKt")
+}
+
+tasks.getByName("run", JavaExec::class) {
+    standardInput = System.`in`
 }
