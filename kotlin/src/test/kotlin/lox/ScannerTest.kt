@@ -70,6 +70,29 @@ internal class ScannerTest {
             "42.69" to listOf(
                 Token(TokenType.NUMBER, "42.69", 42.69, 0),
             ),
+            "hello" to listOf(
+                Token(TokenType.IDENTIFIER, "hello", null, 0)
+            ),
+            "hello+1" to listOf(
+                Token(TokenType.IDENTIFIER, "hello", null, 0),
+                Token(TokenType.PLUS, null, null, 0),
+                Token(TokenType.NUMBER, "1", 1.0, 0)
+            ),
+            "true and false" to listOf(
+                Token(TokenType.TRUE, null, null, 0),
+                Token(TokenType.AND, null, null, 0),
+                Token(TokenType.FALSE, null, null, 0)
+            ),
+            """
+            var a =
+            17;
+            """.trimIndent() to listOf(
+                Token(TokenType.VAR, null, null, 0),
+                Token(TokenType.IDENTIFIER, "a", null, 0),
+                Token(TokenType.EQUAL, null, null, 0),
+                Token(TokenType.NUMBER, "17", 17.0, 1),
+                Token(TokenType.SEMICOLON, null, null, 1),
+            )
         )
         sourceToTokens.entries.forEach { kv ->
             val (source, want) = kv

@@ -65,11 +65,9 @@ class Scanner(val source: String) {
 
             '"' -> TokenType.STRING
             in validDigits -> TokenType.NUMBER
-            else -> {
-                when {
-                    else -> TokenType.INVALID
-                }
-            }
+            in validStartingIdentifierChars -> TokenType.IDENTIFIER
+            else -> TokenType.INVALID
+
         }
         if (nextTokenType == TokenType.SKIP) return
         if (nextTokenType == TokenType.INVALID) {
@@ -78,12 +76,34 @@ class Scanner(val source: String) {
         val nextToken: Token = when (nextTokenType) {
             TokenType.STRING -> consumeUntilEOSandReturnString()
             TokenType.NUMBER -> consumeNumber()
+            TokenType.IDENTIFIER -> consumeUntilEOI()
             else -> makeToken(nextTokenType)
         }
         addToken(nextToken)
     }
 
     private val validDigits = '0'..'9'
+    private val validStartingIdentifierChars = 'A'..'z'
+    private val validIdentifierChars = validDigits + validStartingIdentifierChars
+    private val keywordToTokenType: Map<String, TokenType> = mapOf(
+        "and" to TokenType.AND,
+        "class" to TokenType.CLASS,
+        "else" to TokenType.ELSE,
+        "false" to TokenType.FALSE,
+        "for" to TokenType.FOR,
+        "fun" to TokenType.FUN,
+        "if" to TokenType.IF,
+        "nil" to TokenType.NIL,
+        "or" to TokenType.OR,
+        "print" to TokenType.PRINT,
+        "return" to TokenType.RETURN,
+        "super" to TokenType.SUPER,
+        "this" to TokenType.THIS,
+        "true" to TokenType.TRUE,
+        "var" to TokenType.VAR,
+        "while" to TokenType.WHILE
+    )
+
     private fun consumeNumber(): Token {
         while (peek() in validDigits)
             advance()
@@ -114,10 +134,22 @@ class Scanner(val source: String) {
             val length = current - (start + 1)
             if (length == 0) "" else source.substring(start + 1, current)
         }
-
+        
         val stringIncludingQuotes = source.substring(start, current + 1)
         advance()
         return Token(TokenType.STRING, stringIncludingQuotes, stringContents, line)
+    }
+
+    private fun consumeUntilEOI(): Token {
+        while (peek() in validIdentifierChars) {
+            advance()
+        }
+
+        val tokenName = source.substring(start, current)
+        val tokenType = keywordToTokenType.getOrDefault(tokenName, TokenType.IDENTIFIER)
+        val lexeme = if (tokenType == TokenType.IDENTIFIER) tokenName else null
+
+        return Token(tokenType, lexeme, null, line)
     }
 
     private fun consumeUntil(char: Char): Char? {
