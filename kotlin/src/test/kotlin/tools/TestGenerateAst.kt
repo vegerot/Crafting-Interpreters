@@ -10,7 +10,16 @@ internal class GenerateAstTest {
     fun testCreateBinaryExpr() {
         val want = """
             sealed class Expr {
-            data class Binary(val left: Expr, val operator: Token, val right: Expr): Expr()
+            interface Visitor<R> {
+            fun visitBinaryExpr(expr: Binary): R
+            }
+
+            abstract fun<R> accept(visitor: Visitor<R>): R
+            data class Binary(val left: Expr, val operator: Token, val right: Expr): Expr() {
+                override fun<R> accept(visitor: Visitor<R>): R {
+                    return visitor.visitBinaryExpr(this)
+                    }
+                }
             }
         """.trimIndent()
 
@@ -29,8 +38,22 @@ internal class GenerateAstTest {
     fun testCreateExpr() {
         val want = """
             sealed class B {
-            data class Foo(val f: F, val s: S, val t: T): B()
-            data class Bar(val o: O, val t: T, val th: Th): B()
+                    interface Visitor<R> {
+                    fun visitFooB(b: Foo): R
+            fun visitBarB(b: Bar): R
+                    }
+            
+            abstract fun<R> accept(visitor: Visitor<R>): R
+            data class Foo(val f: F, val s: S, val t: T): B() {
+                override fun<R> accept(visitor: Visitor<R>): R {
+                    return visitor.visitFooB(this)
+                    }
+                }
+            data class Bar(val o: O, val t: T, val th: Th): B() {
+                override fun<R> accept(visitor: Visitor<R>): R {
+                    return visitor.visitBarB(this)
+                    }
+                }
             }
         """.trimIndent()
 

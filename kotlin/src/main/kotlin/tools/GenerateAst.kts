@@ -5,6 +5,8 @@ import java.io.File
 fun createAstClass(name: String, types: List<String>): String {
     return """
 sealed class $name {
+${createVisitorInterface(name, types)}
+abstract fun<R> accept(visitor: Visitor<R>): R
 ${
         types.map { t ->
             val (className, fieldsString) = t.trim().split(':').map { it.trim() }
@@ -18,10 +20,29 @@ ${
  """.trimIndent()
 }
 
+fun createVisitorInterface(baseName: String, types: List<String>): String {
+    return """
+        interface Visitor<R> {
+        ${types.map{type->
+            val (typeName, _) = type.trim().split(':').map { it.trim() }
+            "fun visit${typeName}${baseName}(${baseName.toLowerCase()}: $typeName): R"
+        }.joinToString("\n")
+        }
+        }
+
+    """.trimIndent()
+}
+
 fun createExpressionType(baseName: String, typeName: String, nonterminals: List<Pair<String, String>>): String {
-    return "data class $typeName(${
+    return """
+    data class $typeName(${
         nonterminals.map{(type, name)-> "val $name: $type"}.joinToString(", ")
-    }): $baseName()"
+        }): $baseName() {
+        override fun<R> accept(visitor: Visitor<R>): R {
+            return visitor.visit${typeName}${baseName}(this)
+            }
+        }
+    """.trimIndent()
 }
 
 fun writeExprFile(outputDir: String, name: String, types: List<String>) {
@@ -38,7 +59,9 @@ fun writeExprFile(outputDir: String, name: String, types: List<String>) {
 
 }
 
-
+/**
+ * run like `kotlinc -script .\src\main\kotlin\tools\GenerateAst.kts`
+ */
 fun main() {
     writeExprFile("src/main/kotlin/lox", "Expr", listOf(
             "Binary   : Expr left, Token operator, Expr right",
