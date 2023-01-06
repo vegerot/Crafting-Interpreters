@@ -54,10 +54,19 @@ class Lox {
         }
     }
 }
+
 fun main(args: Array<String>) {
-    if (args.size > 1) {
+    if (args.size > 2) {
         println("Usage: jlox [script]")
         exitProcess(64)
+    } else if (args.size == 2) {
+        if (args[0] != "--fmt") {
+            println("Usage: jlox [script]")
+            exitProcess(64)
+        }
+        else {
+            println("TODO:")
+        }
     } else if (args.size == 1) {
         Lox.runFile(args[0])
     } else {
