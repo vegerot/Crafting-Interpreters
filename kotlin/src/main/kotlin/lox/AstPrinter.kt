@@ -21,7 +21,6 @@ class AstPrinter : Expr.Visitor<String> {
     override fun visitUnaryExpr(expr: Expr.Unary): String {
         return "(${expr.operator.lexeme} ${expr.right.accept(this)})"
     }
-
 }
 
 fun main(args: Array<String>) {

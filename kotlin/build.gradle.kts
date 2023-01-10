@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "1.7.21"
     application
+    id("com.ncorti.ktfmt.gradle") version "0.11.0"
 }
 
 group = "org.example"
@@ -35,3 +36,5 @@ application {
 tasks.getByName("run", JavaExec::class) {
     standardInput = System.`in`
 }
+
+ktfmt {kotlinLangStyle()}

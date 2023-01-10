@@ -1,6 +1,5 @@
 package lox
 
-
 import java.io.File
 import java.nio.charset.Charset
 import kotlin.system.exitProcess
@@ -19,13 +18,14 @@ class Lox {
         fun runPrompt() {
             while (true) {
                 print("> ")
-                val line: String = try {
-                    readln()
-                } catch (e: RuntimeException) {
-                    println(e)
-                    null
-                } // `readln` doesn't return a more specific error??
-                    ?: break
+                val line: String =
+                    try {
+                        readln()
+                    } catch (e: RuntimeException) {
+                        println(e)
+                        null
+                    } // `readln` doesn't return a more specific error??
+                     ?: break
                 runCode(line)
                 hadError = false
             }
@@ -40,17 +40,13 @@ class Lox {
 
         private var hadError: Boolean = false
 
-
         fun error(line: Int, where: String?, message: String) {
             reportError(line, where ?: "", message)
             this.hadError = true
         }
 
         fun reportError(line: Int, where: String, message: String) {
-            System.err.println(
-                "[line $line] Error $where: $message"
-            )
-
+            System.err.println("[line $line] Error $where: $message")
         }
     }
 }
@@ -63,8 +59,7 @@ fun main(args: Array<String>) {
         if (args[0] != "--fmt") {
             println("Usage: jlox [script]")
             exitProcess(64)
-        }
-        else {
+        } else {
             println("TODO:")
         }
     } else if (args.size == 1) {

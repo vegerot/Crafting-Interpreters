@@ -8,7 +8,8 @@ internal class GenerateAstTest {
 
     @Test
     fun testCreateBinaryExpr() {
-        val want = """
+        val want =
+            """
             sealed class Expr {
             interface Visitor<R> {
             fun visitBinaryExpr(expr: Binary): R
@@ -21,13 +22,11 @@ internal class GenerateAstTest {
                     }
                 }
             }
-        """.trimIndent()
+        """
+                .trimIndent()
 
-        val got = script.createAstClass(
-            "Expr", listOf(
-                "Binary : Expr left, Token operator, Expr right"
-            )
-        )
+        val got =
+            script.createAstClass("Expr", listOf("Binary : Expr left, Token operator, Expr right"))
         // todo: assert code compiles
         // todo^2: test compiled code
 
@@ -36,7 +35,8 @@ internal class GenerateAstTest {
 
     @Test
     fun testCreateExpr() {
-        val want = """
+        val want =
+            """
             sealed class B {
                     interface Visitor<R> {
                     fun visitFooB(b: Foo): R
@@ -55,14 +55,10 @@ internal class GenerateAstTest {
                     }
                 }
             }
-        """.trimIndent()
+        """
+                .trimIndent()
 
-        val got = script.createAstClass(
-            "B", listOf(
-                "Foo : F f, S s, T t",
-                "Bar : O o, T t, Th th"
-            )
-        )
+        val got = script.createAstClass("B", listOf("Foo : F f, S s, T t", "Bar : O o, T t, Th th"))
 
         assertEquals(want, got)
     }

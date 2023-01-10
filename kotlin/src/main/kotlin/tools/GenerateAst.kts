@@ -17,7 +17,8 @@ ${
         }.joinToString("\n")
     }
 }
- """.trimIndent()
+ """
+        .trimIndent()
 }
 
 fun createVisitorInterface(baseName: String, types: List<String>): String {
@@ -30,10 +31,15 @@ fun createVisitorInterface(baseName: String, types: List<String>): String {
         }
         }
 
-    """.trimIndent()
+    """
+        .trimIndent()
 }
 
-fun createExpressionType(baseName: String, typeName: String, nonterminals: List<Pair<String, String>>): String {
+fun createExpressionType(
+    baseName: String,
+    typeName: String,
+    nonterminals: List<Pair<String, String>>
+): String {
     return """
     data class $typeName(${
         nonterminals.map{(type, name)-> "val $name: $type"}.joinToString(", ")
@@ -42,7 +48,8 @@ fun createExpressionType(baseName: String, typeName: String, nonterminals: List<
             return visitor.visit${typeName}${baseName}(this)
             }
         }
-    """.trimIndent()
+    """
+        .trimIndent()
 }
 
 fun writeExprFile(outputDir: String, name: String, types: List<String>) {
@@ -51,24 +58,28 @@ fun writeExprFile(outputDir: String, name: String, types: List<String>) {
 
     val path = "$outputDir/$name.kt"
 
-    File(path).writeText("""
+    File(path)
+        .writeText(
+            """
         $header
         $body
-    """.trimIndent())
-
-
+    """
+                .trimIndent()
+        )
 }
 
-/**
- * run like `kotlinc -script .\src\main\kotlin\tools\GenerateAst.kts`
- */
+/** run like `kotlinc -script .\src\main\kotlin\tools\GenerateAst.kts` */
 fun main() {
-    writeExprFile("src/main/kotlin/lox", "Expr", listOf(
+    writeExprFile(
+        "src/main/kotlin/lox",
+        "Expr",
+        listOf(
             "Binary   : Expr left, Token operator, Expr right",
-        "Grouping : Expr expression",
-        "Literal  : Any value",
-        "Unary    : Token operator, Expr right"
-    ) )
+            "Grouping : Expr expression",
+            "Literal  : Any value",
+            "Unary    : Token operator, Expr right"
+        )
+    )
 }
 
 main()
