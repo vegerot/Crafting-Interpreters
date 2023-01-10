@@ -15,7 +15,7 @@ class AstPrinter : Expr.Visitor<String> {
     }
 
     override fun visitLiteralExpr(expr: Expr.Literal): String {
-        return "${expr.value}"
+        return "${expr.value.literal}"
     }
 
     override fun visitUnaryExpr(expr: Expr.Unary): String {
@@ -26,9 +26,9 @@ class AstPrinter : Expr.Visitor<String> {
 fun main(args: Array<String>) {
     val expression =
         Expr.Binary(
-            Expr.Unary(Token(TokenType.MINUS, "-", null, 1), Expr.Literal(123)),
-            Token(TokenType.STAR, "*", null, 1),
-            Expr.Grouping(Expr.Literal(45.67))
+            Expr.Unary(Token.Minus(1), Expr.Literal(Token.False())),
+            Token.Star(1),
+            Expr.Grouping(Expr.Literal(Token.Number(45.67)))
         )
 
     println(AstPrinter().print(expression))

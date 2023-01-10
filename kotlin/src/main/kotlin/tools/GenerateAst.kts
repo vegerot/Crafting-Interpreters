@@ -76,7 +76,7 @@ fun main() {
         listOf(
             "Binary   : Expr left, Token operator, Expr right",
             "Grouping : Expr expression",
-            "Literal  : Any value",
+            "Literal  : Token value",
             "Unary    : Token operator, Expr right"
         )
     )
