@@ -23,6 +23,7 @@ class AstPrinter : Expr.Visitor<String> {
     }
 
 }
+
 fun main(args: Array<String>) {
     val expression =
         Expr.Binary(

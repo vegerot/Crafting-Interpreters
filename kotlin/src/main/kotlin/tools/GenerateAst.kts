@@ -25,7 +25,7 @@ fun createVisitorInterface(baseName: String, types: List<String>): String {
         interface Visitor<R> {
         ${types.map{type->
             val (typeName, _) = type.trim().split(':').map { it.trim() }
-            "fun visit${typeName}${baseName}(${baseName.toLowerCase()}: $typeName): R"
+            "fun visit${typeName}${baseName}(${baseName.lowercase()}: $typeName): R"
         }.joinToString("\n")
         }
         }
