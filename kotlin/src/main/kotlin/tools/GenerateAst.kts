@@ -82,4 +82,5 @@ fun main() {
     )
 }
 
-main()
+// don't generate ast during tests
+if (args[0] != "--no-write") main()

@@ -4,7 +4,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 internal class GenerateAstTest {
-    val script = GenerateAst(arrayOf())
+    val script = GenerateAst(arrayOf("--no-write"))
 
     @Test
     fun testCreateBinaryExpr() {
@@ -42,7 +42,7 @@ internal class GenerateAstTest {
                     fun visitFooB(b: Foo): R
             fun visitBarB(b: Bar): R
                     }
-            
+
             abstract fun<R> accept(visitor: Visitor<R>): R
             data class Foo(val f: F, val s: S, val t: T): B() {
                 override fun<R> accept(visitor: Visitor<R>): R {
