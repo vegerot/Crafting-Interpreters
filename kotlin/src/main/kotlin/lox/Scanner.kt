@@ -143,9 +143,8 @@ class Scanner(val source: String) {
 
         val tokenName = source.substring(start, current)
         val tokenType = keywordToTokenType.getOrDefault(tokenName, TokenType.IDENTIFIER)
-        val lexeme = if (tokenType == TokenType.IDENTIFIER) tokenName else null
 
-        return Token(tokenType, lexeme, null, line)
+        return Token(tokenType, tokenName, null, line)
     }
 
     private fun consumeUntil(char: Char): Char? {
@@ -177,7 +176,11 @@ class Scanner(val source: String) {
         return source[current++]
     }
 
-    private fun makeToken(type: TokenType): Token = Token(type, lexeme = null, literal = null, line)
+    private fun makeToken(type: TokenType): Token {
+        val text: String = source.substring(start, current)
+
+        return Token(type, lexeme = text, literal = null, line)
+    }
 
     private fun addToken(token: Token) {
         tokens.add(token)

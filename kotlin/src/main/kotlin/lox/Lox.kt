@@ -34,8 +34,11 @@ class Lox {
         fun runCode(source: String) {
             val scanner = Scanner(source)
             val tokens: List<Token> = scanner.scanTokens()
+            val parser = Parser(tokens)
 
-            tokens.forEach { println(it) }
+            val firstExpression = parser.parse()!!
+
+            println(AstPrinter().print(firstExpression))
         }
 
         private var hadError: Boolean = false
@@ -47,6 +50,14 @@ class Lox {
 
         fun reportError(line: Int, where: String, message: String) {
             System.err.println("[line $line] Error $where: $message")
+        }
+
+        fun error(token: Token, message: String) {
+            return if (token.type == TokenType.EOF) {
+                reportError(token.line, " at end", message)
+            } else {
+                reportError(token.line, "at '${token.lexeme}'", message)
+            }
         }
     }
 }

@@ -1,7 +1,7 @@
 "hi
-there"
+there";
 // this is a comment
-(( )){} // grouping stuff
-!*+-/=<> <= == // operators
-1234
-1234.5679
+(( )){}; // grouping stuff
+!*+-/=<> <= ==; // operators
+1234;
+1234.5679;
