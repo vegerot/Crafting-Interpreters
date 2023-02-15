@@ -6,6 +6,7 @@ import kotlin.system.exitProcess
 
 class Lox {
     companion object {
+        private val interpreter: Interpreter = Interpreter()
 
         fun runFile(file: String) {
             val bytes = File(file).readBytes()
@@ -38,7 +39,7 @@ class Lox {
 
             val firstExpression = parser.parse()!!
 
-            println(AstPrinter().print(firstExpression))
+            interpreter.interpret(firstExpression)
         }
 
         private var hadError: Boolean = false

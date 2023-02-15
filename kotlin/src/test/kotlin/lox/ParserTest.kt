@@ -16,14 +16,50 @@ class ParserTest {
         // or 3 + 6 = 9
         // and 6 < 9
         // or 69>42
-        val input: List<Token> = listOf(Tokens.True, Tokens.Or, Tokens.False, Tokens.And,
-            Tokens.LeftParen, Tokens.Number(1), Tokens.Minus, Tokens.Number(1), Tokens.RightParen,
-            Tokens.NotEqual, Tokens.Nil, Tokens.Or, Tokens.String("string"), Tokens.EqualEqual, Tokens.String("stringy"),
-            Tokens.And, Tokens.Number(2), Tokens.Star, Tokens.Number(2), Tokens.EqualEqual, Tokens.Number(4),
-            Tokens.And, Tokens.Number(4), Tokens.Slash, Tokens.Number(2), Tokens.Equal, Tokens.Number(2),
-            Tokens.Or, Tokens.Number(3), Tokens.Plus, Tokens.Number(6), Tokens.Equal, Tokens.Number(9),
-            Tokens.And, Tokens.Number(6), Tokens.Less, Tokens.Number(9),
-            Tokens.Or, Tokens.Number(69), Tokens.Greater, Tokens.Number(4))
+        val input: List<Token> =
+            listOf(
+                Tokens.True,
+                Tokens.Or,
+                Tokens.False,
+                Tokens.And,
+                Tokens.LeftParen,
+                Tokens.Number(1),
+                Tokens.Minus,
+                Tokens.Number(1),
+                Tokens.RightParen,
+                Tokens.NotEqual,
+                Tokens.Nil,
+                Tokens.Or,
+                Tokens.String("string"),
+                Tokens.EqualEqual,
+                Tokens.String("stringy"),
+                Tokens.And,
+                Tokens.Number(2),
+                Tokens.Star,
+                Tokens.Number(2),
+                Tokens.EqualEqual,
+                Tokens.Number(4),
+                Tokens.And,
+                Tokens.Number(4),
+                Tokens.Slash,
+                Tokens.Number(2),
+                Tokens.Equal,
+                Tokens.Number(2),
+                Tokens.Or,
+                Tokens.Number(3),
+                Tokens.Plus,
+                Tokens.Number(6),
+                Tokens.Equal,
+                Tokens.Number(9),
+                Tokens.And,
+                Tokens.Number(6),
+                Tokens.Less,
+                Tokens.Number(9),
+                Tokens.Or,
+                Tokens.Number(69),
+                Tokens.Greater,
+                Tokens.Number(4)
+            )
         val got: Expr? = Parser(input).parse()
         println(got)
     }
