@@ -3,7 +3,15 @@ package lox
 class Interpreter : Expr.Visitor<Any> {
 
     override fun visitLiteralExpr(expr: Expr.Literal): Any {
-        return expr.value.literal!!
+        return when (expr.value.type) {
+            TokenType.NUMBER -> expr.value.literal!!
+            TokenType.FALSE -> false
+            TokenType.TRUE -> true
+            TokenType.STRING -> expr.value.lexeme!!
+            else -> {
+                assert(false) { "invalid literal expression: ${expr.value}" }
+            }
+        }
     }
 
     override fun visitBinaryExpr(expr: Expr.Binary): Any {
@@ -15,11 +23,33 @@ class Interpreter : Expr.Visitor<Any> {
     }
 
     override fun visitUnaryExpr(expr: Expr.Unary): Any {
-        return expr
+        val right = evaluate(expr.right)
+
+        return when (expr.operator.type) {
+            TokenType.MINUS -> {
+                require(right is Double)
+                -right
+            }
+            TokenType.BANG -> {
+                fun isTruthy(t: Any): Boolean {
+                    return when (t) {
+                        is Boolean -> t
+                        // my types are totally wrong.  damn
+                        null -> false
+                        else -> true
+                    }
+                }
+                !isTruthy(right)
+            }
+            // idea: somehow encode "unary" types in the type system so we can exhaustively
+            // pattern-match without `else`
+            else -> assert(false) { "unknown UNARY token" }
+        }
     }
 
     fun interpret(expression: Expr?): String {
-        val value: Any? = evaluate(expression)
+        if (expression == null) return "null"
+        val value: Any = evaluate(expression)
         return stringify(value)
     }
 
@@ -27,8 +57,7 @@ class Interpreter : Expr.Visitor<Any> {
         return evald.toString()
     }
 
-    fun evaluate(expr: Expr?): Any? {
-        if (expr == null) return null
+    private fun evaluate(expr: Expr): Any {
         return expr.accept(this)
     }
 }
