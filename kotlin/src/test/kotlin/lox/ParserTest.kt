@@ -232,6 +232,12 @@ class ParserTest {
                         Tokens.GreaterEqual,
                         Expr.Literal(Tokens.Number(2))
                     ),
+                listOf(Tokens.Number(1), Tokens.EqualEqual, Tokens.Number(2)) to
+                    Expr.Binary(
+                        Expr.Literal(Tokens.Number(1)),
+                        Tokens.EqualEqual,
+                        Expr.Literal(Tokens.Number(2))
+                    ),
             )
         tokensToExpr.map { (tokens, want) ->
             val got = Parser(tokens).parse()

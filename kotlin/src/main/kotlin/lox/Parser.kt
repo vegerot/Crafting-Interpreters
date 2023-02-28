@@ -13,13 +13,27 @@ class Parser(private val tokens: List<Token>) {
         return parsed
     }
 
-    private fun expression() = comparison()
+    private fun expression() = equality()
+
+    private fun equality(): Expr {
+        val expr: Expr = comparison()
+        return if (match(TokenType.EQUAL_EQUAL, TokenType.BANG_EQUAL)) {
+            val operator: Token = previous()
+            val right: Expr = comparison()
+            Expr.Binary(expr, operator, right)
+        } else expr
+    }
 
     private fun comparison(): Expr {
         val left = term()
         if (isAtEnd()) return left
         return if (
-            match(TokenType.LESS, TokenType.LESS_EQUAL, TokenType.GREATER, TokenType.GREATER_EQUAL)
+            match(
+                TokenType.LESS,
+                TokenType.LESS_EQUAL,
+                TokenType.GREATER,
+                TokenType.GREATER_EQUAL,
+            )
         ) {
             val operator = previous()
             val right = term()
