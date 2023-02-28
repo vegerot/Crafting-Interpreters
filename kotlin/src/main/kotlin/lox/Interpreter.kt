@@ -7,7 +7,7 @@ class Interpreter : Expr.Visitor<Any> {
             TokenType.NUMBER -> expr.value.literal!!
             TokenType.FALSE -> false
             TokenType.TRUE -> true
-            TokenType.STRING -> expr.value.lexeme!!
+            TokenType.STRING -> expr.value.literal!!
             else -> {
                 assert(false) { "invalid literal expression: ${expr.value}" }
             }
@@ -15,7 +15,66 @@ class Interpreter : Expr.Visitor<Any> {
     }
 
     override fun visitBinaryExpr(expr: Expr.Binary): Any {
-        return expr
+        val left = evaluate(expr.left)
+        val right = evaluate(expr.right)
+
+        return when (expr.operator.type) {
+            // arithmetic
+            TokenType.MINUS -> {
+                require(left is Double)
+                require(right is Double)
+                left - right
+            }
+            TokenType.PLUS -> {
+                if (left is Double && right is Double) left + right
+                else if (left is String && right is String) left + right
+                else
+                    assert(false) {
+                        "for binary + operations, left and right must be either both numbers or both strings"
+                    }
+            }
+            TokenType.STAR -> {
+                require(left is Double)
+                require(right is Double)
+                left * right
+            }
+            TokenType.SLASH -> {
+                require(left is Double)
+                require(right is Double)
+                left / right
+            }
+
+            // comparison
+            TokenType.GREATER -> {
+                require(left is Double)
+                require(right is Double)
+                left > right
+            }
+            TokenType.LESS -> {
+                require(left is Double)
+                require(right is Double)
+                left < right
+            }
+            TokenType.GREATER_EQUAL -> {
+                require(left is Double)
+                require(right is Double)
+                left >= right
+            }
+            TokenType.LESS_EQUAL -> {
+                require(left is Double)
+                require(right is Double)
+                left <= right
+            }
+
+            // equality
+            TokenType.EQUAL_EQUAL -> {
+                left == right
+            }
+            TokenType.BANG_EQUAL -> {
+                left != right
+            }
+            else -> assert(false) { "unknown binary operator ${expr.operator.type}" }
+        }
     }
 
     override fun visitGroupingExpr(expr: Expr.Grouping): Any {

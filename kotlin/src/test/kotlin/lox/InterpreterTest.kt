@@ -29,16 +29,46 @@ class InterpreterTest {
     }
 
     @Test
+    fun binary() {
+        val want = "4.0"
+        val got = parseAndInterpretCode("2 *2")
+
+        assertEquals(want, got)
+    }
+
+    @Test
     fun testInterpret() {
         val codeToWant: Map<String, String> =
             mapOf(
+                // literals
                 "7" to "7.0",
+                "\"lox\"" to "lox",
                 "(69.0)" to "69.0",
+                // unary
                 "-42" to "-42.0",
                 "!true" to "false",
                 "!7" to "false",
                 "!!\"hello\"" to "true",
                 "!\"\"" to "false",
+                // binary arithmetic
+                "34 + 35" to "69.0",
+                "3*6.5" to "19.5",
+                "69 - 27" to "42.0",
+                "120 /16" to "7.5",
+                "\"he\" + \"llo\"" to "hello",
+                // binary comparison
+                "7 > 2" to "true",
+                "9 < 3" to "false",
+                "2 >= 2" to "true",
+                "3 <= 2" to "false",
+                // equality
+                "1 == 2" to "false",
+                "42 == 42" to "true",
+                "2 != 2" to "false",
+                "\"hi\" == \"hello\"" to "false",
+                "\"hi\" != \"hello\"" to "true",
+                "\"hi\" == \"hi\"" to "true",
+                "\"hi\" != \"hi\"" to "false",
             )
 
         for ((code, want) in codeToWant) {
