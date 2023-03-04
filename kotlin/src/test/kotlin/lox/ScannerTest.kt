@@ -171,7 +171,8 @@ object Tokens {
     fun Minus(line: Int = -1) = Token(TokenType.MINUS, "-", null, line)
     val Minus = Minus()
 
-    val Plus = Token(TokenType.PLUS, "+", null, -1)
+    fun Plus(line: Int = -1) = Token(TokenType.PLUS, "+", null, line)
+    val Plus = Plus()
 
     val Equal = Token(TokenType.EQUAL, "=", null, -1)
 
