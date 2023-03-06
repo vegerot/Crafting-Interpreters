@@ -1,5 +1,4 @@
 package lox
-
 sealed class Expr {
     interface Visitor<R> {
         fun visitBinaryExpr(expr: Binary): R
@@ -14,19 +13,16 @@ sealed class Expr {
             return visitor.visitBinaryExpr(this)
         }
     }
-
     data class Grouping(val expression: Expr) : Expr() {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitGroupingExpr(this)
         }
     }
-
     data class Literal(val value: Token) : Expr() {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitLiteralExpr(this)
         }
     }
-
     data class Unary(val operator: Token, val right: Expr) : Expr() {
         override fun <R> accept(visitor: Visitor<R>): R {
             return visitor.visitUnaryExpr(this)
