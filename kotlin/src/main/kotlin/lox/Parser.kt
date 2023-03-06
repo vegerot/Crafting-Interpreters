@@ -3,14 +3,14 @@ package lox
 class Parser(private val tokens: List<Token>) {
     private var current: Int = 0
 
-    fun parse(): Expr? {
-        if (tokens.isEmpty()) return null
-        val parsed = expression()
+    fun parse(): List<Stmt> {
+        if (tokens.isEmpty()) return listOf()
+        val firstExpression = expression()
         // this doesn't work right without statements
         /*assert(current == tokens.size) {
             "invalid expression ${tokens.drop(current)}"
         }*/
-        return parsed
+        return listOf(Stmt.Expression(firstExpression))
     }
 
     private fun expression() = equality()

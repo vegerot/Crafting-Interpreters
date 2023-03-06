@@ -60,36 +60,36 @@ class ParserTest {
                 Tokens.Greater,
                 Tokens.Number(4)
             )
-        val got: Expr? = Parser(input).parse()
+        val got = Parser(input).parse()
         println(got)
     }
 
     @Test
     fun testLol() {
         val want: Expr? = null
-        val got: Expr? = Parser(listOf()).parse()
-        assertEquals(want, got)
+        val got: List<Stmt> = Parser(listOf()).parse()
+        assertEquals(expressionToExpressionStatements(want), got)
     }
 
     @Test
     fun testParseLiteralEOF() {
         val got = Parser(listOf(Tokens.EOF())).parse()
         val want = Expr.Literal(Tokens.EOF())
-        assertEquals(want, got)
+        assertEquals(expressionToExpressionStatements(want), got)
     }
 
     @Test
     fun testParseLiteralNumber() {
         val got = Parser(listOf(Tokens.Number(123, 2))).parse()
         val want = Expr.Literal(Tokens.Number(123, 2))
-        assertEquals(want, got)
+        assertEquals(expressionToExpressionStatements(want), got)
     }
 
     @Test
     fun testParens() {
         val got = Parser(listOf(Tokens.LeftParen, Tokens.Number(7), Tokens.RightParen)).parse()
         val want = Expr.Grouping(Expr.Literal(Tokens.Number(7)))
-        assertEquals(want, got)
+        assertEquals(expressionToExpressionStatements(want), got)
     }
 
     @Test
@@ -104,7 +104,7 @@ class ParserTest {
             )
         tokensToExpr.map { (tokens, want) ->
             val got = Parser(tokens).parse()
-            assertEquals(want, got)
+            assertEquals(expressionToExpressionStatements(want), got)
         }
     }
 
@@ -119,7 +119,7 @@ class ParserTest {
             )
         tokensToExpr.map { (tokens, want) ->
             val got = Parser(tokens).parse()
-            assertEquals(want, got)
+            assertEquals(expressionToExpressionStatements(want), got)
         }
     }
 
@@ -142,7 +142,7 @@ class ParserTest {
             )
         tokensToExpr.map { (tokens, want) ->
             val got = Parser(tokens).parse()
-            assertEquals(want, got)
+            assertEquals(expressionToExpressionStatements(want), got)
         }
     }
 
@@ -165,7 +165,7 @@ class ParserTest {
             )
         tokensToExpr.map { (tokens, want) ->
             val got = Parser(tokens).parse()
-            assertEquals(want, got)
+            assertEquals(expressionToExpressionStatements(want), got)
         }
     }
 
@@ -200,7 +200,7 @@ class ParserTest {
             )
         tokensToExpr.map { (tokens, want) ->
             val got = Parser(tokens).parse()
-            assertEquals(want, got)
+            assertEquals(expressionToExpressionStatements(want), got)
         }
     }
 
@@ -241,7 +241,16 @@ class ParserTest {
             )
         tokensToExpr.map { (tokens, want) ->
             val got = Parser(tokens).parse()
-            assertEquals(want, got)
+            assertEquals(expressionToExpressionStatements(want), got)
+        }
+    }
+
+    companion object {
+        fun expressionToExpressionStatements(expr: Expr?): List<Stmt.Expression> {
+            return when (expr) {
+                null -> listOf()
+                else -> listOf(Stmt.Expression(expr))
+            }
         }
     }
 }

@@ -38,10 +38,10 @@ class Lox {
             val tokens: List<Token> = scanner.scanTokens()
             val parser = Parser(tokens)
 
-            val firstExpression = parser.parse()!!
+            val program = parser.parse()!!
 
             try {
-                interpreter.interpret(firstExpression)
+                interpreter.interpret(program)
             } catch (error: RuntimeError) {
                 runtimeError(error)
             }

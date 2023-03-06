@@ -2,7 +2,7 @@ package lox
 
 import kotlin.contracts.contract
 
-class Interpreter : Expr.Visitor<Any> {
+class Interpreter : Expr.Visitor<Any>, Stmt.Visitor<Unit> {
 
     override fun visitLiteralExpr(expr: Expr.Literal): Any {
         return when (expr.value.type) {
@@ -104,14 +104,14 @@ class Interpreter : Expr.Visitor<Any> {
     }
 
     @OptIn(kotlin.contracts.ExperimentalContracts::class)
-    private inline fun loxRequireValuesAreNumbers(token: Token, firstValue: Any, secondValue: Any) {
+    private fun loxRequireValuesAreNumbers(token: Token, firstValue: Any, secondValue: Any) {
         contract { returns() implies (firstValue is Double && secondValue is Double) }
         loxRequireValueType<Double>(firstValue, token)
         loxRequireValueType<Double>(secondValue, token)
     }
 
     @OptIn(kotlin.contracts.ExperimentalContracts::class)
-    private inline fun loxRequireValueIsNumber(value: Any, token: Token) {
+    private fun loxRequireValueIsNumber(value: Any, token: Token) {
         contract { returns() implies (value is Double) }
         return loxRequireValueType<Double>(value, token)
     }
@@ -129,10 +129,21 @@ class Interpreter : Expr.Visitor<Any> {
         }
     }
 
-    fun interpret(expression: Expr?): String {
+    fun interpret(statements: List<Stmt>): String {
+        execute(statements[0])
+        return "fuck"
+    }
+
+    fun interpretExpression(statements: List<Stmt>): String {
+        assert(statements.size == 1)
+        val expression: Expr? = (statements[0] as Stmt.Expression).expression
         if (expression == null) return "null"
         val value: Any = evaluate(expression)
         return stringify(value)
+    }
+
+    private fun execute(stmt: Stmt) {
+        stmt.accept(this)
     }
 
     private fun stringify(evald: Any?): String {
@@ -141,5 +152,13 @@ class Interpreter : Expr.Visitor<Any> {
 
     private fun evaluate(expr: Expr): Any {
         return expr.accept(this)
+    }
+
+    override fun visitExpressionStmt(stmt: Stmt.Expression) {
+        evaluate(stmt.expression)
+    }
+
+    override fun visitPrintStmt(stmt: Stmt.Print) {
+        assert(false) { "unimplemented" }
     }
 }

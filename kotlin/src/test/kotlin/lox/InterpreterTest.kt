@@ -6,7 +6,7 @@ class InterpreterTest {
     @Test
     fun lol() {
         val want = "7.0"
-        val got = Interpreter().interpret(Parser(Scanner("7").scanTokens()).parse()!!)
+        val got = Interpreter().interpretExpression(Parser(Scanner("7").scanTokens()).parse()!!)
 
         assertEquals(want, got)
     }
@@ -14,7 +14,8 @@ class InterpreterTest {
     @Test
     fun grouping() {
         val want = "69.0"
-        val got = Interpreter().interpret(Parser(Scanner("(69.0)").scanTokens()).parse()!!)
+        val got =
+            Interpreter().interpretExpression(Parser(Scanner("(69.0)").scanTokens()).parse()!!)
 
         assertEquals(want, got)
     }
@@ -156,6 +157,6 @@ class InterpreterTest {
     }
 
     fun parseAndInterpretCode(code: String): String {
-        return Interpreter().interpret(Parser(Scanner(code).scanTokens()).parse()!!)
+        return Interpreter().interpretExpression(Parser(Scanner(code).scanTokens()).parse()!!)
     }
 }
