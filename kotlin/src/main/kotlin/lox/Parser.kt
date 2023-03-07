@@ -4,13 +4,32 @@ class Parser(private val tokens: List<Token>) {
     private var current: Int = 0
 
     fun parse(): List<Stmt> {
-        if (tokens.isEmpty()) return listOf()
-        val firstExpression = expression()
+        val statements: MutableList<Stmt> = mutableListOf()
+        while (!isAtEnd()) {
+            statements.add(statement())
+        }
+        return statements
         // this doesn't work right without statements
         /*assert(current == tokens.size) {
             "invalid expression ${tokens.drop(current)}"
         }*/
-        return listOf(Stmt.Expression(firstExpression))
+    }
+
+    private fun statement(): Stmt {
+        return expressionStatement()
+    }
+
+    private fun expressionStatement(): Stmt {
+        val expr: Expr = expression()
+        consumeUntil(TokenType.SEMICOLON, "Expect ';' after expression")
+        return Stmt.Expression(expr)
+    }
+
+    /** ONLY CALL FROM TESTS */
+    public fun parseSingleExpression(): Expr? {
+        if (tokens.isEmpty()) return null
+        val firstExpression = expression()
+        return firstExpression
     }
 
     private fun expression() = equality()
