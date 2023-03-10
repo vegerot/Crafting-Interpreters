@@ -136,7 +136,13 @@ class Interpreter : Expr.Visitor<Any> {
     }
 
     private fun stringify(evald: Any?): String {
-        return evald.toString()
+        return when (evald) {
+            is Double -> {
+                val str = evald.toString()
+                if (str.endsWith(".0")) str.dropLast(2) else str
+            }
+            else -> evald.toString()
+        }
     }
 
     private fun evaluate(expr: Expr): Any {

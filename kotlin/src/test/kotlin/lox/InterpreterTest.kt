@@ -5,7 +5,7 @@ import kotlin.test.*
 class InterpreterTest {
     @Test
     fun lol() {
-        val want = "7.0"
+        val want = "7"
         val got = Interpreter().interpret(Parser(Scanner("7").scanTokens()).parse()!!)
 
         assertEquals(want, got)
@@ -13,7 +13,7 @@ class InterpreterTest {
 
     @Test
     fun grouping() {
-        val want = "69.0"
+        val want = "69"
         val got = Interpreter().interpret(Parser(Scanner("(69.0)").scanTokens()).parse()!!)
 
         assertEquals(want, got)
@@ -21,7 +21,7 @@ class InterpreterTest {
 
     @Test
     fun unary() {
-        val want = "-42.0"
+        val want = "-42"
         val got = parseAndInterpretCode("-42")
 
         assertEquals(want, got)
@@ -29,7 +29,7 @@ class InterpreterTest {
 
     @Test
     fun binary() {
-        val want = "4.0"
+        val want = "4"
         val got = parseAndInterpretCode("2 *2")
 
         assertEquals(want, got)
@@ -106,19 +106,19 @@ class InterpreterTest {
         val codeToWant: Map<String, String> =
             mapOf(
                 // literals
-                "7" to "7.0",
+                "7" to "7",
                 "\"lox\"" to "lox",
-                "(69.0)" to "69.0",
+                "(69.0)" to "69",
                 // unary
-                "-42" to "-42.0",
+                "-42" to "-42",
                 "!true" to "false",
                 "!7" to "false",
                 "!!\"hello\"" to "true",
                 "!\"\"" to "false",
                 // binary arithmetic
-                "34 + 35" to "69.0",
+                "34 + 35" to "69",
                 "3*6.5" to "19.5",
-                "69 - 27" to "42.0",
+                "69 - 27" to "42",
                 "120 /16" to "7.5",
                 "\"he\" + \"llo\"" to "hello",
                 // binary comparison
