@@ -1,6 +1,7 @@
 package lox
 
 import java.io.File
+import java.lang.Exception
 import java.nio.charset.Charset
 import kotlin.system.exitProcess
 
@@ -37,11 +38,18 @@ class Lox {
             val scanner = Scanner(source)
             val tokens: List<Token> = scanner.scanTokens()
             val parser = Parser(tokens)
-
-            val firstExpression = parser.parse()!!
+            val statements: List<Stmt> =
+                try {
+                    parser.parse()!!
+                } catch (error: Exception) {
+                    // All the logging is done before this exception is thrown
+                    // TODO: make `parse()` not throw an error
+                    return
+                }
+            if (hadError) return
 
             try {
-                interpreter.interpret(firstExpression)
+                interpreter.interpret(statements)
             } catch (error: RuntimeError) {
                 runtimeError(error)
             }
@@ -60,7 +68,7 @@ class Lox {
 
         fun error(token: Token, message: String) {
             return if (token.type == TokenType.EOF) {
-                reportError(token.line, " at end", message)
+                reportError(token.line, "at end", message)
             } else {
                 reportError(token.line, "at '${token.lexeme}'", message)
             }

@@ -1,12 +1,16 @@
 package lox
 
+import java.io.ByteArrayOutputStream
+import java.io.PrintStream
 import kotlin.test.*
 
 class InterpreterTest {
     @Test
     fun lol() {
         val want = "7"
-        val got = Interpreter().interpret(Parser(Scanner("7").scanTokens()).parse()!!)
+        val got =
+            Interpreter()
+                .interpretExpression(Parser(Scanner("7").scanTokens()).parseSingleExpression()!!)
 
         assertEquals(want, got)
     }
@@ -14,7 +18,11 @@ class InterpreterTest {
     @Test
     fun grouping() {
         val want = "69"
-        val got = Interpreter().interpret(Parser(Scanner("(69.0)").scanTokens()).parse()!!)
+        val got =
+            Interpreter()
+                .interpretExpression(
+                    Parser(Scanner("(69.0)").scanTokens()).parseSingleExpression()!!
+                )
 
         assertEquals(want, got)
     }
@@ -22,15 +30,14 @@ class InterpreterTest {
     @Test
     fun unary() {
         val want = "-42"
-        val got = parseAndInterpretCode("-42")
-
+        val got = parseAndInterpretSingleExpression("-42")
         assertEquals(want, got)
     }
 
     @Test
     fun binary() {
         val want = "4"
-        val got = parseAndInterpretCode("2 *2")
+        val got = parseAndInterpretSingleExpression("2 *2")
 
         assertEquals(want, got)
     }
@@ -42,35 +49,35 @@ class InterpreterTest {
         // TODO: create `assertFailsWith`-like thing but takes an `Exception` as a parameter instead
         // of a `String`
         assertFailsWith<RuntimeError>("Operand must be a number") {
-            parseAndInterpretCode("-\"hello\"")
+            parseAndInterpretSingleExpression("-\"hello\"")
         }
     }
 
     @Test
     fun testNonNumberErrors() {
         assertFailsWith<RuntimeError>("Operand must be a number") {
-            parseAndInterpretCode("2>\"\"")
+            parseAndInterpretSingleExpression("2>\"\"")
         }
         assertFailsWith<RuntimeError>("Operand must be a number") {
-            parseAndInterpretCode("2>=\"\"")
+            parseAndInterpretSingleExpression("2>=\"\"")
         }
         assertFailsWith<RuntimeError>("Operand must be a number") {
-            parseAndInterpretCode("\"a\"<3")
+            parseAndInterpretSingleExpression("\"a\"<3")
         }
         assertFailsWith<RuntimeError>("Operand must be a number") {
-            parseAndInterpretCode("\"a\"<=3")
+            parseAndInterpretSingleExpression("\"a\"<=3")
         }
         assertFailsWith<RuntimeError>("Operand must be a number") {
-            parseAndInterpretCode("\"a\"-3")
+            parseAndInterpretSingleExpression("\"a\"-3")
         }
         assertFailsWith<RuntimeError>("Operand must be a number") {
-            parseAndInterpretCode("\"a\"/3")
+            parseAndInterpretSingleExpression("\"a\"/3")
         }
         assertFailsWith<RuntimeError>("Operand must be a number") {
-            parseAndInterpretCode("78 / \"a\"")
+            parseAndInterpretSingleExpression("78 / \"a\"")
         }
         assertFailsWith<RuntimeError>("Operand must be a number") {
-            parseAndInterpretCode("78 * \"m\"")
+            parseAndInterpretSingleExpression("78 * \"m\"")
         }
     }
 
@@ -81,7 +88,7 @@ class InterpreterTest {
         // TODO: create `assertFailsWith`-like thing but takes an `Exception` as a parameter instead
         // of a `String`
         assertFailsWith<RuntimeError>("Operand must be a number") {
-            parseAndInterpretCode("\"hello\" - 2")
+            parseAndInterpretSingleExpression("\"hello\" - 2")
         }
     }
 
@@ -91,13 +98,30 @@ class InterpreterTest {
         // TODO: Write tests when we have variables
         assertFailsWith<RuntimeError>("Operands must be numbers") {
             // TODO: Add custom parsing errors
-            parseAndInterpretCode("\"hello\" + 2")
+            parseAndInterpretSingleExpression("\"hello\" + 2")
         }
         assertFailsWith<RuntimeError>("Operands must be numbers") {
-            parseAndInterpretCode("69 + \"hello\"")
+            parseAndInterpretSingleExpression("69 + \"hello\"")
         }
         assertFailsWith<RuntimeError>("Operands must be numbers") {
-            parseAndInterpretCode("69 + \"hello\" + \"bye\" + 2")
+            parseAndInterpretSingleExpression("69 + \"hello\" + \"bye\" + 2")
+        }
+    }
+
+    @Test
+    fun testPrintExpression() {
+        val buffer = ByteArrayOutputStream()
+        val originalStdout = System.out
+        try {
+
+            System.setOut(PrintStream(buffer))
+
+            parseAndInterpretCode("print \"lox is a language\";")
+
+            val want = "lox is a language\n"
+            assertEquals(want, buffer.toString())
+        } finally {
+            System.setOut(originalStdout)
         }
     }
 
@@ -138,24 +162,28 @@ class InterpreterTest {
 
         for ((code, want) in codeToWant) {
             try {
-                val got = parseAndInterpretCode(code)
+                val got = parseAndInterpretSingleExpression(code)
                 if (got != want) {
                     assert(false) {
-                        "expected parseAndInterpretCode($code) to be $want but got $got"
+                        "expected parseAndInterpretSingleExpression($code) to be $want but got $got"
                     }
                 } else {
                     assert(true)
                 }
             } catch (e: Exception) {
                 System.err.println(
-                    "error thrown when evaluating assertEquals(parseAndInterpretCode($code), $want)"
+                    "error thrown when evaluating assertEquals(parseAndInterpretSingleExpression($code), $want)"
                 )
                 throw e
             }
         }
     }
 
-    fun parseAndInterpretCode(code: String): String {
-        return Interpreter().interpret(Parser(Scanner(code).scanTokens()).parse()!!)
+    fun parseAndInterpretSingleExpression(code: String): String {
+        return Interpreter()
+            .interpretExpression(Parser(Scanner(code).scanTokens()).parseSingleExpression()!!)
+    }
+    fun parseAndInterpretCode(code: String): Unit {
+        Interpreter().interpret(Parser(Scanner(code).scanTokens()).parse())
     }
 }

@@ -160,8 +160,9 @@ object Tokens {
 
     val Nil = Token(TokenType.NIL, null, null, -1)
 
-    fun Number(value: Number, line: Int = -1) = Token(TokenType.NUMBER, null, value, line)
-    fun String(value: String, line: Int = -1) = Token(TokenType.NUMBER, "\"$value\"", value, line)
+    fun Number(value: Number, line: Int = -1) =
+        Token(TokenType.NUMBER, "$value", value.toDouble(), line)
+    fun String(value: String, line: Int = 0) = Token(TokenType.STRING, "\"$value\"", value, line)
 
     fun Star(line: Int = -1) = Token(TokenType.STAR, "*", null, line)
     val Star = Star()
@@ -197,4 +198,6 @@ object Tokens {
 
     val Or = Token(TokenType.OR, "or", null, -1)
     val And = Token(TokenType.AND, "and", null, -1)
+
+    val Semi = Token(TokenType.SEMICOLON, ";", null, -1)
 }

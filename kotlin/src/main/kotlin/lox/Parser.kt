@@ -3,21 +3,46 @@ package lox
 class Parser(private val tokens: List<Token>) {
     private var current: Int = 0
 
-    fun parse(): Expr? {
-        if (tokens.isEmpty()) return null
-        val parsed = expression()
+    fun parse(): List<Stmt> {
+        val statements: MutableList<Stmt> = mutableListOf()
+        while (!isAtEnd()) {
+            statements.add(statement())
+        }
+        return statements
         // this doesn't work right without statements
         /*assert(current == tokens.size) {
             "invalid expression ${tokens.drop(current)}"
         }*/
-        return parsed
+    }
+
+    private fun statement(): Stmt {
+        return if (ifMatchConsume(TokenType.PRINT)) printStatement() else expressionStatement()
+    }
+
+    private fun printStatement(): Stmt.Print {
+        val value = expression()
+        consumeUntil(TokenType.SEMICOLON, "Expect ';' after value")
+        return Stmt.Print(value)
+    }
+
+    private fun expressionStatement(): Stmt.Expression {
+        val expr: Expr = expression()
+        consumeUntil(TokenType.SEMICOLON, "Expect ';' after expression")
+        return Stmt.Expression(expr)
+    }
+
+    /** ONLY CALL FROM TESTS */
+    public fun parseSingleExpression(): Expr? {
+        if (tokens.isEmpty()) return null
+        val firstExpression = expression()
+        return firstExpression
     }
 
     private fun expression() = equality()
 
     private fun equality(): Expr {
         val expr: Expr = comparison()
-        return if (match(TokenType.EQUAL_EQUAL, TokenType.BANG_EQUAL)) {
+        return if (ifMatchConsume(TokenType.EQUAL_EQUAL, TokenType.BANG_EQUAL)) {
             val operator: Token = previous()
             val right: Expr = comparison()
             Expr.Binary(expr, operator, right)
@@ -28,7 +53,7 @@ class Parser(private val tokens: List<Token>) {
         val left = term()
         if (isAtEnd()) return left
         return if (
-            match(
+            ifMatchConsume(
                 TokenType.LESS,
                 TokenType.LESS_EQUAL,
                 TokenType.GREATER,
@@ -90,12 +115,12 @@ class Parser(private val tokens: List<Token>) {
     }
 
     private fun primary(): Expr {
-        return if (match(TokenType.TRUE)) Expr.Literal(previous())
-        else if (match(TokenType.FALSE)) Expr.Literal(previous())
-        else if (match(TokenType.NIL)) Expr.Literal(previous())
-        else if (match(TokenType.NUMBER)) Expr.Literal(previous())
-        else if (match(TokenType.STRING)) Expr.Literal(previous())
-        else if (match(TokenType.LEFT_PAREN)) {
+        return if (ifMatchConsume(TokenType.TRUE)) Expr.Literal(previous())
+        else if (ifMatchConsume(TokenType.FALSE)) Expr.Literal(previous())
+        else if (ifMatchConsume(TokenType.NIL)) Expr.Literal(previous())
+        else if (ifMatchConsume(TokenType.NUMBER)) Expr.Literal(previous())
+        else if (ifMatchConsume(TokenType.STRING)) Expr.Literal(previous())
+        else if (ifMatchConsume(TokenType.LEFT_PAREN)) {
             val expr = expression()
             consumeUntil(TokenType.RIGHT_PAREN, "Expect ')' after expression")
             Expr.Grouping(expr)
@@ -111,7 +136,7 @@ class Parser(private val tokens: List<Token>) {
         }
     }
 
-    private fun match(vararg types: TokenType): Boolean {
+    private fun ifMatchConsume(vararg types: TokenType): Boolean {
         for (type in types) {
             if (isNextTokenOfType(type)) {
                 advance()

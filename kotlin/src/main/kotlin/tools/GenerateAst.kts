@@ -52,7 +52,7 @@ fun createExpressionType(
         .trimIndent()
 }
 
-fun writeExprFile(outputDir: String, name: String, types: List<String>) {
+fun writeAstFile(outputDir: String, name: String, types: List<String>) {
     val header = "package lox"
     val body = createAstClass(name, types)
 
@@ -70,7 +70,7 @@ fun writeExprFile(outputDir: String, name: String, types: List<String>) {
 
 /** run like `kotlinc -script .\src\main\kotlin\tools\GenerateAst.kts` */
 fun main() {
-    writeExprFile(
+    writeAstFile(
         "src/main/kotlin/lox",
         "Expr",
         listOf(
@@ -79,6 +79,12 @@ fun main() {
             "Literal  : Token value",
             "Unary    : Token operator, Expr right"
         )
+    )
+
+    writeAstFile(
+        "src/main/kotlin/lox",
+        "Stmt",
+        listOf("Expression : Expr expression", "Print      : Expr expression")
     )
 }
 
