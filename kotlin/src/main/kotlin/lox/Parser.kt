@@ -57,7 +57,21 @@ class Parser(private val tokens: List<Token>) {
         return firstExpression
     }
 
-    private fun expression() = equality()
+    private fun expression() = assignment()
+
+    private fun assignment(): Expr {
+        val expr: Expr = equality()
+
+        return if (ifMatchConsume(TokenType.EQUAL)) {
+            val equals: Token = previous()
+            val value: Expr = assignment()
+
+            if (expr is Expr.Variable) {
+                val name: Token = expr.name
+                Expr.Assign(name, value)
+            } else throw error(equals, "can only assign to l-values")
+        } else expr
+    }
 
     private fun equality(): Expr {
         val expr: Expr = comparison()
@@ -150,7 +164,7 @@ class Parser(private val tokens: List<Token>) {
             ++current
             expr
         } else {
-            assert(false) { "invalid expression" }
+            assert(false) { "invalid expression at line ${peek().line}" }
             // unreachable on purpose but needed to get typechecking to work
             Expr.Literal(Token(TokenType.INVALID, "😵🔫", "fuck", -1))
         }

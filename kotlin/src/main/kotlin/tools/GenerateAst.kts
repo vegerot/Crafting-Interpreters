@@ -74,6 +74,7 @@ fun main() {
         "src/main/kotlin/lox",
         "Expr",
         listOf(
+            "Assign   : Token name, Expr value",
             "Binary   : Expr left, Token operator, Expr right",
             "Grouping : Expr expression",
             "Literal  : Token value",

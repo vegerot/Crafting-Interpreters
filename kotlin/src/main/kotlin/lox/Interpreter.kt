@@ -186,6 +186,12 @@ class Interpreter : Expr.Visitor<LoxValue>, Stmt.Visitor<Unit> {
         environment.define(stmt.name.lexeme!!, value)
     }
 
+    override fun visitAssignExpr(expr: Expr.Assign): LoxValue {
+        val value = evaluate(expr.value)
+        environment.assign(expr.name, value)
+        return value
+    }
+
     override fun visitVariableExpr(expr: Expr.Variable): LoxValue {
         return environment.get(expr.name)!!
     }

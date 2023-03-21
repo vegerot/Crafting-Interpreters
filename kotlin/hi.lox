@@ -1,7 +1,11 @@
-"hi
-there";
+"hi there";
 // this is a comment
-(( )){}; // grouping stuff
-!*+-/=<> <= ==; // operators
+((1 )); // grouping stuff
 1234;
 1234.5679;
+
+print 1+1;
+var i = 42;
+print i;
+i = i + 27;
+print i;

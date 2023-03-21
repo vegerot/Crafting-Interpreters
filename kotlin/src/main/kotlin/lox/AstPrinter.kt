@@ -25,6 +25,9 @@ class AstPrinter : Expr.Visitor<String> {
     override fun visitVariableExpr(expr: Expr.Variable): String {
         return "var(${expr.name.lexeme})"
     }
+
+    override fun visitAssignExpr(expr: Expr.Assign): String =
+        "var ${expr.name.lexeme} = ${expr.value}"
 }
 
 fun main(args: Array<String>) {
