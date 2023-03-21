@@ -180,6 +180,27 @@ class Parser(private val tokens: List<Token>) {
         return ParseError()
     }
 
+    private fun synchronize() {
+        advance()
+
+        while (!isAtEnd()) {
+            if (previous().type == TokenType.SEMICOLON) return
+
+            when (peek().type) {
+                TokenType.CLASS,
+                TokenType.FUN,
+                TokenType.VAR,
+                TokenType.FOR,
+                TokenType.IF,
+                TokenType.WHILE,
+                TokenType.PRINT,
+                TokenType.RETURN -> return
+                else -> {}
+            }
+            advance()
+        }
+    }
+
     companion object {
         class ParseError : RuntimeException()
     }
