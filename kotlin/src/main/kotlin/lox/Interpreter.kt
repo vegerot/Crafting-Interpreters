@@ -2,9 +2,9 @@ package lox
 
 import kotlin.contracts.contract
 
-class Interpreter : Expr.Visitor<Any>, Stmt.Visitor<Unit> {
+class Interpreter : Expr.Visitor<LoxValue>, Stmt.Visitor<Unit> {
 
-    override fun visitLiteralExpr(expr: Expr.Literal): Any {
+    override fun visitLiteralExpr(expr: Expr.Literal): LoxValue {
         return when (expr.value.type) {
             TokenType.NUMBER -> expr.value.literal!!
             TokenType.FALSE -> false
@@ -16,7 +16,7 @@ class Interpreter : Expr.Visitor<Any>, Stmt.Visitor<Unit> {
         }
     }
 
-    override fun visitBinaryExpr(expr: Expr.Binary): Any {
+    override fun visitBinaryExpr(expr: Expr.Binary): LoxValue {
         val left = evaluate(expr.left)
         val right = evaluate(expr.right)
 
@@ -74,11 +74,11 @@ class Interpreter : Expr.Visitor<Any>, Stmt.Visitor<Unit> {
         }
     }
 
-    override fun visitGroupingExpr(expr: Expr.Grouping): Any {
+    override fun visitGroupingExpr(expr: Expr.Grouping): LoxValue {
         return evaluate(expr.expression)
     }
 
-    override fun visitUnaryExpr(expr: Expr.Unary): Any {
+    override fun visitUnaryExpr(expr: Expr.Unary): LoxValue {
         val right = evaluate(expr.right)
 
         return when (expr.operator.type) {
@@ -87,7 +87,7 @@ class Interpreter : Expr.Visitor<Any>, Stmt.Visitor<Unit> {
                 -right
             }
             TokenType.BANG -> {
-                fun isTruthy(t: Any): Boolean {
+                fun isTruthy(t: LoxValue): Boolean {
                     return when (t) {
                         is Boolean -> t
                         // my types are totally wrong.  damn
@@ -104,20 +104,20 @@ class Interpreter : Expr.Visitor<Any>, Stmt.Visitor<Unit> {
     }
 
     @OptIn(kotlin.contracts.ExperimentalContracts::class)
-    private fun loxRequireValuesAreNumbers(token: Token, firstValue: Any, secondValue: Any) {
+    private fun loxRequireValuesAreNumbers(token: Token, firstValue: LoxValue, secondValue: LoxValue) {
         contract { returns() implies (firstValue is Double && secondValue is Double) }
         loxRequireValueType<Double>(firstValue, token)
         loxRequireValueType<Double>(secondValue, token)
     }
 
     @OptIn(kotlin.contracts.ExperimentalContracts::class)
-    private fun loxRequireValueIsNumber(value: Any, token: Token) {
+    private fun loxRequireValueIsNumber(value: LoxValue, token: Token) {
         contract { returns() implies (value is Double) }
         return loxRequireValueType<Double>(value, token)
     }
 
     @OptIn(kotlin.contracts.ExperimentalContracts::class)
-    private inline fun <reified T> loxRequireValueType(value: Any, token: Token) {
+    private inline fun <reified T> loxRequireValueType(value: LoxValue, token: Token) {
         contract { returns() implies (value is T) }
         try {
             if (value !is T) {
@@ -141,7 +141,7 @@ class Interpreter : Expr.Visitor<Any>, Stmt.Visitor<Unit> {
 
     fun interpretExpression(expr: Expr?): String {
         if (expr == null) return "null"
-        val value: Any = evaluate(expr)
+        val value: LoxValue = evaluate(expr)
         return stringify(value)
     }
 
@@ -149,7 +149,7 @@ class Interpreter : Expr.Visitor<Any>, Stmt.Visitor<Unit> {
         stmt.accept(this)
     }
 
-    private fun stringify(evald: Any?): String {
+    private fun stringify(evald: LoxValue?): String {
         return when (evald) {
             is Double -> {
                 val str = evald.toString()
@@ -159,7 +159,7 @@ class Interpreter : Expr.Visitor<Any>, Stmt.Visitor<Unit> {
         }
     }
 
-    private fun evaluate(expr: Expr): Any {
+    private fun evaluate(expr: Expr): LoxValue {
         return expr.accept(this)
     }
 

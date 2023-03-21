@@ -100,3 +100,5 @@ fun main(args: Array<String>) {
         Lox.runPrompt()
     }
 }
+
+typealias LoxValue = Any
