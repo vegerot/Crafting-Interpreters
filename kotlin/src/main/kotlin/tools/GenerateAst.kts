@@ -77,16 +77,21 @@ fun main() {
             "Binary   : Expr left, Token operator, Expr right",
             "Grouping : Expr expression",
             "Literal  : Token value",
-            "Unary    : Token operator, Expr right"
+            "Unary    : Token operator, Expr right",
+            "Variable : Token name",
         )
     )
 
     writeAstFile(
         "src/main/kotlin/lox",
         "Stmt",
-        listOf("Expression : Expr expression", "Print      : Expr expression")
+        listOf(
+            "Expression : Expr expression",
+            "Print      : Expr expression",
+            "Var        : Token name, Expr? initializer ",
+        )
     )
 }
 
 // don't generate ast during tests
-if (args[0] != "--no-write") main()
+if (!args.contains("--no-write")) main()

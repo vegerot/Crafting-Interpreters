@@ -3,6 +3,7 @@ package lox
 import kotlin.contracts.contract
 
 class Interpreter : Expr.Visitor<LoxValue>, Stmt.Visitor<Unit> {
+    private val environment: Environment = Environment()
 
     override fun visitLiteralExpr(expr: Expr.Literal): LoxValue {
         return when (expr.value.type) {
@@ -104,7 +105,11 @@ class Interpreter : Expr.Visitor<LoxValue>, Stmt.Visitor<Unit> {
     }
 
     @OptIn(kotlin.contracts.ExperimentalContracts::class)
-    private fun loxRequireValuesAreNumbers(token: Token, firstValue: LoxValue, secondValue: LoxValue) {
+    private fun loxRequireValuesAreNumbers(
+        token: Token,
+        firstValue: LoxValue,
+        secondValue: LoxValue
+    ) {
         contract { returns() implies (firstValue is Double && secondValue is Double) }
         loxRequireValueType<Double>(firstValue, token)
         loxRequireValueType<Double>(secondValue, token)
@@ -170,5 +175,18 @@ class Interpreter : Expr.Visitor<LoxValue>, Stmt.Visitor<Unit> {
     override fun visitPrintStmt(stmt: Stmt.Print) {
         val value = evaluate(stmt.expression)
         println(stringify(value))
+    }
+
+    override fun visitVarStmt(stmt: Stmt.Var) {
+        val value =
+            if (stmt.initializer != null) {
+                evaluate(stmt.initializer)
+            } else null
+
+        environment.define(stmt.name.lexeme!!, value)
+    }
+
+    override fun visitVariableExpr(expr: Expr.Variable): LoxValue {
+        return environment.get(expr.name)!!
     }
 }

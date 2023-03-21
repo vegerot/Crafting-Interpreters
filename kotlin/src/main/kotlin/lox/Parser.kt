@@ -6,13 +6,32 @@ class Parser(private val tokens: List<Token>) {
     fun parse(): List<Stmt> {
         val statements: MutableList<Stmt> = mutableListOf()
         while (!isAtEnd()) {
-            statements.add(statement())
+            val decl = declaration()
+            if (decl != null) statements.add(decl)
         }
         return statements
         // this doesn't work right without statements
         /*assert(current == tokens.size) {
             "invalid expression ${tokens.drop(current)}"
         }*/
+    }
+
+    private fun declaration(): Stmt? {
+        return try {
+            if (ifMatchConsume(TokenType.VAR)) varDeclaration() else statement()
+        } catch (error: ParseError) {
+            synchronize()
+            null
+        }
+    }
+
+    private fun varDeclaration(): Stmt {
+        val name: Token = consumeUntil(TokenType.IDENTIFIER, "Expected a variable name")
+
+        val initializer: Expr? = if (ifMatchConsume(TokenType.EQUAL)) expression() else null
+
+        consumeUntil(TokenType.SEMICOLON, "Expected ';' after variable declaration")
+        return Stmt.Var(name, initializer)
     }
 
     private fun statement(): Stmt {
@@ -120,6 +139,7 @@ class Parser(private val tokens: List<Token>) {
         else if (ifMatchConsume(TokenType.NIL)) Expr.Literal(previous())
         else if (ifMatchConsume(TokenType.NUMBER)) Expr.Literal(previous())
         else if (ifMatchConsume(TokenType.STRING)) Expr.Literal(previous())
+        else if (ifMatchConsume(TokenType.IDENTIFIER)) Expr.Variable(previous())
         else if (ifMatchConsume(TokenType.LEFT_PAREN)) {
             val expr = expression()
             consumeUntil(TokenType.RIGHT_PAREN, "Expect ')' after expression")
@@ -181,10 +201,10 @@ class Parser(private val tokens: List<Token>) {
     }
 
     private fun synchronize() {
-        advance()
+        var prev = advance()
 
         while (!isAtEnd()) {
-            if (previous().type == TokenType.SEMICOLON) return
+            if (prev.type == TokenType.SEMICOLON) return
 
             when (peek().type) {
                 TokenType.CLASS,
@@ -197,7 +217,7 @@ class Parser(private val tokens: List<Token>) {
                 TokenType.RETURN -> return
                 else -> {}
             }
-            advance()
+            prev = advance()
         }
     }
 
