@@ -87,6 +87,7 @@ fun main() {
         "src/main/kotlin/lox",
         "Stmt",
         listOf(
+            "Block      : List<Stmt> statements",
             "Expression : Expr expression",
             "Print      : Expr expression",
             "Var        : Token name, Expr? initializer ",

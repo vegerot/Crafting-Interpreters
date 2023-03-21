@@ -35,7 +35,9 @@ class Parser(private val tokens: List<Token>) {
     }
 
     private fun statement(): Stmt {
-        return if (ifMatchConsume(TokenType.PRINT)) printStatement() else expressionStatement()
+        return if (ifMatchConsume(TokenType.PRINT)) printStatement()
+        else if (ifMatchConsume(TokenType.LEFT_BRACE)) Stmt.Block(block())
+        else expressionStatement()
     }
 
     private fun printStatement(): Stmt.Print {
@@ -48,6 +50,18 @@ class Parser(private val tokens: List<Token>) {
         val expr: Expr = expression()
         consumeUntil(TokenType.SEMICOLON, "Expect ';' after expression")
         return Stmt.Expression(expr)
+    }
+
+    private fun block(): List<Stmt> {
+        val statements: MutableList<Stmt> = mutableListOf()
+
+        while (!isNextTokenOfType(TokenType.RIGHT_BRACE)) {
+            val stmt: Stmt? = declaration()
+            // stmt will be null if there is a parsing error that we recover from
+            if (stmt != null) statements.add(stmt)
+        }
+        consumeUntil(TokenType.RIGHT_BRACE, "Expect '}' after block.")
+        return statements
     }
 
     /** ONLY CALL FROM TESTS */

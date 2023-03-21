@@ -3,7 +3,7 @@ package lox
 import kotlin.contracts.contract
 
 class Interpreter : Expr.Visitor<LoxValue>, Stmt.Visitor<Unit> {
-    private val environment: Environment = Environment()
+    private var environment: Environment = Environment()
 
     override fun visitLiteralExpr(expr: Expr.Literal): LoxValue {
         return when (expr.value.type) {
@@ -152,6 +152,22 @@ class Interpreter : Expr.Visitor<LoxValue>, Stmt.Visitor<Unit> {
 
     private fun execute(stmt: Stmt) {
         stmt.accept(this)
+    }
+
+    private fun executeBlock(statements: List<Stmt>, environment: Environment) {
+        val previousEnvironment: Environment = this.environment
+        try {
+            this.environment = environment
+            for (statement in statements) {
+                execute(statement)
+            }
+        } finally {
+            this.environment = previousEnvironment
+        }
+    }
+
+    override fun visitBlockStmt(stmt: Stmt.Block) {
+        executeBlock(stmt.statements, Environment(environment))
     }
 
     private fun stringify(evald: LoxValue?): String {
