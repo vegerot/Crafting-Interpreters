@@ -26,11 +26,11 @@ class Parser(private val tokens: List<Token>) {
     }
 
     private fun varDeclaration(): Stmt {
-        val name: Token = consumeUntil(TokenType.IDENTIFIER, "Expected a variable name")
+        val name: Token = assertNextCharAndConsume(TokenType.IDENTIFIER, "Expected a variable name")
 
         val initializer: Expr? = if (ifMatchConsume(TokenType.EQUAL)) expression() else null
 
-        consumeUntil(TokenType.SEMICOLON, "Expected ';' after variable declaration")
+        assertNextCharAndConsume(TokenType.SEMICOLON, "Expected ';' after variable declaration")
         return Stmt.Var(name, initializer)
     }
 
@@ -42,13 +42,13 @@ class Parser(private val tokens: List<Token>) {
 
     private fun printStatement(): Stmt.Print {
         val value = expression()
-        consumeUntil(TokenType.SEMICOLON, "Expect ';' after value")
+        assertNextCharAndConsume(TokenType.SEMICOLON, "Expect ';' after value")
         return Stmt.Print(value)
     }
 
     private fun expressionStatement(): Stmt.Expression {
         val expr: Expr = expression()
-        consumeUntil(TokenType.SEMICOLON, "Expect ';' after expression")
+        assertNextCharAndConsume(TokenType.SEMICOLON, "Expect ';' after expression")
         return Stmt.Expression(expr)
     }
 
@@ -60,7 +60,7 @@ class Parser(private val tokens: List<Token>) {
             // stmt will be null if there is a parsing error that we recover from
             if (stmt != null) statements.add(stmt)
         }
-        consumeUntil(TokenType.RIGHT_BRACE, "Expect '}' after block.")
+        assertNextCharAndConsume(TokenType.RIGHT_BRACE, "Expect '}' after block.")
         return statements
     }
 
@@ -170,7 +170,7 @@ class Parser(private val tokens: List<Token>) {
         else if (ifMatchConsume(TokenType.IDENTIFIER)) Expr.Variable(previous())
         else if (ifMatchConsume(TokenType.LEFT_PAREN)) {
             val expr = expression()
-            consumeUntil(TokenType.RIGHT_PAREN, "Expect ')' after expression")
+            assertNextCharAndConsume(TokenType.RIGHT_PAREN, "Expect ')' after expression")
             Expr.Grouping(expr)
         } else if (peek().type === TokenType.EOF) {
             assert(current == tokens.size - 1) { "unexpected EOF" }
@@ -194,7 +194,7 @@ class Parser(private val tokens: List<Token>) {
         return false
     }
 
-    private fun consumeUntil(type: TokenType, errorMessage: String): Token {
+    private fun assertNextCharAndConsume(type: TokenType, errorMessage: String): Token {
         if (isNextTokenOfType(type)) return advance() else throw error(peek(), errorMessage)
     }
 
