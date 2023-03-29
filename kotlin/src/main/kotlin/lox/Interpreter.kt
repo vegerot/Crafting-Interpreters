@@ -88,19 +88,20 @@ class Interpreter : Expr.Visitor<LoxValue>, Stmt.Visitor<Unit> {
                 -right
             }
             TokenType.BANG -> {
-                fun isTruthy(t: LoxValue): Boolean {
-                    return when (t) {
-                        is Boolean -> t
-                        // my types are totally wrong.  damn
-                        null -> false
-                        else -> true
-                    }
-                }
                 !isTruthy(right)
             }
             // idea: somehow encode "unary" types in the type system so we can exhaustively
             // pattern-match without `else`
             else -> assert(false) { "unknown UNARY token" }
+        }
+    }
+
+    private fun isTruthy(t: LoxValue): Boolean {
+        return when (t) {
+            is Boolean -> t
+            // my types are totally wrong.  damn
+            null -> false
+            else -> true
         }
     }
 
@@ -186,6 +187,11 @@ class Interpreter : Expr.Visitor<LoxValue>, Stmt.Visitor<Unit> {
 
     override fun visitExpressionStmt(stmt: Stmt.Expression) {
         evaluate(stmt.expression)
+    }
+
+    override fun visitIfStmt(stmt: Stmt.If) {
+        if (isTruthy(evaluate(stmt.condition))) execute(stmt.thenBranch)
+        else if (stmt.elseBranch != null) execute(stmt.elseBranch)
     }
 
     override fun visitPrintStmt(stmt: Stmt.Print) {

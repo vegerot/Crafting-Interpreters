@@ -35,9 +35,21 @@ class Parser(private val tokens: List<Token>) {
     }
 
     private fun statement(): Stmt {
-        return if (ifMatchConsume(TokenType.PRINT)) printStatement()
+        return if (ifMatchConsume(TokenType.IF)) ifStatement()
+        else if (ifMatchConsume(TokenType.PRINT)) printStatement()
         else if (ifMatchConsume(TokenType.LEFT_BRACE)) Stmt.Block(block())
         else expressionStatement()
+    }
+
+    private fun ifStatement(): Stmt {
+        assertNextCharAndConsume(TokenType.LEFT_PAREN, "Expect '(' after 'if'")
+        val condition: Expr = expression()
+        assertNextCharAndConsume(TokenType.RIGHT_PAREN, "Expect ')' after if condition")
+
+        val thenBranch: Stmt = statement()
+        val elseBranch = if (ifMatchConsume(TokenType.ELSE)) statement() else null
+
+        return Stmt.If(condition, thenBranch, elseBranch)
     }
 
     private fun printStatement(): Stmt.Print {
