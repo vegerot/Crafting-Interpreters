@@ -11,8 +11,26 @@ class Interpreter : Expr.Visitor<LoxValue>, Stmt.Visitor<Unit> {
             TokenType.FALSE -> false
             TokenType.TRUE -> true
             TokenType.STRING -> expr.value.literal!!
+            // TODO: support nil
+            // TokenType.NIL -> null!!
             else -> {
                 assert(false) { "invalid literal expression: ${expr.value}" }
+            }
+        }
+    }
+
+    override fun visitLogicalExpr(expr: Expr.Logical): LoxValue {
+        val left: LoxValue = evaluate(expr.left)
+
+        return when (expr.operator.type) {
+            TokenType.OR -> {
+                if (isTruthy(left)) left else evaluate(expr.right)
+            }
+            TokenType.AND -> {
+                if (!isTruthy(left)) left else evaluate(expr.right)
+            }
+            else -> {
+                assert(false) { "invalid logical operator: ${expr.operator.type}" }
             }
         }
     }

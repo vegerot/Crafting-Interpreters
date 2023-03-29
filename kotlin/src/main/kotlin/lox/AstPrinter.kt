@@ -18,6 +18,10 @@ class AstPrinter : Expr.Visitor<String> {
         return "${expr.value.literal ?: expr.value.lexeme}"
     }
 
+    override fun visitLogicalExpr(expr: Expr.Logical): String {
+        return "(${expr.operator.lexeme} ${expr.left.accept(this)} ${expr.right.accept(this)})"
+    }
+
     override fun visitUnaryExpr(expr: Expr.Unary): String {
         return "(${expr.operator.lexeme} ${expr.right.accept(this)})"
     }

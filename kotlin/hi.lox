@@ -1,15 +1,18 @@
+print "LITERALS";
 "hi there";
 // this is a comment
 ((1 )); // grouping stuff
 1234;
 1234.5679;
 
+print "VARIABLEs";
 print 1+1;
 var i = 42;
 print i;
 i = i + 27;
 print i;
 
+print "SCOPE";
 var a = "global a";
 var b = "global b";
 var c = "global c";
@@ -30,10 +33,12 @@ print a;
 print b;
 print c;
 
+print "BOOL";
 var t = true;
 print("opposite of true is ");
 print(!t);
 
+print "IF";
 var i = true;
 if (i) print("true");
 else {
@@ -45,3 +50,13 @@ if (f) print("true");
 else {
 	print("false");
 }
+
+print "LOGICAL EXPRESSIONS";
+print "hi" or 2; //"hi"
+// lox doesn't support nil yet
+//print nil or "yes"; // "yes"
+
+print false or "yes"; // "yes"
+
+print true and true; // true
+print true and false; // false

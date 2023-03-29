@@ -86,7 +86,7 @@ class Parser(private val tokens: List<Token>) {
     private fun expression() = assignment()
 
     private fun assignment(): Expr {
-        val expr: Expr = equality()
+        val expr: Expr = or()
 
         return if (ifMatchConsume(TokenType.EQUAL)) {
             val equals: Token = previous()
@@ -97,6 +97,29 @@ class Parser(private val tokens: List<Token>) {
                 Expr.Assign(name, value)
             } else throw error(equals, "can only assign to l-values")
         } else expr
+    }
+
+    private fun or(): Expr {
+        var expr: Expr = and()
+
+        while (ifMatchConsume(TokenType.OR)) {
+            val operator: Token = previous() // OR
+            val right: Expr = and()
+            expr = Expr.Logical(expr, operator, right)
+        }
+        return expr
+    }
+
+    private fun and(): Expr {
+        var expr: Expr = equality()
+
+        while (ifMatchConsume(TokenType.AND)) {
+            val operator: Token = previous() // AND
+            val right: Expr = equality()
+            expr = Expr.Logical(expr, operator, right)
+        }
+
+        return expr
     }
 
     private fun equality(): Expr {

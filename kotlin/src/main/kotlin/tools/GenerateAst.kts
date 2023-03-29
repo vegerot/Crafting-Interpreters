@@ -78,6 +78,7 @@ fun main() {
             "Binary   : Expr left, Token operator, Expr right",
             "Grouping : Expr expression",
             "Literal  : Token value",
+            "Logical  : Expr left, Token operator, Expr right",
             "Unary    : Token operator, Expr right",
             "Variable : Token name",
         )
