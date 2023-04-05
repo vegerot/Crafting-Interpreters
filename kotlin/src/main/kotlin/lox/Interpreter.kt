@@ -226,6 +226,12 @@ class Interpreter : Expr.Visitor<LoxValue>, Stmt.Visitor<Unit> {
         environment.define(stmt.name.lexeme!!, value)
     }
 
+    override fun visitWhileStmt(stmt: Stmt.While) {
+        while (isTruthy(evaluate(stmt.condition))) {
+            execute(stmt.body)
+        }
+    }
+
     override fun visitAssignExpr(expr: Expr.Assign): LoxValue {
         val value = evaluate(expr.value)
         environment.assign(expr.name, value)

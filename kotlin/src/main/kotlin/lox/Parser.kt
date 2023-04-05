@@ -34,9 +34,18 @@ class Parser(private val tokens: List<Token>) {
         return Stmt.Var(name, initializer)
     }
 
+    private fun whileStatement(): Stmt {
+        assertNextCharAndConsume(TokenType.LEFT_PAREN, "Missing condition for while loop")
+        val condition: Expr = expression()
+        assertNextCharAndConsume(TokenType.RIGHT_PAREN, "Expect ')' after condition")
+        val body: Stmt = statement()
+        return Stmt.While(condition, body)
+    }
+
     private fun statement(): Stmt {
         return if (ifMatchConsume(TokenType.IF)) ifStatement()
         else if (ifMatchConsume(TokenType.PRINT)) printStatement()
+        else if (ifMatchConsume(TokenType.WHILE)) whileStatement()
         else if (ifMatchConsume(TokenType.LEFT_BRACE)) Stmt.Block(block())
         else expressionStatement()
     }
