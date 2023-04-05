@@ -5,34 +5,73 @@ import kotlin.contracts.contract
 class Interpreter : Expr.Visitor<LoxValue>, Stmt.Visitor<Unit> {
     private var environment: Environment = Environment()
 
-    override fun visitLiteralExpr(expr: Expr.Literal): LoxValue {
-        return when (expr.value.type) {
-            TokenType.NUMBER -> expr.value.literal!!
-            TokenType.FALSE -> false
-            TokenType.TRUE -> true
-            TokenType.STRING -> expr.value.literal!!
-            // TODO: support nil
-            // TokenType.NIL -> null!!
-            else -> {
-                assert(false) { "invalid literal expression: ${expr.value}" }
+    fun interpret(statements: List<Stmt>): Unit {
+        try {
+            for (statement in statements) {
+                execute(statement)
             }
+        } catch (error: RuntimeError) {
+            Lox.runtimeError(error)
         }
     }
 
-    override fun visitLogicalExpr(expr: Expr.Logical): LoxValue {
-        val left: LoxValue = evaluate(expr.left)
+    private fun evaluate(expr: Expr): LoxValue {
+        return expr.accept(this)
+    }
 
-        return when (expr.operator.type) {
-            TokenType.OR -> {
-                if (isTruthy(left)) left else evaluate(expr.right)
+    private fun execute(stmt: Stmt) {
+        stmt.accept(this)
+    }
+
+    private fun executeBlock(statements: List<Stmt>, environment: Environment) {
+        val previousEnvironment: Environment = this.environment
+        try {
+            this.environment = environment
+            for (statement in statements) {
+                execute(statement)
             }
-            TokenType.AND -> {
-                if (!isTruthy(left)) left else evaluate(expr.right)
-            }
-            else -> {
-                assert(false) { "invalid logical operator: ${expr.operator.type}" }
-            }
+        } finally {
+            this.environment = previousEnvironment
         }
+    }
+
+    override fun visitBlockStmt(stmt: Stmt.Block) {
+        executeBlock(stmt.statements, Environment(environment))
+    }
+
+    override fun visitExpressionStmt(stmt: Stmt.Expression) {
+        evaluate(stmt.expression)
+    }
+
+    override fun visitIfStmt(stmt: Stmt.If) {
+        if (isTruthy(evaluate(stmt.condition))) execute(stmt.thenBranch)
+        else if (stmt.elseBranch != null) execute(stmt.elseBranch)
+    }
+
+    override fun visitPrintStmt(stmt: Stmt.Print) {
+        val value = evaluate(stmt.expression)
+        println(stringify(value))
+    }
+
+    override fun visitVarStmt(stmt: Stmt.Var) {
+        val value =
+            if (stmt.initializer != null) {
+                evaluate(stmt.initializer)
+            } else null
+
+        environment.define(stmt.name.lexeme!!, value)
+    }
+
+    override fun visitWhileStmt(stmt: Stmt.While) {
+        while (isTruthy(evaluate(stmt.condition))) {
+            execute(stmt.body)
+        }
+    }
+
+    override fun visitAssignExpr(expr: Expr.Assign): LoxValue {
+        val value = evaluate(expr.value)
+        environment.assign(expr.name, value)
+        return value
     }
 
     override fun visitBinaryExpr(expr: Expr.Binary): LoxValue {
@@ -97,6 +136,36 @@ class Interpreter : Expr.Visitor<LoxValue>, Stmt.Visitor<Unit> {
         return evaluate(expr.expression)
     }
 
+    override fun visitLiteralExpr(expr: Expr.Literal): LoxValue {
+        return when (expr.value.type) {
+            TokenType.NUMBER -> expr.value.literal!!
+            TokenType.FALSE -> false
+            TokenType.TRUE -> true
+            TokenType.STRING -> expr.value.literal!!
+            // TODO: support nil
+            // TokenType.NIL -> null!!
+            else -> {
+                assert(false) { "invalid literal expression: ${expr.value}" }
+            }
+        }
+    }
+
+    override fun visitLogicalExpr(expr: Expr.Logical): LoxValue {
+        val left: LoxValue = evaluate(expr.left)
+
+        return when (expr.operator.type) {
+            TokenType.OR -> {
+                if (isTruthy(left)) left else evaluate(expr.right)
+            }
+            TokenType.AND -> {
+                if (!isTruthy(left)) left else evaluate(expr.right)
+            }
+            else -> {
+                assert(false) { "invalid logical operator: ${expr.operator.type}" }
+            }
+        }
+    }
+
     override fun visitUnaryExpr(expr: Expr.Unary): LoxValue {
         val right = evaluate(expr.right)
 
@@ -114,14 +183,11 @@ class Interpreter : Expr.Visitor<LoxValue>, Stmt.Visitor<Unit> {
         }
     }
 
-    private fun isTruthy(t: LoxValue): Boolean {
-        return when (t) {
-            is Boolean -> t
-            // my types are totally wrong.  damn
-            null -> false
-            else -> true
-        }
+    override fun visitVariableExpr(expr: Expr.Variable): LoxValue {
+        return environment.get(expr.name)!!
     }
+
+    /* UTILS */
 
     @OptIn(kotlin.contracts.ExperimentalContracts::class)
     private fun loxRequireValuesAreNumbers(
@@ -153,40 +219,13 @@ class Interpreter : Expr.Visitor<LoxValue>, Stmt.Visitor<Unit> {
         }
     }
 
-    fun interpret(statements: List<Stmt>): Unit {
-        try {
-            for (statement in statements) {
-                execute(statement)
-            }
-        } catch (error: RuntimeError) {
-            Lox.runtimeError(error)
+    private fun isTruthy(t: LoxValue): Boolean {
+        return when (t) {
+            is Boolean -> t
+            // my types are totally wrong.  damn
+            null -> false
+            else -> true
         }
-    }
-
-    fun interpretExpression(expr: Expr?): String {
-        if (expr == null) return "null"
-        val value: LoxValue = evaluate(expr)
-        return stringify(value)
-    }
-
-    private fun execute(stmt: Stmt) {
-        stmt.accept(this)
-    }
-
-    private fun executeBlock(statements: List<Stmt>, environment: Environment) {
-        val previousEnvironment: Environment = this.environment
-        try {
-            this.environment = environment
-            for (statement in statements) {
-                execute(statement)
-            }
-        } finally {
-            this.environment = previousEnvironment
-        }
-    }
-
-    override fun visitBlockStmt(stmt: Stmt.Block) {
-        executeBlock(stmt.statements, Environment(environment))
     }
 
     private fun stringify(evald: LoxValue?): String {
@@ -199,46 +238,10 @@ class Interpreter : Expr.Visitor<LoxValue>, Stmt.Visitor<Unit> {
         }
     }
 
-    private fun evaluate(expr: Expr): LoxValue {
-        return expr.accept(this)
-    }
-
-    override fun visitExpressionStmt(stmt: Stmt.Expression) {
-        evaluate(stmt.expression)
-    }
-
-    override fun visitIfStmt(stmt: Stmt.If) {
-        if (isTruthy(evaluate(stmt.condition))) execute(stmt.thenBranch)
-        else if (stmt.elseBranch != null) execute(stmt.elseBranch)
-    }
-
-    override fun visitPrintStmt(stmt: Stmt.Print) {
-        val value = evaluate(stmt.expression)
-        println(stringify(value))
-    }
-
-    override fun visitVarStmt(stmt: Stmt.Var) {
-        val value =
-            if (stmt.initializer != null) {
-                evaluate(stmt.initializer)
-            } else null
-
-        environment.define(stmt.name.lexeme!!, value)
-    }
-
-    override fun visitWhileStmt(stmt: Stmt.While) {
-        while (isTruthy(evaluate(stmt.condition))) {
-            execute(stmt.body)
-        }
-    }
-
-    override fun visitAssignExpr(expr: Expr.Assign): LoxValue {
-        val value = evaluate(expr.value)
-        environment.assign(expr.name, value)
-        return value
-    }
-
-    override fun visitVariableExpr(expr: Expr.Variable): LoxValue {
-        return environment.get(expr.name)!!
+    /** ONLY RUN FROM TESTS */
+    fun interpretExpression(expr: Expr?): String {
+        if (expr == null) return "null"
+        val value: LoxValue = evaluate(expr)
+        return stringify(value)
     }
 }
