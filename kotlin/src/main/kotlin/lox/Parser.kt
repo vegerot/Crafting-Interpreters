@@ -1,6 +1,10 @@
 package lox
 
 class Parser(private val tokens: List<Token>) {
+    companion object {
+        class ParseError : RuntimeException()
+    }
+
     private var current: Int = 0
 
     fun parse(): List<Stmt> {
@@ -16,6 +20,8 @@ class Parser(private val tokens: List<Token>) {
         }*/
     }
 
+    private fun expression() = assignment()
+
     private fun declaration(): Stmt? {
         return try {
             if (ifMatchConsume(TokenType.VAR)) varDeclaration() else statement()
@@ -23,23 +29,6 @@ class Parser(private val tokens: List<Token>) {
             synchronize()
             null
         }
-    }
-
-    private fun varDeclaration(): Stmt {
-        val name: Token = assertNextCharAndConsume(TokenType.IDENTIFIER, "Expected a variable name")
-
-        val initializer: Expr? = if (ifMatchConsume(TokenType.EQUAL)) expression() else null
-
-        assertNextCharAndConsume(TokenType.SEMICOLON, "Expected ';' after variable declaration")
-        return Stmt.Var(name, initializer)
-    }
-
-    private fun whileStatement(): Stmt {
-        assertNextCharAndConsume(TokenType.LEFT_PAREN, "Missing condition for while loop")
-        val condition: Expr = expression()
-        assertNextCharAndConsume(TokenType.RIGHT_PAREN, "Expect ')' after condition")
-        val body: Stmt = statement()
-        return Stmt.While(condition, body)
     }
 
     private fun statement(): Stmt {
@@ -67,6 +56,23 @@ class Parser(private val tokens: List<Token>) {
         return Stmt.Print(value)
     }
 
+    private fun varDeclaration(): Stmt {
+        val name: Token = assertNextCharAndConsume(TokenType.IDENTIFIER, "Expected a variable name")
+
+        val initializer: Expr? = if (ifMatchConsume(TokenType.EQUAL)) expression() else null
+
+        assertNextCharAndConsume(TokenType.SEMICOLON, "Expected ';' after variable declaration")
+        return Stmt.Var(name, initializer)
+    }
+
+    private fun whileStatement(): Stmt {
+        assertNextCharAndConsume(TokenType.LEFT_PAREN, "Missing condition for while loop")
+        val condition: Expr = expression()
+        assertNextCharAndConsume(TokenType.RIGHT_PAREN, "Expect ')' after condition")
+        val body: Stmt = statement()
+        return Stmt.While(condition, body)
+    }
+
     private fun expressionStatement(): Stmt.Expression {
         val expr: Expr = expression()
         assertNextCharAndConsume(TokenType.SEMICOLON, "Expect ';' after expression")
@@ -84,15 +90,6 @@ class Parser(private val tokens: List<Token>) {
         assertNextCharAndConsume(TokenType.RIGHT_BRACE, "Expect '}' after block.")
         return statements
     }
-
-    /** ONLY CALL FROM TESTS */
-    public fun parseSingleExpression(): Expr? {
-        if (tokens.isEmpty()) return null
-        val firstExpression = expression()
-        return firstExpression
-    }
-
-    private fun expression() = assignment()
 
     private fun assignment(): Expr {
         val expr: Expr = or()
@@ -228,6 +225,14 @@ class Parser(private val tokens: List<Token>) {
         }
     }
 
+    /** ONLY CALL FROM TESTS */
+    public fun parseSingleExpression(): Expr? {
+        if (tokens.isEmpty()) return null
+        val firstExpression = expression()
+        return firstExpression
+    }
+
+    /* UTILITIES */
     private fun ifMatchConsume(vararg types: TokenType): Boolean {
         for (type in types) {
             if (isNextTokenOfType(type)) {
@@ -240,10 +245,6 @@ class Parser(private val tokens: List<Token>) {
 
     private fun assertNextCharAndConsume(type: TokenType, errorMessage: String): Token {
         if (isNextTokenOfType(type)) return advance() else throw error(peek(), errorMessage)
-    }
-
-    private fun consume(): Token {
-        return advance()
     }
 
     private fun isNextTokenOfType(type: TokenType): Boolean {
@@ -272,6 +273,10 @@ class Parser(private val tokens: List<Token>) {
         return ParseError()
     }
 
+    private fun consume(): Token {
+        return advance()
+    }
+
     private fun synchronize() {
         var prev = advance()
 
@@ -291,9 +296,5 @@ class Parser(private val tokens: List<Token>) {
             }
             prev = advance()
         }
-    }
-
-    companion object {
-        class ParseError : RuntimeException()
     }
 }
