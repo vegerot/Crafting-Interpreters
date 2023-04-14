@@ -22,6 +22,14 @@ class AstPrinter : Expr.Visitor<String>, Stmt.Visitor<String> {
         } else parenthesize2("if-else", listOf(stmt.condition, stmt.thenBranch, stmt.elseBranch))
     }
 
+	override fun visitCallExpr(expr: Expr.Call): String {
+        val functionName = expr.callee.accept(this)
+        val arguments = expr.arguments.joinToString(", ") { it.accept(this) }
+        
+        return "${functionName}(${arguments})"
+
+	}
+
     private fun parenthesize2(name: String, parts: List<Any>): String {
         fun transform(string: String, parts: List<*>): String {
             var str = string
