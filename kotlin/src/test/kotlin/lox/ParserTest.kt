@@ -283,7 +283,7 @@ class ParserTest {
             )
         val whileStatement = Stmt.While(condition, Stmt.Block(listOf(printStatement, increment)))
         val want = listOf(Stmt.Block(listOf(initializer, whileStatement)))
-        
+
         assertEquals(
             want.map { AstPrinter().printStatement(it) },
             got.map { AstPrinter().printStatement(it) }

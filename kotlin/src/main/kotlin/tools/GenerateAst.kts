@@ -2,6 +2,40 @@ package tools
 
 import java.io.File
 
+/** run like `kotlinc -script .\src\main\kotlin\tools\GenerateAst.kts` */
+fun main() {
+    writeAstFile(
+        "src/main/kotlin/lox",
+        "Expr",
+        listOf(
+            "Assign   : Token name, Expr value",
+            "Binary   : Expr left, Token operator, Expr right",
+            "Call     : Expr callee, Token endParen, List<Expr> arguments",
+            "Grouping : Expr expression",
+            "Literal  : Token value",
+            "Logical  : Expr left, Token operator, Expr right",
+            "Unary    : Token operator, Expr right",
+            "Variable : Token name",
+        )
+    )
+
+    writeAstFile(
+        "src/main/kotlin/lox",
+        "Stmt",
+        listOf(
+            "Block      : List<Stmt> statements",
+            "Expression : Expr expression",
+            "If         : Expr condition, Stmt thenBranch, Stmt? elseBranch",
+            "Print      : Expr expression",
+            "Var        : Token name, Expr? initializer ",
+            "While      : Expr condition, Stmt body"
+        )
+    )
+}
+
+// don't generate ast during tests
+if (!args.contains("--no-write")) main()
+
 fun createAstClass(name: String, types: List<String>): String {
     return """
 sealed class $name {
@@ -67,36 +101,3 @@ fun writeAstFile(outputDir: String, name: String, types: List<String>) {
                 .trimIndent()
         )
 }
-
-/** run like `kotlinc -script .\src\main\kotlin\tools\GenerateAst.kts` */
-fun main() {
-    writeAstFile(
-        "src/main/kotlin/lox",
-        "Expr",
-        listOf(
-            "Assign   : Token name, Expr value",
-            "Binary   : Expr left, Token operator, Expr right",
-            "Grouping : Expr expression",
-            "Literal  : Token value",
-            "Logical  : Expr left, Token operator, Expr right",
-            "Unary    : Token operator, Expr right",
-            "Variable : Token name",
-        )
-    )
-
-    writeAstFile(
-        "src/main/kotlin/lox",
-        "Stmt",
-        listOf(
-            "Block      : List<Stmt> statements",
-            "Expression : Expr expression",
-            "If         : Expr condition, Stmt thenBranch, Stmt? elseBranch",
-            "Print      : Expr expression",
-            "Var        : Token name, Expr? initializer ",
-            "While      : Expr condition, Stmt body"
-        )
-    )
-}
-
-// don't generate ast during tests
-if (!args.contains("--no-write")) main()
