@@ -1,69 +1,18 @@
-print "LITERALS";
-"hi there";
-// this is a comment
-((1 )); // grouping stuff
-1234;
-1234.5679;
+print "FOR";
 
-print "VARIABLEs";
-print 1+1;
-var i = 42;
-print i;
-i = i + 27;
-print i;
+var a = 0;
+var temp;
 
-print "SCOPE";
-var a = "global a";
-var b = "global b";
-var c = "global c";
-{
-  var a = "outer a";
-  var b = "outer b";
-  {
-    var a = "inner a";
-    print a;
-    print b;
-    print c;
-  }
+for (var b = 1; a < 10000; b = temp + b) {
   print a;
-  print b;
-  print c;
-}
-print a;
-print b;
-print c;
-
-print "BOOL";
-var t = true;
-print("opposite of true is ");
-print(!t);
-
-print "IF";
-var i = true;
-if (i) print("true");
-else {
-	print("false");
+  temp = a;
+  a = b;
 }
 
-var f = false;
-if (f) print("true");
-else {
-	print("false");
+
+for (var i = 0; i<10; i = i + 1) {
+	print i;
 }
 
-print "LOGICAL EXPRESSIONS";
-print "hi" or 2; //"hi"
-// lox doesn't support nil yet
-//print nil or "yes"; // "yes"
-
-print false or "yes"; // "yes"
-
-print true and true; // true
-print true and false; // false
-
-print "WHILE";
 var i = 0;
-while (i < 5) {
-  print i;
-  i = i + 1;
-}
+for (; i<10; i = i + 1) print i;

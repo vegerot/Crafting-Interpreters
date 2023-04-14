@@ -265,6 +265,31 @@ class ParserTest {
         assertEquals(want, got)
     }
 
+    @Test
+    fun testForStatement() {
+        val got = scanAndParseCode("for (var i = 0; i<10; i = i + 1) print i;")
+
+        val i = Tokens.Identifier("i")
+        val initializer = Stmt.Var(i, Expr.Literal(Tokens.Number(0)))
+
+        val condition = Expr.Binary(Expr.Variable(i), Tokens.Less, Expr.Literal(Tokens.Number(10)))
+        val printStatement = Stmt.Print(Expr.Variable(i))
+        val increment =
+            Stmt.Expression(
+                Expr.Assign(
+                    i,
+                    Expr.Binary(Expr.Variable(i), Tokens.Plus(0), Expr.Literal(Tokens.Number(1, 0)))
+                )
+            )
+        val whileStatement = Stmt.While(condition, Stmt.Block(listOf(printStatement, increment)))
+        val want = listOf(Stmt.Block(listOf(initializer, whileStatement)))
+        
+        assertEquals(
+            want.map { AstPrinter().printStatement(it) },
+            got.map { AstPrinter().printStatement(it) }
+        )
+    }
+
     companion object {
         fun expressionToExpressionStatements(expr: Expr?): Expr? {
             return expr

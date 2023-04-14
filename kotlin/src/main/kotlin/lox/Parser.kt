@@ -32,11 +32,44 @@ class Parser(private val tokens: List<Token>) {
     }
 
     private fun statement(): Stmt {
-        return if (ifMatchConsume(TokenType.IF)) ifStatement()
+        return if (ifMatchConsume(TokenType.FOR)) forStatement()
+        else if (ifMatchConsume(TokenType.IF)) ifStatement()
         else if (ifMatchConsume(TokenType.PRINT)) printStatement()
         else if (ifMatchConsume(TokenType.WHILE)) whileStatement()
         else if (ifMatchConsume(TokenType.LEFT_BRACE)) Stmt.Block(block())
         else expressionStatement()
+    }
+
+    private fun forStatement(): Stmt {
+        assertNextCharAndConsume(TokenType.LEFT_PAREN, "Expect '(' after 'for'")
+
+        val initializer: Stmt? =
+            if (ifMatchConsume(TokenType.SEMICOLON)) null
+            else if (ifMatchConsume(TokenType.VAR)) varDeclaration() else expressionStatement()
+
+        val condition: Expr? = if (!isNextTokenOfType(TokenType.SEMICOLON)) expression() else null
+        assertNextCharAndConsume(TokenType.SEMICOLON, "Expect ';' after loop condition")
+
+        val increment: Expr? = if (!isNextTokenOfType(TokenType.RIGHT_PAREN)) expression() else null
+        assertNextCharAndConsume(TokenType.RIGHT_PAREN, "Expect ')' at the end of 'for'")
+
+        val forBody: Stmt = statement()
+
+        val whileBody =
+            if (increment != null) {
+                Stmt.Block(listOf(forBody, Stmt.Expression(increment)))
+            } else forBody
+
+        // HACK: how do I get a better line number?
+        val whileCondition = condition ?: Expr.Literal(Token(TokenType.TRUE, null, null, -1))
+
+        val whileStatementWithCondition = Stmt.While(whileCondition, whileBody)
+
+        val whileStatement =
+            if (initializer != null) Stmt.Block(listOf(initializer, whileStatementWithCondition))
+            else whileStatementWithCondition
+
+        return whileStatement
     }
 
     private fun ifStatement(): Stmt {
@@ -219,7 +252,7 @@ class Parser(private val tokens: List<Token>) {
             ++current
             expr
         } else {
-            assert(false) { "invalid expression at line ${peek().line}" }
+            assert(false) { "invalid expression '${peek()}' at line ${peek().line}" }
             // unreachable on purpose but needed to get typechecking to work
             Expr.Literal(Token(TokenType.INVALID, "😵🔫", "fuck", -1))
         }
