@@ -1,8 +1,69 @@
 package lox
 
-class AstPrinter : Expr.Visitor<String> {
+class AstPrinter : Expr.Visitor<String>, Stmt.Visitor<String> {
     fun print(expr: Expr): String {
         return expr.accept(this)
+    }
+    fun printStatement(stmt: Stmt): String {
+        return stmt.accept(this)
+    }
+
+    override fun visitBlockStmt(stmt: Stmt.Block): String {
+        return "(block ${stmt.statements.map{it.accept(this)}} )"
+    }
+
+    override fun visitExpressionStmt(stmt: Stmt.Expression): String {
+        return "(; ${stmt.expression.accept(this)})"
+    }
+
+    override fun visitIfStmt(stmt: Stmt.If): String {
+        return if (stmt.elseBranch == null) {
+            parenthesize2("if", listOf(stmt.condition, stmt.thenBranch))
+        } else parenthesize2("if-else", listOf(stmt.condition, stmt.thenBranch, stmt.elseBranch))
+    }
+
+    private fun parenthesize2(name: String, parts: List<Any>): String {
+        fun transform(string: String, parts: List<*>): String {
+            var str = string
+            for (part in parts) {
+                str += " "
+                str +=
+                    when (part) {
+                        is Expr -> {
+                            part.accept(this)
+                        }
+                        is Stmt -> {
+                            part.accept(this)
+                        }
+                        is Token -> {
+                            part.lexeme
+                        }
+                        is List<*> -> {
+                            transform(str, part)
+                        }
+                        else -> {
+                            part
+                        }
+                    }
+            }
+            return str
+        }
+
+        return "(${name} ${transform("", parts)})"
+    }
+
+    override fun visitPrintStmt(stmt: Stmt.Print): String {
+        return "(print ${stmt.expression.accept(this)})"
+    }
+
+    override fun visitVarStmt(stmt: Stmt.Var): String {
+        return if (stmt.initializer == null) {
+            parenthesize2("var", listOf(stmt.name))
+        } else parenthesize2("var", listOf(stmt.name, "=", stmt.initializer))
+    }
+
+    override fun visitWhileStmt(stmt: Stmt.While): String {
+        return parenthesize2("while", listOf(stmt.condition, stmt.body))
     }
 
     override fun visitBinaryExpr(expr: Expr.Binary): String {

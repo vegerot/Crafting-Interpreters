@@ -200,4 +200,6 @@ object Tokens {
     val And = Token(TokenType.AND, "and", null, -1)
 
     val Semi = Token(TokenType.SEMICOLON, ";", null, -1)
+
+    fun Identifier(name: String) = Token(TokenType.IDENTIFIER, name, null, 0)
 }
