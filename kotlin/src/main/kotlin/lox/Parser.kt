@@ -231,8 +231,39 @@ class Parser(private val tokens: List<Token>) {
                 advance()
                 Expr.Unary(previous(), unary())
             }
-            else -> primary()
+            else -> call()
         }
+    }
+    
+    private fun call(): Expr {
+        var expr: Expr = primary()
+        
+        while(true) {
+            if (ifMatchConsume(TokenType.LEFT_PAREN)) {
+                expr = finishCall(expr)
+            } else {
+                break
+            }
+        }
+        return expr
+    }
+    
+    private fun finishCall(callee: Expr): Expr {
+        val arguments: MutableList<Expr> = mutableListOf()
+        
+        if (!isNextTokenOfType(TokenType.RIGHT_PAREN)) {
+            arguments.add(expression())
+            if (arguments.size > 255) {
+                error(peek(), "Can't have more than 255 arguments")
+            }
+            while (ifMatchConsume(TokenType.COMMA)) {
+                arguments.add(expression())
+            }
+        }
+        
+        val endParen = assertNextCharAndConsume(TokenType.RIGHT_PAREN, "Expect ')' after arguments")
+        
+        return Expr.Call(callee, endParen, arguments)
     }
 
     private fun primary(): Expr {
