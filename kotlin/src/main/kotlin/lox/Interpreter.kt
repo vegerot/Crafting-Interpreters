@@ -132,6 +132,17 @@ class Interpreter : Expr.Visitor<LoxValue>, Stmt.Visitor<Unit> {
         }
     }
 
+    override fun visitCallExpr(expr: Expr.Call): LoxValue {
+        val callee: LoxValue = evaluate(expr.callee)
+
+        if (callee !is LoxCallable)
+            throw RuntimeError(expr.endParen, "Can only call functions and classes")
+
+        val arguments = expr.arguments.map { evaluate(it) }
+
+        return callee.call(this, arguments)
+    }
+
     override fun visitGroupingExpr(expr: Expr.Grouping): LoxValue {
         return evaluate(expr.expression)
     }

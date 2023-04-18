@@ -10,6 +10,7 @@ fun main() {
         listOf(
             "Assign   : Token name, Expr value",
             "Binary   : Expr left, Token operator, Expr right",
+            "Call     : Expr callee, Token endParen, List<Expr> arguments",
             "Grouping : Expr expression",
             "Literal  : Token value",
             "Logical  : Expr left, Token operator, Expr right",
