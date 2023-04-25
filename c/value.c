@@ -1,5 +1,7 @@
 #include "value.h"
+#include "memory.h"
 #include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 void initValueArray(ValueArray *array) {
@@ -12,22 +14,20 @@ void initValueArray(ValueArray *array) {
 }
 
 void writeValueArray(ValueArray *array, Value value) {
-  int count = array->count;
-  int capacity = array->capacity;
-  // just ==?
-  if (count >= capacity) {
-    // grow
-	int newCap = capacity >= 8 ? 2 * capacity : 8;
-    int newSize = sizeof(Value) * newCap;
-	array->values = realloc(array->values, newSize);
-    array->capacity = newCap;
+  if (array->capacity < array->count + 1) {
+    int oldCapacity = array->capacity;
+    array->capacity = GROW_CAPACITY(oldCapacity);
+    array->values =
+        GROW_ARRAY(Value, array->values, oldCapacity, array->capacity);
   }
 
   array->values[array->count] = value;
   ++array->count;
 }
 
-void freeValueArray(ValueArray* array) {
-  free(array->values);
+void freeValueArray(ValueArray *array) {
+  FREE_ARRAY(Value, array->values, 69);
   initValueArray(array);
 }
+
+void printValue(Value value) { printf("%g", value); }

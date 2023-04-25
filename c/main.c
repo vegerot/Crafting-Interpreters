@@ -6,36 +6,37 @@
 #include <stdio.h>
 
 int main(int argc, const char *argv[]) {
-  /*
   Chunk chunk;
   initChunk(&chunk);
-  writeChunk(&chunk, OP_RETURN);
-  // want this to fail
-  writeChunk(&chunk, 7);
-  dissasembleChunk(&chunk, "test chunk");
-  freeChunk(&chunk);
-  */
+  writeChunk(&chunk, OP_CONSTANT, 1);
+  int constant = addConstant(&chunk, 1.2);
+  writeChunk(&chunk, constant, 2);
 
-  ValueArray array;
-  initValueArray(&array);
-  writeValueArray(&array, 69.0);
-  writeValueArray(&array, 420);
-  writeValueArray(&array, 69.0);
-  writeValueArray(&array, 420);
-  writeValueArray(&array, 69.0);
-  writeValueArray(&array, 420);
-  writeValueArray(&array, 69.0);
-  writeValueArray(&array, 420);
-  writeValueArray(&array, 69.0);
-  writeValueArray(&array, 420);
-  writeValueArray(&array, 69.0);
-  writeValueArray(&array, 420);
-  writeValueArray(&array, 69.0);
-  writeValueArray(&array, 420);
-  printf("array.capacity: %x, array.count: %x\n", array.capacity, array.count);
-  for (int i = 0; i<array.capacity; ++i) {
-	printf("array.values[%d] = %f\n", i, array.values[i]);
+  writeChunk(&chunk, OP_RETURN, 2);
+  // want this to fail
+  // writeChunk(&chunk, 7);
+  dissasembleChunk(&chunk, "test chunk");
+  printf("\n");
+
+  addConstant(&chunk, 69.0);
+  addConstant(&chunk, 420);
+  addConstant(&chunk, 69.0);
+  addConstant(&chunk, 420);
+  addConstant(&chunk, 69.0);
+  addConstant(&chunk, 420);
+  addConstant(&chunk, 69.0);
+  addConstant(&chunk, 420);
+  addConstant(&chunk, 69.0);
+  addConstant(&chunk, 420);
+  addConstant(&chunk, 69.0);
+  addConstant(&chunk, 420);
+  addConstant(&chunk, 69.0);
+  addConstant(&chunk, 420);
+  printf("chunk.constants.capacity: 0x%x, array.count: 0x%x\n",
+         chunk.constants.capacity, chunk.constants.count);
+  for (int i = 0; i < chunk.constants.capacity; ++i) {
+    printf("chunk.constants.values[%d] = %g\n", i, chunk.constants.values[i]);
   }
-  freeValueArray(&array);
+  freeChunk(&chunk);
   return 0;
 }
