@@ -25,7 +25,7 @@ int dissasembleInstruction(Chunk *chunk, int offset) {
     return simpleInstruction("OP_RETURN", offset);
   default:
     fflush(stdout);
-    fprintf(stderr, "Unknown opcode %x\n", instruction);
+    fprintf(stderr, "Unknown opcode 0x%x\n", instruction);
     exit(1);
   }
 }
