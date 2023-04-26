@@ -1,7 +1,7 @@
 #include "chunk.h"
 #include "memory.h"
 
-void initChunk(Chunk *chunk) {
+void initChunk(Chunk* chunk) {
   chunk->count = 0;
   /** should init `capacity` to 8 */
   (*chunk).capacity = 0;
@@ -10,7 +10,7 @@ void initChunk(Chunk *chunk) {
   initValueArray(&(chunk->constants));
 }
 
-void writeChunk(Chunk *chunk, uint8_t byte, int line) {
+void writeChunk(Chunk* chunk, uint8_t byte, int line) {
   // could this just be ==?
   if (chunk->capacity <= chunk->count) {
     int oldCapacity = chunk->capacity;
@@ -24,12 +24,12 @@ void writeChunk(Chunk *chunk, uint8_t byte, int line) {
   ++chunk->count;
 }
 
-int addConstant(Chunk *chunk, Value value) {
+int addConstant(Chunk* chunk, Value value) {
   writeValueArray(&chunk->constants, value);
   return chunk->constants.count - 1;
 }
 
-void freeChunk(Chunk *chunk) {
+void freeChunk(Chunk* chunk) {
   FREE_ARRAY(uint8_t, chunk->code, chunk->capacity);
   FREE_ARRAY(int, chunk->lines, chunk->capacity);
   freeValueArray(&((*chunk).constants));

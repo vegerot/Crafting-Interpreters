@@ -5,7 +5,7 @@
 #include "value.h"
 #include <stdio.h>
 
-int main(int argc, const char *argv[]) {
+int main(int argc, char const* argv[]) {
   Chunk chunk;
   initChunk(&chunk);
   writeChunk(&chunk, OP_CONSTANT, 1);

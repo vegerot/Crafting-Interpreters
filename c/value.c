@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void initValueArray(ValueArray *array) {
+void initValueArray(ValueArray* array) {
 #define VALUE_ARRAY_INIT_CAPACITY 0
 #define VALUE_ARRAY_INIT_COUNT 0
   assert(VALUE_ARRAY_INIT_CAPACITY >= VALUE_ARRAY_INIT_COUNT);
@@ -13,7 +13,7 @@ void initValueArray(ValueArray *array) {
   array->values = NULL;
 }
 
-void writeValueArray(ValueArray *array, Value value) {
+void writeValueArray(ValueArray* array, Value value) {
   if (array->capacity < array->count + 1) {
     int oldCapacity = array->capacity;
     array->capacity = GROW_CAPACITY(oldCapacity);
@@ -25,7 +25,7 @@ void writeValueArray(ValueArray *array, Value value) {
   ++array->count;
 }
 
-void freeValueArray(ValueArray *array) {
+void freeValueArray(ValueArray* array) {
   FREE_ARRAY(Value, array->values, 69);
   initValueArray(array);
 }
