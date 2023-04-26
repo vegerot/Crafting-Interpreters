@@ -5,7 +5,7 @@
 #include "value.h"
 #include <stdio.h>
 
-int main(int argc, char const* argv[]) {
+int main() {
   Chunk chunk;
   initChunk(&chunk);
   writeChunk(&chunk, OP_CONSTANT, 1);
@@ -14,7 +14,7 @@ int main(int argc, char const* argv[]) {
 
   writeChunk(&chunk, OP_RETURN, 2);
   // want this to fail
-  // writeChunk(&chunk, 7);
+  // writeChunk(&chunk, 7, 0);
   dissasembleChunk(&chunk, "test chunk");
   printf("\n");
 
