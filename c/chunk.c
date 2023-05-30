@@ -11,7 +11,7 @@ void initChunk(Chunk* chunk) {
 }
 
 void writeChunkNoLine(Chunk* chunk, uint8_t byte) {
-  return writeChunk(chunk, byte, 0);
+  writeChunk(chunk, byte, 0);
 }
 
 void writeChunk(Chunk* chunk, uint8_t byte, int line) {
