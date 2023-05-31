@@ -10,6 +10,10 @@ void initChunk(Chunk* chunk) {
   initValueArray(&(chunk->constants));
 }
 
+void writeChunkNoLine(Chunk* chunk, uint8_t byte) {
+  return writeChunk(chunk, byte, 0);
+}
+
 void writeChunk(Chunk* chunk, uint8_t byte, int line) {
   // could this just be ==?
   if (chunk->capacity <= chunk->count) {

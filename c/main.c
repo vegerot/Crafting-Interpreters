@@ -1,42 +1,43 @@
+#include <stdio.h>
+
 #include "chunk.h"
 #include "common.h"
 #include "debug.h"
-
 #include "value.h"
-#include <stdio.h>
+#include "vm.h"
+
+/** -((1.2+3.4)/5.6)*/
+void negativeOnepoint2PlusThreepoint4DividedbyFivepoint6(Chunk* chunk) {
+  writeChunk(chunk, OP_CONSTANT, 1);
+  int constant = addConstant(chunk, 1.2);
+  writeChunk(chunk, constant, 2);
+
+  constant = addConstant(chunk, 3.4);
+  writeChunk(chunk, OP_CONSTANT, 1);
+  writeChunk(chunk, constant, 42);
+
+  writeChunk(chunk, OP_ADD, 1);
+
+  constant = addConstant(chunk, 5.6);
+  writeChunk(chunk, OP_CONSTANT, 1);
+  writeChunk(chunk, constant, 1);
+
+  writeChunk(chunk, OP_DIVIDE, 1);
+
+  writeChunk(chunk, OP_NEGATE, 2);
+
+  writeChunk(chunk, OP_RETURN, 2);
+}
 
 int main() {
+  initVM();
   Chunk chunk;
   initChunk(&chunk);
-  writeChunk(&chunk, OP_CONSTANT, 1);
-  int constant = addConstant(&chunk, 1.2);
-  writeChunk(&chunk, constant, 2);
+  negativeOnepoint2PlusThreepoint4DividedbyFivepoint6(&chunk);
+  printf("\nINTERPRET BYTECODE:\n");
+  interpret(&chunk);
 
-  writeChunk(&chunk, OP_RETURN, 2);
-  // want this to fail
-  // writeChunk(&chunk, 7, 0);
-  dissasembleChunk(&chunk, "test chunk");
-  printf("\n");
-
-  addConstant(&chunk, 69.0);
-  addConstant(&chunk, 420);
-  addConstant(&chunk, 69.0);
-  addConstant(&chunk, 420);
-  addConstant(&chunk, 69.0);
-  addConstant(&chunk, 420);
-  addConstant(&chunk, 69.0);
-  addConstant(&chunk, 420);
-  addConstant(&chunk, 69.0);
-  addConstant(&chunk, 420);
-  addConstant(&chunk, 69.0);
-  addConstant(&chunk, 420);
-  addConstant(&chunk, 69.0);
-  addConstant(&chunk, 420);
-  printf("chunk.constants.capacity: 0x%x, array.count: 0x%x\n",
-         chunk.constants.capacity, chunk.constants.count);
-  for (int i = 0; i < chunk.constants.capacity; ++i) {
-    printf("chunk.constants.values[%d] = %g\n", i, chunk.constants.values[i]);
-  }
+  freeVM();
   freeChunk(&chunk);
   return 0;
 }

@@ -6,6 +6,11 @@
 
 typedef enum {
   OP_CONSTANT,
+  OP_ADD,
+  OP_SUBTRACT,
+  OP_MULTIPLY,
+  OP_DIVIDE,
+  OP_NEGATE,
   OP_RETURN,
 } OpCode;
 
@@ -19,6 +24,8 @@ typedef struct {
 
 void initChunk(Chunk* chunk);
 void writeChunk(Chunk* chunk, uint8_t byte, int line);
+/** `writeChunk` and set line number to -1*/
+void writeChunkNoLine(Chunk* chunk, uint8_t byte);
 void freeChunk(Chunk* chunk);
 int addConstant(Chunk* chunk, Value value);
 

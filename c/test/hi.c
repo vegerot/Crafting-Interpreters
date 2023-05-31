@@ -3,6 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../chunk.h"
+#include "../debug.h"
+
 char* hello(char const* name, int nameLen) {
   char* format = "Hello, %s!\n";
   // larger than required because of format specifiers
@@ -18,6 +21,41 @@ void shouldPrintHelloMax() {
   free(hiMax);
 }
 
-void test() { shouldPrintHelloMax(); }
+void testConstant() {
+  Chunk chunk;
+  initChunk(&chunk);
+  assert(chunk.constants.capacity == 0);
+  assert(chunk.constants.count == 0);
+  addConstant(&chunk, 69.0);
+  assert(chunk.constants.capacity == 8);
+  assert(chunk.constants.count == 1);
+  addConstant(&chunk, 420);
+  addConstant(&chunk, 69.0);
+  addConstant(&chunk, 420);
+  addConstant(&chunk, 69.0);
+  addConstant(&chunk, 420);
+  addConstant(&chunk, 69.0);
+  addConstant(&chunk, 420);
+  assert(chunk.constants.capacity == 8);
+  assert(chunk.constants.count == 8);
+  addConstant(&chunk, 69.0);
+  assert(chunk.constants.capacity == 0x10 && "grows when count > cap");
+  assert(chunk.constants.count == 9);
+  addConstant(&chunk, 420);
+  addConstant(&chunk, 69.0);
+  addConstant(&chunk, 420);
+  addConstant(&chunk, 69.0);
+  addConstant(&chunk, 420);
+  assert(chunk.constants.capacity == 0x10);
+  assert(chunk.constants.count == 0xe);
+}
+
+void testInterpretResult() {}
+
+void test() {
+  testConstant();
+  testInterpretResult();
+  shouldPrintHelloMax();
+}
 
 int main() { test(); }
