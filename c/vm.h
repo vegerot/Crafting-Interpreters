@@ -2,18 +2,13 @@
 #define clox_vm_h
 
 #include "chunk.h"
-
-#define STACK_MAX 256
+#include "stack.h"
 
 typedef struct {
   Chunk* chunk;
   /// actual location in memory of ip instead of offset into `chunk`
   uint8_t* ip;
-  Value stack[STACK_MAX];
-  /**
-   * actual location in memory of stack top instead of offset into `stack`
-   */
-  Value* stackTop;
+  Stack stack;
 } VM;
 
 typedef enum {
@@ -26,8 +21,5 @@ void initVM();
 void freeVM();
 
 InterpretResult interpret(Chunk* chunk);
-void push(Value value);
-Value pop(void);
-bool isStackEmpty();
 
 #endif

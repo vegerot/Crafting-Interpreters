@@ -5,9 +5,12 @@
 
 VM vm;
 
-static void resetStack() { vm.stackTop = vm.stack; }
+static void resetStack() { vm.stack.top = vm.stack.bottom; }
 
-void initVM() { resetStack(); }
+void initVM() {
+  new_stack(&vm.stack);
+  resetStack();
+}
 
 void freeVM() {}
 
@@ -16,17 +19,17 @@ InterpretResult run() {
 #define READ_CONSTANT() (vm.chunk->constants.values[READ_BYTE()])
 #define BINARY_OP(op)                                                          \
   do {                                                                         \
-    double b = pop();                                                          \
-    double a = pop();                                                          \
-    push(a op b);                                                              \
+    double b = stack_pop(&vm.stack);                                           \
+    double a = stack_pop(&vm.stack);                                           \
+    stack_push(&vm.stack, a op b);                                             \
   } while (false)
 
   for (;;) {
 #ifdef DEBUG_TRACE_EXECUTION
     printf("\t\t");
-    if (isStackEmpty())
+    if (stack_is_empty(&vm.stack))
       printf("[empty]");
-    for (Value* slot = vm.stackTop - 1; slot >= vm.stack; --slot) {
+    for (Value* slot = vm.stack.top - 1; slot >= vm.stack.bottom; --slot) {
       printf("[ ");
       printValue(*slot);
       printf(" ]");
@@ -38,7 +41,7 @@ InterpretResult run() {
     switch (instruction) {
     case OP_CONSTANT: {
       Value constant = READ_CONSTANT();
-      push(constant);
+      stack_push(&vm.stack, constant);
       printf("constant at 0x%ld = ", (vm.ip - 1) - vm.chunk->code);
       printValue(constant);
       printf("\n");
@@ -57,12 +60,12 @@ InterpretResult run() {
       BINARY_OP(/);
       break;
     case OP_NEGATE: {
-      Value constant = pop();
-      push(-1 * constant);
+      Value constant = stack_pop(&vm.stack);
+      stack_push(&vm.stack, -1 * constant);
       break;
     }
     case OP_RETURN:
-      printValue(pop());
+      printValue(stack_pop(&vm.stack));
       printf("\n");
       return INTERPRET_OK;
     default:
@@ -80,15 +83,3 @@ InterpretResult interpret(Chunk* chunk) {
 
   return run();
 }
-
-void push(Value value) {
-  *vm.stackTop = value;
-  ++vm.stackTop;
-}
-
-Value pop() {
-  --vm.stackTop;
-  return *vm.stackTop;
-}
-
-bool isStackEmpty() { return vm.stackTop == vm.stack; }
