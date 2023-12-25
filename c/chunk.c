@@ -3,7 +3,7 @@
 
 void initChunk(Chunk* chunk) {
   chunk->count = 0;
-  /** should init `capacity` to 8 */
+  /** FIXME: should init `capacity` to 8 */
   (*chunk).capacity = 0;
   chunk->code = NULL;
   chunk->lines = NULL;
