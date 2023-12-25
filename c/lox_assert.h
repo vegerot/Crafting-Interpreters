@@ -8,7 +8,7 @@
 
 #define LOX_ASSERT_FAIL(func, file, line, cond_literal)                        \
                                                                                \
-  ({                                                                           \
+  __extension__ ({                                                                           \
     fflush(stdout);                                                            \
     fprintf(stderr, "\n%s:%d: %s: Assertion `%s` failed.\n", file, line, func, \
             cond_literal);                                                     \
