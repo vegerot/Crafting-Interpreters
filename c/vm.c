@@ -42,9 +42,11 @@ InterpretResult run() {
     case OP_CONSTANT: {
       Value constant = READ_CONSTANT();
       stack_push(&vm.stack, constant);
+#ifdef DEBUG_TRACE_EXECUTION
       printf("constant at 0x%ld = ", (vm.ip - 1) - vm.chunk->code);
       printValue(constant);
       printf("\n");
+#endif
       break;
     }
     case OP_ADD:
