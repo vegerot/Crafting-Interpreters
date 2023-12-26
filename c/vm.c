@@ -62,8 +62,11 @@ InterpretResult run() {
       BINARY_OP(/);
       break;
     case OP_NEGATE: {
-      Value constant = stack_pop(&vm.stack);
-      stack_push(&vm.stack, -1 * constant);
+        // Value constant = stack_pop(&vm.stack);
+        // stack_push(&vm.stack, -1 * constant);
+        // HACK: edit the stack directly
+        // this is a bonus challenge in chapter 15
+        *(vm.stack.top-1) *= -1;
       break;
     }
     case OP_RETURN:
