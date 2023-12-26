@@ -1,13 +1,13 @@
-#include "../vm.h"
 #include "../chunk.h"
 #include "../lox_assert.h"
+#include "../vm.h"
 
 Value peekStack(VM* vm, int index) {
   // HACK: the top element of the stack should be `top-1`, but since `OP_RETURN`
   // pops the return value off the stack we're technically reading
   // "uninitalized" memory.  However, since we control the stack we know this
   // will have the value of the last thing set
-  return *(vm->stack.top-index);
+  return *(vm->stack.top - index);
 }
 
 void addToStack() {
@@ -52,7 +52,6 @@ void addition() {
   VM vm = _getVM();
   LOX_ASSERT(peekStack(&vm, 0) == 69);
 }
-
 
 void subtraction() {
   initVM();
