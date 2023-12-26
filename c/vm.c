@@ -37,6 +37,7 @@ InterpretResult run() {
     printf("\n");
     dissasembleInstruction(vm.chunk, vm.ip - vm.chunk->code);
 #endif
+    if (vm.ip > vm.chunk->code + vm.chunk->capacity) LOX_ASSERT(false && "ran too much code.  Did you forget to OP_RETURN?");
     uint8_t instruction = READ_BYTE();
     switch (instruction) {
     case OP_CONSTANT: {
