@@ -20,6 +20,8 @@ typedef enum {
 void initVM();
 void freeVM();
 
+VM _getVM();
+
 InterpretResult interpret(Chunk* chunk);
 
 #endif

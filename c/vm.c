@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "debug.h"
+#include "lox_assert.h"
 #include "vm.h"
 
 VM vm;
@@ -13,6 +14,13 @@ void initVM() {
 }
 
 void freeVM() {}
+
+/**
+* hack: only used for tests
+*/
+VM _getVM() {
+  return vm;
+}
 
 InterpretResult run() {
 #define READ_BYTE() (*vm.ip++)
