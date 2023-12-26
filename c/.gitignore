@@ -1,4 +1,5 @@
 *.out
 *.dSYM/
 lox
-test/test
+test/test-*
+!test/test-*.c
