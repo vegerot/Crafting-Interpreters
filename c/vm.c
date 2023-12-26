@@ -19,8 +19,8 @@ InterpretResult run() {
 #define READ_CONSTANT() (vm.chunk->constants.values[READ_BYTE()])
 #define BINARY_OP(op)                                                          \
   do {                                                                         \
-    double b = stack_pop(&vm.stack);                                           \
-    double a = stack_pop(&vm.stack);                                           \
+    Value b = stack_pop(&vm.stack);                                           \
+    Value a = stack_pop(&vm.stack);                                           \
     stack_push(&vm.stack, a op b);                                             \
   } while (false)
 
