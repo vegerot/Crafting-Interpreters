@@ -13,4 +13,4 @@ test-stack: test/test-stack.c stack.h stack.c
 	test/test-stack
 
 clangd:
-	clang $(CFLAGS) -MJ compile_commands.json $(SRC_FILES) -o lox
+	clang $(CFLAGS) -MJ compile_commands.json -D DEBUG_TRACE_EXECUTION $(SRC_FILES) -o lox
