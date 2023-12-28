@@ -15,13 +15,13 @@ char* hello(char const* name, int nameLen) {
   return ret;
 }
 
-void shouldPrintHelloMax() {
+void shouldPrintHelloMax(void) {
   char* hiMax = hello("Max", 3);
   assert(strcmp(hiMax, "Hello, Max!\n") == 0);
   free(hiMax);
 }
 
-void testConstant() {
+void testConstant(void) {
   Chunk chunk;
   initChunk(&chunk);
   assert(chunk.constants.capacity == 0);
@@ -50,12 +50,12 @@ void testConstant() {
   assert(chunk.constants.count == 0xe);
 }
 
-void testInterpretResult() {}
+void testInterpretResult(void) {}
 
-void test() {
+void test(void) {
   testConstant();
   testInterpretResult();
   shouldPrintHelloMax();
 }
 
-int main() { test(); }
+int main(void) { test(); }

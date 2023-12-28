@@ -168,7 +168,7 @@ void FourMinusThreeTimesNegativeTwo_without_subtract(Chunk* chunk) {
   writeChunkNoLine(chunk, OP_RETURN);
 }
 
-int main() {
+int main(void) {
   initVM();
   Chunk chunk;
   initChunk(&chunk);

@@ -10,7 +10,7 @@ Value peekStack(VM* vm, int index) {
   return *(vm->stack.top - index);
 }
 
-void addToStack() {
+void addToStack(void) {
   initVM();
   Chunk chunk;
   initChunk(&chunk);
@@ -31,7 +31,7 @@ void addToStack() {
   LOX_ASSERT(peekStack(&vm, 1) == 42);
 }
 
-void addition() {
+void addition(void) {
   initVM();
   Chunk chunk;
   initChunk(&chunk);
@@ -53,7 +53,7 @@ void addition() {
   LOX_ASSERT(peekStack(&vm, 0) == 69);
 }
 
-void subtraction() {
+void subtraction(void) {
   initVM();
   Chunk chunk;
   initChunk(&chunk);
@@ -75,7 +75,7 @@ void subtraction() {
   LOX_ASSERT(peekStack(&vm, 0) == 4);
 }
 
-void negation() {
+void negation(void) {
   initVM();
   Chunk chunk;
   initChunk(&chunk);
@@ -93,7 +93,7 @@ void negation() {
   LOX_ASSERT(peekStack(&vm, 0) == -7);
 }
 
-void multiplication() {
+void multiplication(void) {
   initVM();
   Chunk chunk;
   initChunk(&chunk);
@@ -115,7 +115,7 @@ void multiplication() {
   LOX_ASSERT(peekStack(&vm, 0) == 420);
 }
 
-void division() {
+void division(void) {
   initVM();
   Chunk chunk;
   initChunk(&chunk);
@@ -137,7 +137,7 @@ void division() {
   LOX_ASSERT(peekStack(&vm, 0) == 42);
 }
 
-int main() {
+int main(void) {
   addToStack();
   addition();
   subtraction();

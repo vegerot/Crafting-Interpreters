@@ -4,7 +4,7 @@
 #include "../lox_assert.h"
 #include "../stack.h"
 
-void basic() {
+void basic(void) {
   Stack stack;
   new_stack(&stack);
 
@@ -16,7 +16,7 @@ void basic() {
   LOX_ASSERT(n == 42);
 }
 
-void stack_grows() {
+void stack_grows(void) {
   Stack stack;
   new_stack(&stack);
 
@@ -45,7 +45,7 @@ void stack_grows() {
   LOX_ASSERT(stack_pop(&stack) == 1.);
 }
 
-void push_and_pop() {
+void push_and_pop(void) {
   Stack stack;
   new_stack(&stack);
   LOX_ASSERT(stack.cap == 1);
@@ -58,7 +58,7 @@ void push_and_pop() {
   LOX_ASSERT(stack_pop(&stack) == 1);
 }
 
-int main() {
+int main(void) {
   basic();
   stack_grows();
   push_and_pop();

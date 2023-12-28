@@ -6,21 +6,21 @@
 
 VM vm;
 
-static void resetStack() { vm.stack.top = vm.stack.bottom; }
+static void resetStack(void) { vm.stack.top = vm.stack.bottom; }
 
-void initVM() {
+void initVM(void) {
   new_stack(&vm.stack);
   resetStack();
 }
 
-void freeVM() {}
+void freeVM(void) {}
 
 /**
  * hack: only used for tests
  */
-VM _getVM() { return vm; }
+VM _getVM(void) { return vm; }
 
-InterpretResult run() {
+InterpretResult run(void) {
 #define READ_BYTE() (*vm.ip++)
 #define READ_CONSTANT() (vm.chunk->constants.values[READ_BYTE()])
 #define BINARY_OP(op)                                                          \
