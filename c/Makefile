@@ -1,4 +1,4 @@
-CC=cc
+CC ?= cc
 CFLAGS= -g -Wall -Wextra -Wpedantic -Werror -Wno-gnu-statement-expression
 SRC_FILES= main.c chunk.c debug.c memory.c stack.c value.c vm.c
 
