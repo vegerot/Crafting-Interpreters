@@ -1,2 +1,8 @@
 QualifierAlignment: Right
 PointerAlignment: Left
+
+# formatting
+# source: https://stackoverflow.com/a/69311475/6100005
+UseTab: Always
+IndentWidth: 4
+TabWidth: 4
