@@ -5,12 +5,12 @@
 #include "value.h"
 
 typedef struct {
-  int cap;
-  /**
-   * actual location in memory of stack top instead of offset into `stack`
-   */
-  Value* top;
-  Value* bottom;
+	int cap;
+	/**
+	 * actual location in memory of stack top instead of offset into `stack`
+	 */
+	Value* top;
+	Value* bottom;
 } Stack;
 
 void new_stack(Stack* stack);
