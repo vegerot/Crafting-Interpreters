@@ -17,4 +17,7 @@ lint: $(SRC_FILES) *.h test/*.c
 	clang-tidy $(SRC_FILES) *.h test/*.c
 
 clangd:
-	clang $(CFLAGS) -MJ compile_commands.json -D DEBUG_TRACE_EXECUTION $(SRC_FILES) -o lox
+	printf "[" > compile_commands.json
+	clang $(CFLAGS) -MJ /dev/stdout -D DEBUG_TRACE_EXECUTION main.c $(SRC_FILES) -o lox | sed '$$s|.$$||' >> compile_commands.json
+	printf "]" >> compile_commands.json
+
