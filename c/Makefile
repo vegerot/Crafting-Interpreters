@@ -4,6 +4,8 @@ SRC_FILES= compiler.c scanner.c chunk.c debug.c memory.c stack.c value.c vm.c
 
 lox: main.c chunk.c debug.c memory.c stack.c value.c vm.c
 	$(CC) $(CFLAGS) -D DEBUG_TRACE_EXECUTION main.c $(SRC_FILES) -o lox
+
+all: lox test lint
 test: test-stack test-vm test-scanner
 test-vm: test/test-vm.c vm.h vm.c chunk.h chunk.c
 	$(CC) $(CFLAGS) test/test-vm.c $(SRC_FILES) -o test/test-vm
