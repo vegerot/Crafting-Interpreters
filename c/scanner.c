@@ -60,6 +60,9 @@ static Token scanString(Scanner* s) {
 	return makeToken(s, TOKEN_STRING);
 }
 
+static bool isAlpha(char c) {
+	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+}
 static bool isDigit(char c) { return c >= '0' && c <= '9'; }
 
 static Token scanNumber(Scanner* s) {
@@ -73,6 +76,13 @@ static Token scanNumber(Scanner* s) {
 		} while (isDigit(peek(s)));
 	}
 	return makeToken(s, TOKEN_NUMBER);
+}
+
+static Token scanIdentifierOrKeyword(Scanner* s) {
+	while (isAlpha(peek(s)) || isDigit(peek(s))) {
+		++s->current;
+	}
+	return makeToken(s, TOKEN_IDENTIFIER);
 }
 
 static bool ifMatchConsume(Scanner* scanner, char c) {
@@ -115,6 +125,10 @@ Token scanToken(Scanner* scanner) {
 	}
 
 	char c = advance(scanner);
+
+	if (isAlpha(c))
+		return scanIdentifierOrKeyword(scanner);
+
 	switch (c) {
 	// simple tokens
 	case '(':
