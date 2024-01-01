@@ -40,6 +40,8 @@ typedef struct {
 	int length;
 	/// precondition: MUST CHECK `type` is `TOKEN_ERROR` before accessing
 	char const* error_message;
+	/// precondition: MUST CHECK `type` is `TOKEN_ERROR` before accessing
+	int error_message_length;
 } Token;
 
 Token scanToken(Scanner* scanner);
