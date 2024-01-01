@@ -30,15 +30,46 @@ Token errorToken(Scanner* scanner, char const* message, int length) {
 	};
 }
 
+static char advance(Scanner* scanner) { return *scanner->current++; }
+
 Token scanToken(Scanner* scanner) {
 	scanner->start_of_lexeme = scanner->current;
 	if (isAtEnd(scanner)) {
 		return makeToken(scanner, TOKEN_EOF);
 	}
+
+	char c = advance(scanner);
+	switch (c) {
+	case '(':
+		return makeToken(scanner, TOKEN_LEFT_PAREN);
+	case ')':
+		return makeToken(scanner, TOKEN_RIGHT_PAREN);
+	case '{':
+		return makeToken(scanner, TOKEN_LEFT_BRACE);
+	case '}':
+		return makeToken(scanner, TOKEN_RIGHT_BRACE);
+	case ';':
+		return makeToken(scanner, TOKEN_SEMICOLON);
+	case ',':
+		return makeToken(scanner, TOKEN_COMMA);
+	case '.':
+		return makeToken(scanner, TOKEN_DOT);
+	case '+':
+		return makeToken(scanner, TOKEN_PLUS);
+	case '/':
+		return makeToken(scanner, TOKEN_SLASH);
+	case '*':
+		return makeToken(scanner, TOKEN_STAR);
+	}
+
 	return errorToken(scanner, "Unexpected character",
 					  strlen("Unexpected character"));
 }
 
 char* tokenTypeToString_(TokenType type) {
-	LOX_ASSERT(0 && type && "unimplemented");
+	switch (type) {
+	#define X(name) case name: return #name;
+	TOKEN_TYPES
+	#undef X
+	}
 }
