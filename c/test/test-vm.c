@@ -25,8 +25,8 @@ void addToStack(void) {
 
 		writeChunkNoLine(&chunk, OP_RETURN);
 	}
-	interpret(&chunk);
-	VM vm = _getVM();
+	interpret_bytecode_(&chunk);
+	VM vm = getVM_();
 	LOX_ASSERT(peekStack(&vm, 0) == 69);
 	LOX_ASSERT(peekStack(&vm, 1) == 42);
 }
@@ -48,8 +48,8 @@ void addition(void) {
 
 		writeChunkNoLine(&chunk, OP_RETURN);
 	}
-	interpret(&chunk);
-	VM vm = _getVM();
+	interpret_bytecode_(&chunk);
+	VM vm = getVM_();
 	LOX_ASSERT(peekStack(&vm, 0) == 69);
 }
 
@@ -70,8 +70,8 @@ void subtraction(void) {
 
 		writeChunkNoLine(&chunk, OP_RETURN);
 	}
-	interpret(&chunk);
-	VM vm = _getVM();
+	interpret_bytecode_(&chunk);
+	VM vm = getVM_();
 	LOX_ASSERT(peekStack(&vm, 0) == 4);
 }
 
@@ -88,8 +88,8 @@ void negation(void) {
 
 		writeChunkNoLine(&chunk, OP_RETURN);
 	}
-	interpret(&chunk);
-	VM vm = _getVM();
+	interpret_bytecode_(&chunk);
+	VM vm = getVM_();
 	LOX_ASSERT(peekStack(&vm, 0) == -7);
 }
 
@@ -110,8 +110,8 @@ void multiplication(void) {
 
 		writeChunkNoLine(&chunk, OP_RETURN);
 	}
-	interpret(&chunk);
-	VM vm = _getVM();
+	interpret_bytecode_(&chunk);
+	VM vm = getVM_();
 	LOX_ASSERT(peekStack(&vm, 0) == 420);
 }
 
@@ -132,8 +132,8 @@ void division(void) {
 
 		writeChunkNoLine(&chunk, OP_RETURN);
 	}
-	interpret(&chunk);
-	VM vm = _getVM();
+	interpret_bytecode_(&chunk);
+	VM vm = getVM_();
 	LOX_ASSERT(peekStack(&vm, 0) == 42);
 }
 
