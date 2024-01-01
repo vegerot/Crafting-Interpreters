@@ -32,9 +32,19 @@ Token errorToken(Scanner* scanner, char const* message, int length) {
 
 static char advance(Scanner* scanner) { return *scanner->current++; }
 
-static char peek(Scanner* scanner) { return *scanner->current; }
+static void consumeUntilNewLine(Scanner* scanner) {
+	while (!isAtEnd(scanner) && advance(scanner) != '\n') {
+	}
+	++scanner->line;
+}
 
-static void skipWhitespace(Scanner* scanner) {
+static char peek(Scanner* scanner) { return *scanner->current; }
+static char peekNext(Scanner* scanner) {
+	if (isAtEnd(scanner)) return '\0';
+	return scanner->current[1];
+}
+
+static void skipWhitespaceAndComments(Scanner* scanner) {
 	while (1) {
 		char t = peek(scanner);
 		switch (t) {
@@ -44,9 +54,14 @@ static void skipWhitespace(Scanner* scanner) {
 			advance(scanner);
 			break;
 		case '\n':
-			advance(scanner);
 			++scanner->line;
+			advance(scanner);
 			break;
+		case '/':
+			if (peekNext(scanner) == '/') {
+				consumeUntilNewLine(scanner);
+			}
+			return;
 		default:
 			return;
 		}
@@ -54,7 +69,7 @@ static void skipWhitespace(Scanner* scanner) {
 }
 
 Token scanToken(Scanner* scanner) {
-	skipWhitespace(scanner);
+	skipWhitespaceAndComments(scanner);
 	scanner->start_of_lexeme = scanner->current;
 	if (isAtEnd(scanner)) {
 		return makeToken(scanner, TOKEN_EOF);
@@ -90,8 +105,10 @@ Token scanToken(Scanner* scanner) {
 
 char* tokenTypeToString_(TokenType type) {
 	switch (type) {
-	#define X(name) case name: return #name;
-	TOKEN_TYPES
-	#undef X
+		// clang-format off
+#define X(name) case name: return #name;
+		TOKEN_TYPES
+#undef X
+		//clang-format on
 	}
 }
