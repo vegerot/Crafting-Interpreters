@@ -21,6 +21,9 @@ test-scanner: test/test-scanner.c scanner.h scanner.c
 lint: $(SRC_FILES) *.h test/*.c
 	clang-tidy $(SRC_FILES) *.h test/*.c
 
+format: $(SRC_FILES) *.h test/*.c
+	clang-format -i $(SRC_FILES) *.h test/*.c
+
 clangd:
 	printf "[" > compile_commands.json
 	clang $(CFLAGS) -MJ /dev/stdout -D DEBUG_TRACE_EXECUTION main.c $(SRC_FILES) -o lox | sed '$$s|.$$||' >> compile_commands.json
