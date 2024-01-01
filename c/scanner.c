@@ -156,4 +156,5 @@ char* tokenTypeToString_(TokenType type) {
 #undef X
 		//clang-format on
 	}
+	__builtin_unreachable();
 }
