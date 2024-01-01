@@ -6,6 +6,7 @@
 #include "lox_assert.h"
 #include "value.h"
 #include "vm.h"
+#include <stdbool.h>
 
 static void runFile(char* filename) {
 	LOX_ASSERT(false && filename && "unimplemented");

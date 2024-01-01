@@ -3,6 +3,7 @@
 #define STACK_MAX 256
 #define STACK_INIT_SIZE 1
 #include "value.h"
+#include <stdbool.h>
 
 typedef struct {
 	int cap;

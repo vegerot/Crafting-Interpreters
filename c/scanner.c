@@ -3,6 +3,7 @@
 
 #include "lox_assert.h"
 #include "scanner.h"
+#include <stdbool.h>
 
 void initScanner(Scanner* scanner, char const* source) {
 	scanner->start_of_lexeme = scanner->current = source;
