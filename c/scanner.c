@@ -60,6 +60,21 @@ static Token scanString(Scanner* s) {
 	return makeToken(s, TOKEN_STRING);
 }
 
+static bool isDigit(char c) { return c >= '0' && c <= '9'; }
+
+static Token scanNumber(Scanner* s) {
+	LOX_ASSERT(isDigit(s->current[-1]));
+	while (isDigit(peek(s))) {
+		++s->current;
+	}
+	if (peek(s) == '.') {
+		do {
+			++s->current;
+		} while (isDigit(peek(s)));
+	}
+	return makeToken(s, TOKEN_NUMBER);
+}
+
 static bool ifMatchConsume(Scanner* scanner, char c) {
 	if (peek(scanner) == c) {
 		advance(scanner);
@@ -141,7 +156,17 @@ Token scanToken(Scanner* scanner) {
 									  : TOKEN_GREATER);
 	case '"':
 		return scanString(scanner);
-
+	case '0':
+	case '1':
+	case '2':
+	case '3':
+	case '4':
+	case '5':
+	case '6':
+	case '7':
+	case '8':
+	case '9':
+		return scanNumber(scanner);
 	default:
 		return errorToken(scanner, "Unexpected character",
 						  strlen("Unexpected character"));

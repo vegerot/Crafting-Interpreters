@@ -158,6 +158,32 @@ static void unterminated_string() {
 	LOX_ASSERT(equal == 0);
 }
 
+static void lex_number() {
+	Scanner scanner;
+	char* src = "{ 123.456; }";
+	initScanner(&scanner, src);
+
+	Token t = scanToken(&scanner);
+	LOX_ASSERT_EQUALS(t.type, TOKEN_LEFT_BRACE);
+
+	t = scanToken(&scanner);
+	if (t.type != TOKEN_NUMBER) {
+		fflush(stdout);
+		fprintf(stderr, "wrong token type.  Expected '%c' to be %s, got %s\n",
+				*t.start, tokenTypeToString_(TOKEN_NUMBER),
+				tokenTypeToString_(t.type));
+		LOX_ASSERT(1 == 0);
+	}
+	LOX_ASSERT_EQUALS(t.type, TOKEN_NUMBER);
+	LOX_ASSERT_EQUALS(t.length, 7);
+	LOX_ASSERT(t.start == src + 2);
+
+	t = scanToken(&scanner);
+	LOX_ASSERT_EQUALS(t.type, TOKEN_SEMICOLON);
+	t = scanToken(&scanner);
+	LOX_ASSERT_EQUALS(t.type, TOKEN_RIGHT_BRACE);
+}
+
 int main(void) {
 	eof();
 	single_character_tokens();
@@ -166,4 +192,5 @@ int main(void) {
 	skip_comments();
 	scan_strings();
 	unterminated_string();
+	lex_number();
 }
