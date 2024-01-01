@@ -38,6 +38,13 @@ static void consumeUntilNewLine(Scanner* scanner) {
 	++scanner->line;
 }
 
+static int consumeUntilEndOfString(Scanner* s) {
+	LOX_ASSERT(s->current[-1] == '"');
+	while (*s->current++ != '"') {
+	};
+	return (int)(s->current - s->start_of_lexeme);
+}
+
 static char peek(Scanner* scanner) { return *scanner->current; }
 static char peekNext(Scanner* scanner) {
 	if (isAtEnd(scanner))
@@ -124,7 +131,10 @@ Token scanToken(Scanner* scanner) {
 		return makeToken(scanner, ifMatchConsume(scanner, '=')
 									  ? TOKEN_GREATER_EQUAL
 									  : TOKEN_GREATER);
-
+	case '"': {
+		consumeUntilEndOfString(scanner);
+		return makeToken(scanner, TOKEN_STRING);
+	}
 	default:
 		return errorToken(scanner, "Unexpected character",
 						  strlen("Unexpected character"));
