@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+#include "compiler.h"
 #include "debug.h"
 #include "lox_assert.h"
 #include "vm.h"
@@ -97,4 +98,9 @@ InterpretResult interpret_bytecode_(Chunk* chunk) {
 	vm.ip = chunk->code;
 
 	return run();
+}
+
+InterpretResult interpret(char const* source) {
+	compile(source);
+	return INTERPRET_OK;
 }
