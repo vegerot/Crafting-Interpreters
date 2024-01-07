@@ -32,7 +32,29 @@ Token errorToken(Scanner* scanner, char const* message, int length) {
 
 static char advance(Scanner* scanner) { return *scanner->current++; }
 
+static char peek(Scanner* scanner) { return *scanner->current; }
+
+static void skipWhitespace(Scanner* scanner) {
+	while (1) {
+		char t = peek(scanner);
+		switch (t) {
+		case ' ':
+		case '\r':
+		case '\t':
+			advance(scanner);
+			break;
+		case '\n':
+			advance(scanner);
+			++scanner->line;
+			break;
+		default:
+			return;
+		}
+	}
+}
+
 Token scanToken(Scanner* scanner) {
+	skipWhitespace(scanner);
 	scanner->start_of_lexeme = scanner->current;
 	if (isAtEnd(scanner)) {
 		return makeToken(scanner, TOKEN_EOF);
