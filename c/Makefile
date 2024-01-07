@@ -1,6 +1,6 @@
 CC ?= cc
-CFLAGS= -g -Wall -Wextra -Wpedantic -Werror -Wno-gnu-statement-expression
-SRC_FILES= main.c chunk.c debug.c memory.c stack.c value.c vm.c
+CFLAGS= -g -Wall -Wextra -Wpedantic -Werror -Wno-gnu-statement-expression -Wno-strict-prototypes
+SRC_FILES= compiler.c scanner.c chunk.c debug.c memory.c stack.c value.c vm.c
 
 lox: main.c chunk.c debug.c memory.c stack.c value.c vm.c
 	$(CC) $(CFLAGS) -D DEBUG_TRACE_EXECUTION main.c $(SRC_FILES) -o lox
