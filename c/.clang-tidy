@@ -1,0 +1,2 @@
+Checks:          'bugprone-*, clang-diagnostic-*,clang-analyzer-*,cppcoreguidelines-*,darwin-*,modernize-*,performance-*, -bugprone-easily-swappable-parameters, -cppcoreguidelines-avoid-magic-numbers, -modernize-redundant-void-arg,'
+WarningsAsErrors: false
