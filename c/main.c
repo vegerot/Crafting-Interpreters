@@ -7,7 +7,6 @@
 #include "value.h"
 #include "vm.h"
 
-
 static void runFile(char* filename) {
 	LOX_ASSERT(false && filename && "unimplemented");
 }
