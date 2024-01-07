@@ -140,6 +140,24 @@ static void scan_strings() {
 	LOX_ASSERT_EQUALS(t.type, TOKEN_RIGHT_PAREN);
 }
 
+static void unterminated_string() {
+	Scanner scanner;
+	char const* src = "(\"hello world!)";
+	initScanner(&scanner, src);
+
+	Token t = scanToken(&scanner);
+	LOX_ASSERT_EQUALS(t.type, TOKEN_LEFT_PAREN)
+
+	t = scanToken(&scanner);
+	LOX_ASSERT_EQUALS(t.type, TOKEN_ERROR);
+	LOX_ASSERT_EQUALS(t.length, (int)strlen("\"hello world!)"));
+	LOX_ASSERT_EQUALS(t.error_message_length,
+					  (int)strlen("Unterminated string"));
+	int equal =
+		strncmp(t.error_message, "Unterminated string", t.error_message_length);
+	LOX_ASSERT(equal == 0);
+}
+
 int main(void) {
 	eof();
 	single_character_tokens();
@@ -147,4 +165,5 @@ int main(void) {
 	skip_whitespace();
 	skip_comments();
 	scan_strings();
+	unterminated_string();
 }
