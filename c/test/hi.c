@@ -9,7 +9,7 @@
 char* hello(char const* name, int nameLen) {
 	char* format = "Hello, %s!\n";
 	// larger than required because of format specifiers
-	int lengthOfTarget = strlen(format) + nameLen;
+	int lengthOfTarget = (int)strlen(format) + nameLen;
 	char* ret = malloc(sizeof(char) * lengthOfTarget);
 	snprintf(ret, lengthOfTarget, format, name);
 	return ret;

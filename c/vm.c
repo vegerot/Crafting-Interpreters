@@ -4,7 +4,8 @@
 #include "lox_assert.h"
 #include "vm.h"
 
-VM vm;
+// TODO: make this a parameter
+VM vm; // NOLINT
 
 static void resetStack(void) { vm.stack.top = vm.stack.bottom; }
 
@@ -18,7 +19,7 @@ void freeVM(void) {}
 /**
  * hack: only used for tests
  */
-VM _getVM(void) { return vm; }
+VM getVM_(void) { return vm; }
 
 InterpretResult run(void) {
 #define READ_BYTE() (*vm.ip++)
@@ -91,7 +92,7 @@ InterpretResult run(void) {
 #undef BINARY_OP
 }
 
-InterpretResult interpret(Chunk* chunk) {
+InterpretResult interpret_bytecode_(Chunk* chunk) {
 	vm.chunk = chunk;
 	vm.ip = chunk->code;
 
