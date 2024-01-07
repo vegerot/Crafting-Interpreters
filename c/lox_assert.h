@@ -1,5 +1,6 @@
 #ifndef lox_assert_h
 #define lox_assert_h
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
