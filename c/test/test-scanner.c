@@ -1,5 +1,6 @@
 #include "../lox_assert.h"
 #include "../scanner.h"
+#include <string.h>
 
 static void eof() {
 	char const* src = "\0";
@@ -120,10 +121,30 @@ static void skip_comments() {
 	LOX_ASSERT_EQUALS(scanner.line, 3);
 }
 
+static void scan_strings() {
+	Scanner scanner;
+	char const* src = "(\"hello\nworld!\")";
+	initScanner(&scanner, src);
+
+	Token t = scanToken(&scanner);
+	LOX_ASSERT_EQUALS(t.type, TOKEN_LEFT_PAREN)
+
+	t = scanToken(&scanner);
+	LOX_ASSERT_EQUALS(t.type, TOKEN_STRING);
+	LOX_ASSERT_EQUALS(t.line, 2);
+	LOX_ASSERT_EQUALS(t.length, (int)strlen("\"hello world!\""));
+	int equal = strncmp(t.start, "\"hello\nworld!\"", t.length);
+	LOX_ASSERT(equal == 0);
+
+	t = scanToken(&scanner);
+	LOX_ASSERT_EQUALS(t.type, TOKEN_RIGHT_PAREN);
+}
+
 int main(void) {
 	eof();
 	single_character_tokens();
 	multi_character_tokens();
 	skip_whitespace();
 	skip_comments();
+	scan_strings();
 }
