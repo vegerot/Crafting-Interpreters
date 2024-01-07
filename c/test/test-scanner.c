@@ -184,6 +184,29 @@ static void lex_number() {
 	LOX_ASSERT_EQUALS(t.type, TOKEN_RIGHT_BRACE);
 }
 
+static void lex_identifier() {
+	Scanner s;
+	char* src = "(1 + yomomma);";
+	initScanner(&s, src);
+
+	Token t = scanToken(&s);
+	LOX_ASSERT_EQUALS(t.type, TOKEN_LEFT_PAREN);
+	t = scanToken(&s);
+	LOX_ASSERT_EQUALS(t.type, TOKEN_NUMBER);
+	t = scanToken(&s);
+	LOX_ASSERT_EQUALS(t.type, TOKEN_PLUS);
+
+	t = scanToken(&s);
+	if (t.type != TOKEN_IDENTIFIER) {
+		fflush(stdout);
+		fprintf(stderr, "wrong token type.  Expected '%c' to be %s, got %s\n",
+				*t.start, tokenTypeToString_(TOKEN_IDENTIFIER),
+				tokenTypeToString_(t.type));
+		LOX_ASSERT(1 == 0);
+	}
+	LOX_ASSERT_EQUALS(t.length, 7);
+	LOX_ASSERT_EQUALS((int)((src + 5) - t.start), 0);
+}
 int main(void) {
 	eof();
 	single_character_tokens();
@@ -193,4 +216,5 @@ int main(void) {
 	scan_strings();
 	unterminated_string();
 	lex_number();
+	lex_identifier();
 }
