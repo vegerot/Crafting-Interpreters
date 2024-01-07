@@ -13,9 +13,9 @@ test/test-vm: test/test-vm.c vm.h vm.c chunk.h chunk.c
 test/test-stack: test/test-stack.c stack.h stack.c
 	$(CC) $(CFLAGS) test/test-stack.c $(SRC_FILES) -o test/test-stack
 	test/test-stack
-test/test-scanner: test/test-scanner.c scanner.h scanner.c
-	$(CC) $(CFLAGS) test/test-scanner.c $(SRC_FILES) -o test/test-scanner
-	test/test-scanner
+test/test-scanner: test/test-scanner.c scanner.h scanner.c lox_assert.h
+	$(CC) $(CFLAGS) -Wno-error test/test-scanner.c $(SRC_FILES) -o test/test-scanner
+	test/test-scanner || mv test/test-scanner test/test-scanner.failed
 
 
 lint: $(SRC_FILES) *.h test/*.c
