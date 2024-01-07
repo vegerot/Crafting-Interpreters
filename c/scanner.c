@@ -40,8 +40,17 @@ static void consumeUntilNewLine(Scanner* scanner) {
 
 static char peek(Scanner* scanner) { return *scanner->current; }
 static char peekNext(Scanner* scanner) {
-	if (isAtEnd(scanner)) return '\0';
+	if (isAtEnd(scanner))
+		return '\0';
 	return scanner->current[1];
+}
+
+static bool ifMatchConsume(Scanner* scanner, char c) {
+	if (peek(scanner) == c) {
+		advance(scanner);
+		return true;
+	}
+	return false;
 }
 
 static void skipWhitespaceAndComments(Scanner* scanner) {
@@ -77,6 +86,7 @@ Token scanToken(Scanner* scanner) {
 
 	char c = advance(scanner);
 	switch (c) {
+	// simple tokens
 	case '(':
 		return makeToken(scanner, TOKEN_LEFT_PAREN);
 	case ')':
@@ -97,10 +107,28 @@ Token scanToken(Scanner* scanner) {
 		return makeToken(scanner, TOKEN_SLASH);
 	case '*':
 		return makeToken(scanner, TOKEN_STAR);
-	}
+	// one lookahead symbols
+	case '=':
+		return makeToken(scanner, ifMatchConsume(scanner, '=')
+									  ? TOKEN_EQUAL_EQUAL
+									  : TOKEN_EQUAL);
+	case '!':
+		return makeToken(scanner, ifMatchConsume(scanner, '=')
+									  ? TOKEN_BANG_EQUAL
+									  : TOKEN_BANG);
+	case '<':
+		return makeToken(scanner, ifMatchConsume(scanner, '=')
+									  ? TOKEN_LESS_EQUAL
+									  : TOKEN_LESS);
+	case '>':
+		return makeToken(scanner, ifMatchConsume(scanner, '=')
+									  ? TOKEN_GREATER_EQUAL
+									  : TOKEN_GREATER);
 
-	return errorToken(scanner, "Unexpected character",
-					  strlen("Unexpected character"));
+	default:
+		return errorToken(scanner, "Unexpected character",
+						  strlen("Unexpected character"));
+	}
 }
 
 char* tokenTypeToString_(TokenType type) {

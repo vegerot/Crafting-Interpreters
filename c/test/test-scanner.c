@@ -38,6 +38,36 @@ static void single_character_tokens() {
 	LOX_ASSERT_EQUALS(got, want)
 }
 
+static void multi_character_tokens() {
+	Scanner scanner;
+
+	char const* src = "!;!=;<;<=;>;>=";
+	initScanner(&scanner, src);
+
+	TokenType wants[] = {
+		TOKEN_BANG,	   TOKEN_SEMICOLON, TOKEN_BANG_EQUAL,	 TOKEN_SEMICOLON,
+		TOKEN_LESS,	   TOKEN_SEMICOLON, TOKEN_LESS_EQUAL,	 TOKEN_SEMICOLON,
+		TOKEN_GREATER, TOKEN_SEMICOLON, TOKEN_GREATER_EQUAL,
+	};
+
+	for (unsigned long i = 0; i < sizeof(wants) / sizeof(wants[0]); ++i) {
+		Token t = scanToken(&scanner);
+		TokenType want = wants[i];
+		TokenType got = t.type;
+		if (got != want) {
+			fflush(stdout);
+			fprintf(
+				stderr, "wrong token type.  Expected '%c' to be %s, got %s\n",
+				*t.start, tokenTypeToString_(want), tokenTypeToString_(got));
+			LOX_ASSERT(1 == 0);
+		}
+	}
+	Token t = scanToken(&scanner);
+	TokenType want = TOKEN_EOF;
+	TokenType got = t.type;
+	LOX_ASSERT_EQUALS(got, want)
+}
+
 static void skip_whitespace() {
 	Scanner scanner;
 	char const* src = "(	{\r,  +\n; ";
@@ -93,6 +123,7 @@ static void skip_comments() {
 int main(void) {
 	eof();
 	single_character_tokens();
+	multi_character_tokens();
 	skip_whitespace();
 	skip_comments();
 }
