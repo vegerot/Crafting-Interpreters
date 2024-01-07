@@ -34,6 +34,7 @@ typedef struct {
 	char const* start;
 	int line;
 	int length;
+	/// precondition: MUST CHECK `type` is `TOKEN_ERROR` before accessing
 	const char* error_message;
 } Token;
 
