@@ -78,11 +78,92 @@ static Token scanNumber(Scanner* s) {
 	return makeToken(s, TOKEN_NUMBER);
 }
 
+TokenType checkKeyword(char const* start_of_lexeme, long length_of_lexeme,
+					   char const* rest_of_kw, int length_of_chars_already_read,
+					   int length_of_kw, TokenType type) {
+	bool lengths_are_equal = length_of_lexeme == length_of_kw;
+	if (!lengths_are_equal)
+		return TOKEN_IDENTIFIER;
+	char const* rest_of_lexeme = start_of_lexeme + length_of_chars_already_read;
+	bool is_keyword = memcmp(rest_of_lexeme, rest_of_kw,
+							 length_of_kw - length_of_chars_already_read) == 0;
+	if (!is_keyword)
+		return TOKEN_IDENTIFIER;
+	return type;
+}
+
+TokenType identifierOrKeywordType(Scanner* s) {
+	// FIXME: we compute this difference here and in `makeToken`
+	long length_of_maybe_keyword = s->current - s->start_of_lexeme;
+	switch (*s->start_of_lexeme) {
+	case 'a':
+		return checkKeyword(s->start_of_lexeme, length_of_maybe_keyword, "nd",
+							1, 3, TOKEN_AND);
+	case 'c':
+		return checkKeyword(s->start_of_lexeme, length_of_maybe_keyword, "lass",
+							1, 5, TOKEN_CLASS);
+	case 'e':
+		return checkKeyword(s->start_of_lexeme, length_of_maybe_keyword, "lse",
+							1, 4, TOKEN_ELSE);
+	case 'f':
+		switch (s->start_of_lexeme[1]) {
+		case 'a':
+			return checkKeyword(s->start_of_lexeme, length_of_maybe_keyword,
+								"lse", 2, 5, TOKEN_FALSE);
+		case 'o':
+			return checkKeyword(s->start_of_lexeme, length_of_maybe_keyword,
+								"r", 2, 3, TOKEN_FOR);
+		case 'u':
+			return checkKeyword(s->start_of_lexeme, length_of_maybe_keyword,
+								"n", 2, 3, TOKEN_FUN);
+		default:
+			return TOKEN_IDENTIFIER;
+		}
+	case 'i':
+		return checkKeyword(s->start_of_lexeme, length_of_maybe_keyword, "f", 1,
+							2, TOKEN_IF);
+	case 'n':
+		return checkKeyword(s->start_of_lexeme, length_of_maybe_keyword, "il",
+							1, 3, TOKEN_NIL);
+	case 'o':
+		return checkKeyword(s->start_of_lexeme, length_of_maybe_keyword, "r", 1,
+							2, TOKEN_OR);
+	case 'p':
+		return checkKeyword(s->start_of_lexeme, length_of_maybe_keyword, "rint",
+							1, 5, TOKEN_PRINT);
+	case 'r':
+		return checkKeyword(s->start_of_lexeme, length_of_maybe_keyword,
+							"eturn", 1, 6, TOKEN_RETURN);
+	case 's':
+		return checkKeyword(s->start_of_lexeme, length_of_maybe_keyword, "uper",
+							1, 5, TOKEN_SUPER);
+	case 't':
+		switch (s->start_of_lexeme[1]) {
+		case 'h':
+			return checkKeyword(s->start_of_lexeme, length_of_maybe_keyword,
+								"is", 2, 4, TOKEN_THIS);
+		case 'r':
+			return checkKeyword(s->start_of_lexeme, length_of_maybe_keyword,
+								"ue", 2, 4, TOKEN_TRUE);
+		default:
+			return TOKEN_IDENTIFIER;
+		}
+	case 'v':
+		return checkKeyword(s->start_of_lexeme, length_of_maybe_keyword, "ar",
+							1, 3, TOKEN_VAR);
+	case 'w':
+		return checkKeyword(s->start_of_lexeme, length_of_maybe_keyword, "hile",
+							1, 5, TOKEN_WHILE);
+	default:
+		return TOKEN_IDENTIFIER;
+	}
+}
+
 static Token scanIdentifierOrKeyword(Scanner* s) {
 	while (isAlpha(peek(s)) || isDigit(peek(s))) {
 		++s->current;
 	}
-	return makeToken(s, TOKEN_IDENTIFIER);
+	return makeToken(s, identifierOrKeywordType(s));
 }
 
 static bool ifMatchConsume(Scanner* scanner, char c) {

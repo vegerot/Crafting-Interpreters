@@ -207,6 +207,39 @@ static void lex_identifier() {
 	LOX_ASSERT_EQUALS(t.length, 7);
 	LOX_ASSERT_EQUALS((int)((src + 5) - t.start), 0);
 }
+
+static void lex_keyword() {
+	Scanner s;
+	char* src =
+		"(and class else false for fun fuck if nil or print return super "
+		"this true var while)";
+	initScanner(&s, src);
+
+	TokenType wants[] = {
+		TOKEN_LEFT_PAREN, TOKEN_AND,   TOKEN_CLASS,		 TOKEN_ELSE,
+		TOKEN_FALSE,	  TOKEN_FOR,   TOKEN_FUN,		 TOKEN_IDENTIFIER,
+		TOKEN_IF,		  TOKEN_NIL,   TOKEN_OR,		 TOKEN_PRINT,
+		TOKEN_RETURN,	  TOKEN_SUPER, TOKEN_THIS,		 TOKEN_TRUE,
+		TOKEN_VAR,		  TOKEN_WHILE, TOKEN_RIGHT_PAREN};
+
+	int fails = 0;
+	for (unsigned long i = 0; i < sizeof(wants) / sizeof(wants[0]); ++i) {
+		TokenType want = wants[i];
+		Token t = scanToken(&s);
+		TokenType got = t.type;
+
+		if (got != want) {
+			fflush(stdout);
+			fprintf(stderr,
+					"wrong token type.  Expected '%.*s' to be %s, got %s\n",
+					t.length, t.start, tokenTypeToString_(want),
+					tokenTypeToString_(got));
+			++fails;
+		}
+	}
+	LOX_ASSERT_EQUALS(fails, 0);
+}
+
 int main(void) {
 	eof();
 	single_character_tokens();
@@ -217,4 +250,5 @@ int main(void) {
 	unterminated_string();
 	lex_number();
 	lex_identifier();
+	lex_keyword();
 }
