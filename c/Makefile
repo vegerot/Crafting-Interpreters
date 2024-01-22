@@ -26,6 +26,6 @@ format: $(SRC_FILES) *.h test/*.c
 
 clangd:
 	printf "[" > compile_commands.json
-	clang $(CFLAGS) -MJ /dev/stdout -D DEBUG_TRACE_EXECUTION main.c $(SRC_FILES) -o lox | sed '$$s|.$$||' >> compile_commands.json
+	clang $(CFLAGS) -Wno-error -MJ /dev/stdout -D DEBUG_TRACE_EXECUTION main.c $(SRC_FILES) -o lox | sed '$$s|.$$||' >> compile_commands.json
 	printf "]" >> compile_commands.json
 
