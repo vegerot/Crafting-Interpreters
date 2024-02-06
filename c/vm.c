@@ -6,7 +6,7 @@
 #include "vm.h"
 
 // TODO: make this a parameter
-VM vm; // NOLINT
+static VM vm; // NOLINT
 
 static void resetStack(void) { vm.stack.top = vm.stack.bottom; }
 
@@ -101,6 +101,18 @@ InterpretResult interpret_bytecode_(Chunk* chunk) {
 }
 
 InterpretResult interpret(char const* source) {
-	compile(source);
-	return INTERPRET_OK;
+	Chunk chunk;
+	initChunk(&chunk);
+
+	if (!compile(source, &chunk)) {
+		freeChunk(&chunk);
+		return INTERPRET_COMPILE_ERROR;
+	}
+
+	vm.chunk = &chunk;
+	vm.ip = chunk.code;
+
+	InterpretResult result = run();
+	freeChunk(&chunk);
+	return result;
 }
