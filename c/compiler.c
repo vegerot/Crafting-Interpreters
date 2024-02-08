@@ -11,6 +11,11 @@ typedef struct {
 } Parser;
 
 static Parser parser; // NOLINT
+static Chunk* compilingChunk; // NOLINT
+
+static Chunk* currentChunk() {
+	return compilingChunk;
+}
 
 static void initParser() {
 	parser.had_error = false;
@@ -35,12 +40,14 @@ static void errorAtCurrent(char const* message) {
 	parser.had_error = true;
 }
 
+/*
 static void error(char const* message) {
 	if (parser.in_panic_mode)
 		return;
 	errorAt(&parser.previous, message);
 	parser.had_error = true;
 }
+*/
 
 void advance() {
 	parser.previous = parser.current;
@@ -61,14 +68,39 @@ static void consume_or_error(TokenType type, char const* message) {
 	return;
 }
 
+static void EmitByte(uint8_t byte) {
+	writeChunk(currentChunk(), byte, parser.previous.line);
+}
+
+
+#define EmitBytes(...) \
+	do { \
+		uint8_t bytes[] = { __VA_ARGS__};\
+		for (size_t i = 0; i < sizeof(bytes)/sizeof(bytes[0]); ++i) {\
+			EmitByte(bytes[i]);\
+		} \
+	} while (0)
+
+static void EmitReturn() {
+	EmitByte(OP_RETURN);
+}
+
+static void EndCompiler() {
+	EmitReturn();
+}
+
 bool compile(char const* source, Chunk* chunk) {
+	(void)chunk;
 	Scanner scanner;
 	initScanner(&scanner, source);
+	compilingChunk = chunk;
 	initParser();
+	EmitBytes(OP_NEGATE, OP_CONSTANT);
 
 	advance();
-	expression();
-	consume(TOKEN_EOF, "expected end of expression");
+	//expression();
+	consume_or_error(TOKEN_EOF, "expected end of expression");
+	EndCompiler();
 	return !parser.had_error;
 }
 
