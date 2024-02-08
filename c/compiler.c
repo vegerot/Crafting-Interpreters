@@ -10,12 +10,10 @@ typedef struct {
 	bool in_panic_mode;
 } Parser;
 
-static Parser parser; // NOLINT
+static Parser parser;		  // NOLINT
 static Chunk* compilingChunk; // NOLINT
 
-static Chunk* currentChunk() {
-	return compilingChunk;
-}
+static Chunk* currentChunk() { return compilingChunk; }
 
 static void initParser() {
 	parser.had_error = false;
@@ -72,22 +70,17 @@ static void EmitByte(uint8_t byte) {
 	writeChunk(currentChunk(), byte, parser.previous.line);
 }
 
-
-#define EmitBytes(...) \
-	do { \
-		uint8_t bytes[] = { __VA_ARGS__};\
-		for (size_t i = 0; i < sizeof(bytes)/sizeof(bytes[0]); ++i) {\
-			EmitByte(bytes[i]);\
-		} \
+#define EmitBytes(...)                                                         \
+	do {                                                                       \
+		uint8_t bytes[] = {__VA_ARGS__};                                       \
+		for (size_t i = 0; i < sizeof(bytes) / sizeof(bytes[0]); ++i) {        \
+			EmitByte(bytes[i]);                                                \
+		}                                                                      \
 	} while (0)
 
-static void EmitReturn() {
-	EmitByte(OP_RETURN);
-}
+static void EmitReturn() { EmitByte(OP_RETURN); }
 
-static void EndCompiler() {
-	EmitReturn();
-}
+static void EndCompiler() { EmitReturn(); }
 
 bool compile(char const* source, Chunk* chunk) {
 	(void)chunk;
@@ -98,7 +91,7 @@ bool compile(char const* source, Chunk* chunk) {
 	EmitBytes(OP_NEGATE, OP_CONSTANT);
 
 	advance();
-	//expression();
+	// expression();
 	consume_or_error(TOKEN_EOF, "expected end of expression");
 	EndCompiler();
 	return !parser.had_error;
