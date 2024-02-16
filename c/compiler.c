@@ -1,4 +1,5 @@
 #include "compiler.h"
+#include "lox_assert.h"
 #include "scanner.h"
 #include <stdio.h>
 
@@ -9,6 +10,20 @@ typedef struct {
 	bool had_error;
 	bool in_panic_mode;
 } Parser;
+
+typedef enum {
+	PREC_NONE = 0,
+	PREC_ASSIGNMENT, // =
+	PREC_OR,		 // or
+	PREC_AND,		 // and
+	PREC_EQUALITY,	 // == !=
+	PREC_COMPARISON, // < > <= >=
+	PREC_TERM,		 // + -
+	PREC_FACTOR,	 // * /
+	PREC_UNARY,		 // ! -
+	PREC_CALL,		 // . ()
+	PREC_PRIMARY,
+} Precedence;
 
 static Parser parser;		  // NOLINT
 static Chunk* compilingChunk; // NOLINT
@@ -38,14 +53,12 @@ static void errorAtCurrent(char const* message) {
 	parser.had_error = true;
 }
 
-/*
 static void error(char const* message) {
 	if (parser.in_panic_mode)
 		return;
 	errorAt(&parser.previous, message);
 	parser.had_error = true;
 }
-*/
 
 void advance() {
 	parser.previous = parser.current;
@@ -73,14 +86,60 @@ static void EmitByte(uint8_t byte) {
 #define EmitBytes(...)                                                         \
 	do {                                                                       \
 		uint8_t bytes[] = {__VA_ARGS__};                                       \
-		for (size_t i = 0; i < sizeof(bytes) / sizeof(bytes[0]); ++i) {        \
+		_Pragma("unroll") for (size_t i = 0;                                   \
+							   i < sizeof(bytes) / sizeof(bytes[0]); ++i) {    \
 			EmitByte(bytes[i]);                                                \
 		}                                                                      \
 	} while (0)
 
 static void EmitReturn() { EmitByte(OP_RETURN); }
 
+static uint8_t MakeConstant(Value value) {
+	int constant = addConstant(currentChunk(), value);
+	if (constant > UINT8_MAX) {
+		error("Too many constants in chunk");
+		return 0;
+	}
+	return (uint8_t)constant;
+}
+
+static void EmitConstant(Value value) {
+	EmitBytes(OP_CONSTANT, MakeConstant(value));
+}
+
 static void EndCompiler() { EmitReturn(); }
+
+static void Grouping() {
+	// expression();
+	consume_or_error(TOKEN_RIGHT_PAREN, "Expected ')' after expression");
+}
+
+static void Number() {
+	LOX_ASSERT(parser.previous.type == TOKEN_NUMBER);
+	double value = strtod(parser.previous.start, NULL);
+	EmitConstant(value);
+}
+
+static void Unary() {
+	TokenType operatorType = parser.previous.type;
+
+	// compile the operand
+	ParsePrecedence(PREC_UNARY);
+	// expression();
+
+	switch (operatorType) {
+	case TOKEN_MINUS:
+		EmitBytes(OP_NEGATE);
+		break;
+	default:
+		__builtin_unreachable();
+		break;
+	}
+}
+
+static void ParsePrecedence(Precedence precedence) {}
+
+static void ParseExpression() { ParsePrecedence(PREC_ASSIGNMENT); }
 
 bool compile(char const* source, Chunk* chunk) {
 	(void)chunk;
