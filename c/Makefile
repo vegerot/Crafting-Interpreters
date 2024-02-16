@@ -2,7 +2,7 @@ CC ?= cc
 CFLAGS= -std=gnu2x -g -Wall -Wextra -Wpedantic -Werror -Wno-gnu-statement-expression -Wno-strict-prototypes
 SRC_FILES= compiler.c scanner.c chunk.c debug.c memory.c stack.c value.c vm.c
 
-lox: main.c chunk.c debug.c memory.c stack.c value.c vm.c
+lox: $(SRC_FILES) *.h main.c
 	$(CC) $(CFLAGS) -D DEBUG_TRACE_EXECUTION main.c $(SRC_FILES) -o lox
 
 all: lox test lint
