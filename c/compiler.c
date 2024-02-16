@@ -1,4 +1,5 @@
 #include "compiler.h"
+#include "chunk.h"
 #include "lox_assert.h"
 #include "scanner.h"
 #include <stdio.h>
@@ -24,6 +25,14 @@ typedef enum {
 	PREC_CALL,		 // . ()
 	PREC_PRIMARY,
 } Precedence;
+
+typedef void (*ParseFn)();
+
+typedef struct {
+	void (*prefix)();
+	ParseFn infix;
+	Precedence precedence;
+} ParseRule;
 
 static Parser parser;		  // NOLINT
 static Chunk* compilingChunk; // NOLINT
@@ -109,6 +118,30 @@ static void EmitConstant(Value value) {
 
 static void EndCompiler() { EmitReturn(); }
 
+static void Binary() {
+	TokenType operatorType = parser.previous.type;
+	ParseRule* rule = GetRule(operatorType);
+	ParsePrecedence(rule->precedence + 1);
+
+	switch (operatorType) {
+	case TOKEN_PLUS:
+		EmitBytes(OP_ADD);
+		break;
+	case TOKEN_MINUS:
+		EmitBytes(OP_SUBTRACT);
+		break;
+	case TOKEN_STAR:
+		EmitBytes(OP_MULTIPLY);
+		break;
+	case TOKEN_SLASH:
+		EmitBytes(OP_DIVIDE);
+		break;
+	default:
+		LOX_UNREACHABLE("unreachable");
+		return;
+	}
+}
+
 static void Grouping() {
 	// expression();
 	consume_or_error(TOKEN_RIGHT_PAREN, "Expected ')' after expression");
@@ -132,12 +165,57 @@ static void Unary() {
 		EmitBytes(OP_NEGATE);
 		break;
 	default:
-		__builtin_unreachable();
-		break;
+		LOX_UNREACHABLE("unexpected operator");
+		return;
 	}
 }
 
+static ParseRule const rules[] = {
+	[TOKEN_LEFT_PAREN] = {Grouping, NULL, PREC_NONE},
+	[TOKEN_RIGHT_PAREN] = {NULL, NULL, PREC_NONE},
+	[TOKEN_LEFT_BRACE] = {NULL, NULL, PREC_NONE},
+	[TOKEN_RIGHT_BRACE] = {NULL, NULL, PREC_NONE},
+	[TOKEN_COMMA] = {NULL, NULL, PREC_NONE},
+	[TOKEN_DOT] = {NULL, NULL, PREC_NONE},
+	[TOKEN_MINUS] = {Unary, Binary, PREC_TERM},
+	[TOKEN_PLUS] = {NULL, Binary, PREC_TERM},
+	[TOKEN_SEMICOLON] = {NULL, NULL, PREC_NONE},
+	[TOKEN_SLASH] = {NULL, Binary, PREC_FACTOR},
+	[TOKEN_STAR] = {NULL, Binary, PREC_FACTOR},
+	[TOKEN_BANG] = {NULL, NULL, PREC_NONE},
+	[TOKEN_BANG_EQUAL] = {NULL, NULL, PREC_NONE},
+	[TOKEN_EQUAL] = {NULL, NULL, PREC_NONE},
+	[TOKEN_EQUAL_EQUAL] = {NULL, NULL, PREC_NONE},
+	[TOKEN_GREATER] = {NULL, NULL, PREC_NONE},
+	[TOKEN_GREATER_EQUAL] = {NULL, NULL, PREC_NONE},
+	[TOKEN_LESS] = {NULL, NULL, PREC_NONE},
+	[TOKEN_LESS_EQUAL] = {NULL, NULL, PREC_NONE},
+	[TOKEN_IDENTIFIER] = {NULL, NULL, PREC_NONE},
+	[TOKEN_STRING] = {NULL, NULL, PREC_NONE},
+	[TOKEN_NUMBER] = {Number, NULL, PREC_NONE},
+	[TOKEN_AND] = {NULL, NULL, PREC_NONE},
+	[TOKEN_CLASS] = {NULL, NULL, PREC_NONE},
+	[TOKEN_ELSE] = {NULL, NULL, PREC_NONE},
+	[TOKEN_FALSE] = {NULL, NULL, PREC_NONE},
+	[TOKEN_FOR] = {NULL, NULL, PREC_NONE},
+	[TOKEN_FUN] = {NULL, NULL, PREC_NONE},
+	[TOKEN_IF] = {NULL, NULL, PREC_NONE},
+	[TOKEN_NIL] = {NULL, NULL, PREC_NONE},
+	[TOKEN_OR] = {NULL, NULL, PREC_NONE},
+	[TOKEN_PRINT] = {NULL, NULL, PREC_NONE},
+	[TOKEN_RETURN] = {NULL, NULL, PREC_NONE},
+	[TOKEN_SUPER] = {NULL, NULL, PREC_NONE},
+	[TOKEN_THIS] = {NULL, NULL, PREC_NONE},
+	[TOKEN_TRUE] = {NULL, NULL, PREC_NONE},
+	[TOKEN_VAR] = {NULL, NULL, PREC_NONE},
+	[TOKEN_WHILE] = {NULL, NULL, PREC_NONE},
+	[TOKEN_ERROR] = {NULL, NULL, PREC_NONE},
+	[TOKEN_EOF] = {NULL, NULL, PREC_NONE},
+};
+
 static void ParsePrecedence(Precedence precedence) {}
+
+static ParseRule GetRule(TokenType type) { return rules[type]; }
 
 static void ParseExpression() { ParsePrecedence(PREC_ASSIGNMENT); }
 
