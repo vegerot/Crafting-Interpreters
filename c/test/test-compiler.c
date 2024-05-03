@@ -121,6 +121,8 @@ int writeDisassembledInstruction(string* out, Chunk* chunk, int offset) {
 		return simpleInstruction(out, "NEG", offset);
 	case OP_RETURN:
 		return simpleInstruction(out, "RET", offset);
+	case OP_TERNARY:
+		return simpleInstruction(out, "TERNARYPLACEHOLDER", offset);
 	default:
 		fflush(stdout);
 		fprintf(stderr, "Unknown opcode 0x%x\n", instruction);
@@ -209,6 +211,38 @@ void testCompile1plus1(void) {
 	LOX_ASSERT(strcmp(got, want) == 0);
 }
 
+void testCompileTernarySimple(void) {
+	Chunk chunk;
+	initChunk(&chunk);
+
+	compile("0 ? 1 : 2", &chunk);
+
+	char* want = "CONST 0.0;CONST 1.0;CONST 2.0;TERNARYPLACEHOLDER;RET;";
+
+	string out;
+	initString(&out);
+	writeDisassembledChunk(&out, &chunk);
+	char* got = out.data;
+
+	LOX_ASSERT(strcmp(got, want) == 0);
+}
+
+void testCompileTernaryComplex(void) {
+	Chunk chunk;
+	initChunk(&chunk);
+
+	compile("0-0 ? (1+2) : 3*3", &chunk);
+
+	char* want = "CONST 0.0;CONST 0.0;SUB;CONST 1.0;CONST 2.0;ADD;CONST "
+				 "3.0;CONST 3.0;MULT;TERNARYPLACEHOLDER;RET;";
+
+	string out;
+	initString(&out);
+	writeDisassembledChunk(&out, &chunk);
+	char* got = out.data;
+
+	LOX_ASSERT(strcmp(got, want) == 0);
+}
 int main() {
 	// testing testing tests
 	{
@@ -221,5 +255,9 @@ int main() {
 
 	// actual compiler tests
 
-	{ testCompile1plus1(); }
+	{
+		testCompile1plus1();
+		testCompileTernarySimple();
+		testCompileTernaryComplex();
+	}
 }

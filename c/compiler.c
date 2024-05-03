@@ -136,6 +136,13 @@ static void Expression();
 static ParseRule const* GetRule(TokenType type);
 static void ParsePrecedence(Precedence precedence);
 
+static void Ternary() {
+	consume_or_error(TOKEN_COLON,
+					 "Expected ':' before false branch of ternary operator");
+	ParsePrecedence(PREC_ASSIGNMENT);
+	EmitBytes(OP_TERNARY);
+}
+
 static void Binary() {
 	TokenType operatorType = parser.previous.type;
 	ParseRule const* rule = GetRule(operatorType);
@@ -153,6 +160,9 @@ static void Binary() {
 		break;
 	case TOKEN_SLASH:
 		EmitBytes(OP_DIVIDE);
+		break;
+	case TOKEN_QUESTION:
+		Ternary();
 		break;
 	default:
 		LOX_UNREACHABLE("unreachable");
@@ -228,6 +238,8 @@ static ParseRule const rules[] = {
 	[TOKEN_WHILE] = {NULL, NULL, PREC_NONE},
 	[TOKEN_ERROR] = {NULL, NULL, PREC_NONE},
 	[TOKEN_EOF] = {NULL, NULL, PREC_NONE},
+	[TOKEN_QUESTION] = {NULL, Binary, PREC_TERM},
+	[TOKEN_COLON] = {NULL, NULL, PREC_NONE},
 };
 
 static void ParsePrecedence(Precedence precedence) {
