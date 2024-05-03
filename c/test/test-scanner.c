@@ -13,13 +13,13 @@ static void eof() {
 static void single_character_tokens() {
 	Scanner scanner;
 
-	char const* src = "(){};,.+/*";
+	char const* src = "(){};,.+-/*";
 	initScanner(&scanner, src);
 
 	TokenType wants[] = {TOKEN_LEFT_PAREN,	TOKEN_RIGHT_PAREN, TOKEN_LEFT_BRACE,
 						 TOKEN_RIGHT_BRACE, TOKEN_SEMICOLON,   TOKEN_COMMA,
-						 TOKEN_DOT,			TOKEN_PLUS,		   TOKEN_SLASH,
-						 TOKEN_STAR};
+						 TOKEN_DOT,			TOKEN_PLUS,		   TOKEN_MINUS,
+						 TOKEN_SLASH,		TOKEN_STAR};
 
 	for (unsigned long i = 0; i < sizeof(wants) / sizeof(wants[0]); ++i) {
 		Token t = scanToken(&scanner);

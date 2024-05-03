@@ -228,6 +228,8 @@ Token scanToken(Scanner* scanner) {
 		return makeToken(scanner, TOKEN_DOT);
 	case '+':
 		return makeToken(scanner, TOKEN_PLUS);
+	case '-':
+		return makeToken(scanner, TOKEN_MINUS);
 	case '/':
 		return makeToken(scanner, TOKEN_SLASH);
 	case '*':
