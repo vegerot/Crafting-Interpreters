@@ -1,6 +1,7 @@
 #include "../chunk.h"
 #include "../lox_assert.h"
 #include "../vm.h"
+#include <string.h>
 
 /** -((1.2+3.4)/5.6)*/
 void negativeOnepoint2PlusThreepoint4DividedbyFivepoint6(Chunk* chunk) {

@@ -6,7 +6,7 @@ lox: $(SRC_FILES) *.h main.c
 	$(CC) $(CFLAGS) -D DEBUG_TRACE_EXECUTION -D DEBUG_PRINT_CODE main.c $(SRC_FILES) -o lox
 
 all: lox test lint
-test: test/test-stack test/test-vm test/test-scanner
+test: test/test-stack test/test-vm test/test-scanner test/test-compiler
 test/test-vm: test/test-vm.c vm.h vm.c chunk.h chunk.c
 	$(CC) $(CFLAGS) test/test-vm.c $(SRC_FILES) -o test/test-vm
 	test/test-vm
@@ -16,6 +16,9 @@ test/test-stack: test/test-stack.c stack.h stack.c
 test/test-scanner: test/test-scanner.c scanner.h scanner.c lox_assert.h
 	$(CC) $(CFLAGS) -Wno-error test/test-scanner.c $(SRC_FILES) -o test/test-scanner
 	test/test-scanner || mv test/test-scanner test/test-scanner.failed
+test/test-compiler: test/test-compiler.c compiler.h compiler.c scanner.h scanner.c chunk.h chunk.c
+	$(CC) $(CFLAGS) -Wno-error test/test-compiler.c $(SRC_FILES) -o test/test-compiler
+	test/test-compiler || mv -v test/test-compiler test/test-compiler.failed
 
 
 lint: $(SRC_FILES) *.h test/*.c
