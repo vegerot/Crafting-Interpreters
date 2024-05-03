@@ -28,7 +28,8 @@
 	__extension__({                                                            \
 		fflush(stdout);                                                        \
 		fprintf(stderr, "\n%s:%d: %s: Expected %s(=%d) to equal %s(%d)\n",     \
-				file, line, func, got_name, got_value, want_name, want_value); \
+				file, line, func, got_name, (int)(got_value), want_name,       \
+				(int)(want_value));                                            \
 		abort();                                                               \
 	})
 
