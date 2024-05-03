@@ -34,3 +34,12 @@
 	})
 
 #endif
+
+#define LOX_UNREACHABLE(reason)                                                \
+	__extension__({                                                            \
+		__builtin_unreachable();                                               \
+		fflush(stdout);                                                        \
+		fprintf(stderr, "\n%s:%d: %s: Unreachable code reached: %s\n",         \
+				__FILE__, __LINE__, __func__, reason);                         \
+		abort();                                                               \
+	})
