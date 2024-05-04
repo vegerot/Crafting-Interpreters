@@ -234,6 +234,10 @@ Token scanToken(Scanner* scanner) {
 		return makeToken(scanner, TOKEN_SLASH);
 	case '*':
 		return makeToken(scanner, TOKEN_STAR);
+	case '?':
+		return makeToken(scanner, TOKEN_QUESTION);
+	case ':':
+		return makeToken(scanner, TOKEN_COLON);
 	// one lookahead symbols
 	case '=':
 		return makeToken(scanner, ifMatchConsume(scanner, '=')

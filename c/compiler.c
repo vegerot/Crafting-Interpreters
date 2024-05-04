@@ -136,6 +136,41 @@ static void Expression();
 static ParseRule const* GetRule(TokenType type);
 static void ParsePrecedence(Precedence precedence);
 
+/// Note[ConditionalOperator]
+/// This does not implement the conditional operator, but just gives the general
+/// shape of it.
+/// We don't know how to do branches yet, so this function splits up the work we
+/// _will_ do into three blocks:
+/// 1. Initialize branching code
+/// 2. Compile the true branch
+/// 3. Compile the false branch
+/// When branching is implemented we will replace the code in these blocks with
+/// the relevant branching code.  It will probably end up bytecode identical
+/// with an if/else expression.
+static void Ternary() {
+	TokenType operatorType = parser.previous.type;
+	LOX_ASSERT_EQUALS(operatorType, TOKEN_QUESTION);
+	ParseRule const* rule = GetRule(operatorType);
+	LOX_ASSERT_EQUALS(rule->precedence, PREC_TERM)
+
+	// 1. initialize branches
+	// for now, just emit a placeholder instruction
+	{
+		EmitBytes(OP_CONDITIONAL_PLACEHOLDER);
+	}
+
+	// 2. compile true branch
+	// for now, just write the bytecode for the true branch
+	{ ParsePrecedence(rule->precedence + 1); }
+
+	consume_or_error(TOKEN_COLON,
+					 "Missing ':' before false branch of ternary operator");
+
+	// 3. compile false branch
+	// for now, just write the bytecode for the false branch
+	{ ParsePrecedence(PREC_ASSIGNMENT); }
+}
+
 static void Binary() {
 	TokenType operatorType = parser.previous.type;
 	ParseRule const* rule = GetRule(operatorType);
@@ -228,6 +263,8 @@ static ParseRule const rules[] = {
 	[TOKEN_WHILE] = {NULL, NULL, PREC_NONE},
 	[TOKEN_ERROR] = {NULL, NULL, PREC_NONE},
 	[TOKEN_EOF] = {NULL, NULL, PREC_NONE},
+	[TOKEN_QUESTION] = {NULL, Ternary, PREC_TERM},
+	[TOKEN_COLON] = {NULL, NULL, PREC_NONE},
 };
 
 static void ParsePrecedence(Precedence precedence) {
