@@ -1,7 +1,7 @@
-#include "../chunk.h"
-#include "../compiler.h"
-#include "../debug.h"
-#include "../lox_assert.h"
+#include "../src/chunk.h"
+#include "../src/compiler.h"
+#include "../src/debug.h"
+#include "../src/lox_assert.h"
 #include <stdio.h>
 #include <string.h>
 

@@ -1,6 +1,6 @@
-#include "../chunk.h"
-#include "../lox_assert.h"
-#include "../vm.h"
+#include "../src/chunk.h"
+#include "../src/lox_assert.h"
+#include "../src/vm.h"
 #include <string.h>
 
 /** -((1.2+3.4)/5.6)*/

@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../lox_assert.h"
-#include "../stack.h"
+#include "../src/lox_assert.h"
+#include "../src/stack.h"
 
 void basic(void) {
 	Stack stack;

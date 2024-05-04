@@ -1,5 +1,5 @@
-#include "../lox_assert.h"
-#include "../scanner.h"
+#include "../src/lox_assert.h"
+#include "../src/scanner.h"
 #include <string.h>
 
 static void eof() {

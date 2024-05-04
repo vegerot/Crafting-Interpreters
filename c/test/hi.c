@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../chunk.h"
-#include "../debug.h"
+#include "../src/chunk.h"
+#include "../src/debug.h"
 
 char* hello(char const* name, int nameLen) {
 	char* format = "Hello, %s!\n";
