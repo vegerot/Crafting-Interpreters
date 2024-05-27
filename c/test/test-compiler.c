@@ -91,7 +91,7 @@ static int constantInstruction(string* out, char const* name, Chunk* chunk,
 	appendToString(out, name, strlen(name));
 	char constantAsStr[40];
 	snprintf(constantAsStr, 40, " %.1f",
-			 chunk->constants.values[constantIndex]);
+			 AS_NUMBER(chunk->constants.values[constantIndex]));
 	appendToString(out, constantAsStr, strlen(constantAsStr));
 	appendToString(out, ";", 1);
 	return offset + 2;
@@ -143,7 +143,7 @@ void testDisassembleSimple(void) {
 
 	// 1
 	{
-		int constant = addConstant(&chunk, 1);
+		int constant = addConstant(&chunk, NUMBER_VAL(1));
 		writeChunk(&chunk, OP_CONSTANT, 2);
 		writeChunk(&chunk, constant, 2);
 	}
@@ -163,17 +163,17 @@ void testDisassemble(void) {
 
 	// 1*2 + 3
 	{
-		int constant = addConstant(&chunk, 1);
+		int constant = addConstant(&chunk, NUMBER_VAL(1));
 		writeChunk(&chunk, OP_CONSTANT, 2);
 		writeChunk(&chunk, constant, 2);
 
-		constant = addConstant(&chunk, 2);
+		constant = addConstant(&chunk, NUMBER_VAL(2));
 		writeChunk(&chunk, OP_CONSTANT, 2);
 		writeChunk(&chunk, constant, 2);
 
 		writeChunk(&chunk, OP_MULTIPLY, 2);
 
-		constant = addConstant(&chunk, 300);
+		constant = addConstant(&chunk, NUMBER_VAL(300));
 		writeChunk(&chunk, OP_CONSTANT, 2);
 		writeChunk(&chunk, constant, 2);
 

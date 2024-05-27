@@ -1,10 +1,11 @@
 #ifndef clox_value_h
 #define clox_value_h
-#include "common.h"
 #include <assert.h>
 #include <stdint.h>
 
-typedef enum { VAL_BOOL, VAL_NIL, VAL_NUMBER } ValueType;
+#include "common.h"
+
+typedef enum { VAL_ERR, VAL_BOOL, VAL_NIL, VAL_NUMBER } ValueType;
 
 typedef struct {
 	ValueType type;
@@ -14,12 +15,14 @@ typedef struct {
 	} as;
 } Value;
 
-#define BOOL_VAL(value) ((Value){.type=VAL_VAL_BOOL, .as.bool=(value)})
-#define NUMBER_VAL(value) ((Value){.type=VAL_NUMBER, .as.number=(value)})
-#define NIL_VAL ((Value){.type=VAL_NIL})
+#define BOOL_VAL(value) ((Value){.type = VAL_VAL_BOOL, .as.bool = (value)})
+#define NUMBER_VAL(value) ((Value){.type = VAL_NUMBER, .as.number = (value)})
+#define NIL_VAL ((Value){.type = VAL_NIL})
 
 #define AS_BOOL(value) ((value).as.bool)
+// TODO: in debug builds, check that the value is a bool before returning it
 #define AS_NUMBER(value) ((value).as.number)
+//((value).type==VAL_NUMBER ? (value).as.number : abort() && 0)
 
 #define IS_BOOL(value) ((value).type == VAL_BOOL)
 #define IS_NUMBER(value) ((value).type == VAL_NUMBER)

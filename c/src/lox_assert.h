@@ -21,13 +21,23 @@
 	(((got) != (want)) ? LOX_ASSERT_EQUALS_FAIL(__func__, __FILE__, __LINE__,  \
 												#got, got, #want, want)        \
 					   : (void)0);
-#define LOX_ASSERT_VALUE_EQUALS(got,want) \
-	do {\
-		LOX_ASSERT_EQUALS(got.type, want.type); \
-		switch (want.type) {\
-			case (VAL_BOOL) \
-					}\
-		LOX_ASSERT_EQUALS(got.as.
+#define LOX_ASSERT_VALUE_EQUALS(g, want)                                     \
+	do {                                                                       \
+		Value got = g;\
+		LOX_ASSERT_EQUALS(got.type, want.type);                                \
+		switch (want.type) {                                                   \
+		case (VAL_BOOL):                                                       \
+			LOX_ASSERT_EQUALS(got.as.boolean, want.as.boolean);                \
+			break;                                                             \
+		case (VAL_NUMBER):                                                     \
+			LOX_ASSERT_EQUALS(got.as.number, want.as.number)                   \
+			break;                                                             \
+		case (VAL_NIL):                                                        \
+			break;                                                             \
+		case (VAL_ERR):                                                        \
+			LOX_ASSERT(false && "wtf?!");                                      \
+			break;                                                             \
+		}                                                                      \
 	} while (0);
 
 #define LOX_ASSERT_EQUALS_FAIL(func, file, line, got_name, got_value,          \

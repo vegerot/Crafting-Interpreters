@@ -1,6 +1,6 @@
 #include "value.h"
 #include "memory.h"
-#include <assert.h>
+#include "lox_assert.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -33,13 +33,19 @@ void freeValueArray(ValueArray* array) {
 void printValue(Value value) {
 	switch (value.type) {
 	case VAL_NUMBER: {
-		printf("type: number, value: %g", value.as.number);
+		printf("type: number, value: %g\n", value.as.number);
+		break;
 	}
 	case VAL_BOOL: {
-		printf("type: bool, value: %s", value.as.boolean ? "true" : "false");
+		printf("type: bool, value: %s\n", value.as.boolean ? "true" : "false");
+		break;
 	}
 	case VAL_NIL: {
-		printf("type: NIL");
+		printf("type: NIL\n");
+		break;
 	}
+	case VAL_ERR: {
+			LOX_ASSERT(false && "wtf?");
+		}
 	}
 }
