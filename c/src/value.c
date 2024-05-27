@@ -30,4 +30,16 @@ void freeValueArray(ValueArray* array) {
 	initValueArray(array);
 }
 
-void printValue(Value value) { printf("%g", value); }
+void printValue(Value value) {
+	switch (value.type) {
+	case VAL_NUMBER: {
+		printf("type: number, value: %g", value.as.number);
+	}
+	case VAL_BOOL: {
+		printf("type: bool, value: %s", value.as.boolean ? "true" : "false");
+	}
+	case VAL_NIL: {
+		printf("type: NIL");
+	}
+	}
+}

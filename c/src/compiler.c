@@ -202,7 +202,8 @@ static void Grouping() {
 
 static void Number() {
 	LOX_ASSERT(parser.previous.type == TOKEN_NUMBER);
-	double value = strtod(parser.previous.start, NULL);
+	Value value = {.type = VAL_NUMBER,
+				   .as.number = strtod(parser.previous.start, NULL)};
 	EmitConstant(value);
 }
 

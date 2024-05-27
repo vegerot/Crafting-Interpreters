@@ -1,48 +1,29 @@
 #ifndef clox_value_h
 #define clox_value_h
 #include "common.h"
-#include <stdint.h>
 #include <assert.h>
+#include <stdint.h>
 
-typedef enum { 
-	VAL_BOOL,
-	VAL_NIL,
-	VAL_NUMBER
-} ValueType;
+typedef enum { VAL_BOOL, VAL_NIL, VAL_NUMBER } ValueType;
 
 typedef struct {
+	ValueType type;
 	union {
 		bool boolean;
 		double number;
 	} as;
-	ValueType type;
 } Value;
 
-typedef struct {
-	struct {
-		union {
-			bool boolean;
-			double number;
-		} as;
-		ValueType type;
-		ValueType type2;
-	};
-} sixteenByteValue;
+#define BOOL_VAL(value) ((Value){.type=VAL_VAL_BOOL, .as.bool=(value)})
+#define NUMBER_VAL(value) ((Value){.type=VAL_NUMBER, .as.number=(value)})
+#define NIL_VAL ((Value){.type=VAL_NIL})
 
-static_assert(sizeof(sixteenByteValue) == 16);
+#define AS_BOOL(value) ((value).as.bool)
+#define AS_NUMBER(value) ((value).as.number)
 
-typedef struct {
-	struct {
-		union {
-			bool boolean;
-			double number;
-		} as;
-		ValueType type;
-	};
-	ValueType type2;
-} twentyFourByteValue;
-
-static_assert(sizeof(twentyFourByteValue) == 24);
+#define IS_BOOL(value) ((value).type == VAL_BOOL)
+#define IS_NUMBER(value) ((value).type == VAL_NUMBER)
+#define IS_NIL(value) ((value).type == VAL_NIL)
 
 typedef struct {
 	int capacity;
