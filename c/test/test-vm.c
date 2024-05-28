@@ -164,7 +164,7 @@ void FourMinusThreeTimesNegativeTwo_without_subtract(Chunk* chunk) {
 
 	writeChunkNoLine(chunk, OP_RETURN);
 }
-Value peekStack(VM* vm, int index) {
+static Value peekStack(VM const* vm, int index) {
 	// HACK: the top element of the stack should be `top-1`, but since
 	// `OP_RETURN` pops the return value off the stack we're technically reading
 	// "uninitalized" memory.  However, since we control the stack we know this
@@ -238,6 +238,10 @@ void subtraction(void) {
 	LOX_ASSERT_EQUALS(peekStack(&vm, 0).as.number, 4);
 }
 
+static void assert_vm_exit_ok(InterpretResult result) {
+	LOX_ASSERT_EQUALS(result, INTERPRET_OK);
+}
+
 void negation(void) {
 	initVM();
 	Chunk chunk;
@@ -251,10 +255,12 @@ void negation(void) {
 
 		writeChunkNoLine(&chunk, OP_RETURN);
 	}
-	interpret_bytecode_(&chunk);
+	InterpretResult status = interpret_bytecode_(&chunk);
 	VM vm = getVM_();
-	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0) , NUMBER_VAL(-7));
+	assert_vm_exit_ok(status);
+	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0), NUMBER_VAL(-7));
 }
+
 
 void multiplication(void) {
 	initVM();
@@ -275,7 +281,7 @@ void multiplication(void) {
 	}
 	interpret_bytecode_(&chunk);
 	VM vm = getVM_();
-	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0) , NUMBER_VAL(420));
+	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0), NUMBER_VAL(420));
 }
 
 void division(void) {
@@ -297,7 +303,7 @@ void division(void) {
 	}
 	interpret_bytecode_(&chunk);
 	VM vm = getVM_();
-	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0) , NUMBER_VAL(42));
+	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0), NUMBER_VAL(42));
 }
 
 int main(void) {

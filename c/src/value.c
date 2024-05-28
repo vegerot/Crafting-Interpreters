@@ -1,6 +1,6 @@
 #include "value.h"
-#include "memory.h"
 #include "lox_assert.h"
+#include "memory.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -44,8 +44,8 @@ void printValue(Value value) {
 		printf("type: NIL\n");
 		break;
 	}
-	case VAL_ERR: {
-			LOX_ASSERT(false && "wtf?");
-		}
+	default: {
+		LOX_ASSERT(false && "wtf?");
+	}
 	}
 }

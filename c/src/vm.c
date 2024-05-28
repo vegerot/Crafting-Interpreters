@@ -86,10 +86,11 @@ InterpretResult run(void) {
 			// HACK: edit the stack directly
 			// this is a bonus challenge in chapter 15
 			Value top_of_stack = stack_peek(&vm.stack, 0);
-			if (IS_NUMBER(top_of_stack)) {
+			if (!IS_NUMBER(top_of_stack)) {
 				return INTERPRET_RUNTIME_ERROR;
 			}
-			vm.stack.top->as.number *= -1;
+			printf("the top of stack is: %d\n", top_of_stack.type);
+			(vm.stack.top-1)->as.number *= -1;
 			break;
 		}
 		case OP_RETURN:
