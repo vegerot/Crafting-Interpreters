@@ -34,9 +34,9 @@
 			break;                                                             \
 		case (VAL_NIL):                                                        \
 			break;                                                             \
-		default:\
+		default:                                                               \
 			LOX_ASSERT(false && "wtf?!");                                      \
-	}\
+		}                                                                      \
 	} while (0);
 
 #define LOX_ASSERT_EQUALS_FAIL(func, file, line, got_name, got_value,          \

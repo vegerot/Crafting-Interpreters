@@ -90,7 +90,7 @@ InterpretResult run(void) {
 				return INTERPRET_RUNTIME_ERROR;
 			}
 			printf("the top of stack is: %d\n", top_of_stack.type);
-			(vm.stack.top-1)->as.number *= -1;
+			(vm.stack.top - 1)->as.number *= -1;
 			break;
 		}
 		case OP_RETURN:

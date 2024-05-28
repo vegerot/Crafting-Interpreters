@@ -261,7 +261,6 @@ void negation(void) {
 	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0), NUMBER_VAL(-7));
 }
 
-
 void multiplication(void) {
 	initVM();
 	Chunk chunk;

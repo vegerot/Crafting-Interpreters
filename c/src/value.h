@@ -5,7 +5,7 @@
 
 #include "common.h"
 
-typedef enum { VAL_ERR, VAL_BOOL, VAL_NIL, VAL_NUMBER } ValueType;
+typedef enum { VAL_ERR = 0, VAL_BOOL, VAL_NIL, VAL_NUMBER } ValueType;
 
 typedef struct {
 	ValueType type;
