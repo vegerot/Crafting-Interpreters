@@ -17,5 +17,6 @@ typedef struct {
 void new_stack(Stack* stack);
 void stack_push(Stack* stack, Value value);
 Value stack_pop(Stack* stack);
+Value stack_peek(Stack const* this, int distance);
 bool stack_is_empty(Stack* stack);
 #endif

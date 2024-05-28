@@ -27,4 +27,8 @@ Value stack_pop(Stack* stack) {
 	return *stack->top;
 }
 
+Value stack_peek(Stack const* this, int distance) {
+	return *(this->top - 1 - distance);
+}
+
 bool stack_is_empty(Stack* stack) { return stack->top == stack->bottom; }
