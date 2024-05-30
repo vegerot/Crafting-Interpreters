@@ -32,7 +32,8 @@ function assemble() {
 	while read assembly_file; do
 		local compiled_file=${$(basename $assembly_file)%.S}.o
 		local out=$BUILD_DIR/compiled/$compiled_file
-		$CC ${=CFLAGS} --compile $assembly_file -o $out
+		# $CC ${=CFLAGS} --compile $assembly_file -o $out
+		as $assembly_file -o $out
 		echo $out
 	done
 }
@@ -49,11 +50,10 @@ function link() {
 			-L /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib -lSystem \
 			${=compiled_file_names}\
 			-o $out;
-		mv $out $OUTFILE
 	else
 		$CC ${=CFLAGS} ${=compiled_file_names} -o $out
-		mv $out $OUTFILE
 	fi
+		mv $out $OUTFILE
 	echo $OUTFILE
 }
 
