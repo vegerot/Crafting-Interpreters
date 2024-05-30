@@ -4,7 +4,6 @@ set -e -u -o pipefail
 CC=${CC:-cc}
 BUILD_DIR=$(mktemp -d)
 CFLAGS=${CFLAGS:-""}
-CFLAGS="$CFLAGS -Wno-gnu-line-marker"
 
 function preprocess() {
 	mkdir $BUILD_DIR/preprocess
@@ -50,14 +49,39 @@ function link() {
 			-L /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib -lSystem \
 			${=compiled_file_names}\
 			-o $out;
+		mv $out $OUTFILE
 	else
 		$CC ${=CFLAGS} ${=compiled_file_names} -o $out
+		mv $out $OUTFILE
 	fi
-	echo $out
+	echo $OUTFILE
 }
 
 function main() {
-	echo $@ \
+	local files=""
+	while [[ $# -gt 0 ]]; do
+		case $1 in
+			-o)
+				OUTFILE="$2"
+				shift
+				shift
+				;;
+			-*)
+				CFLAGS="$CFLAGS $1"
+				shift
+				;;
+			*)
+				if [[ -z $files ]]; then
+					files=$1
+				else
+					files="$files $1"
+				fi
+				shift
+				;;
+		esac
+	done
+	CFLAGS="$CFLAGS -Wno-gnu-line-marker"
+	echo $files \
 		| tr ' ' '\n' \
 		| preprocess \
 		| compile-to-asm \
