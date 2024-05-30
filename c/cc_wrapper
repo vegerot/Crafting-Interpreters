@@ -1,0 +1,21 @@
+#!/usr/bin/env bash -x
+set -e -u -o pipefail
+
+
+CC=${CC:-cc}
+BUILD_DIR=$(mktemp -d)
+
+function preprocess() {
+	mkdir $BUILD_DIR/preprocess
+	local c_file=$1
+	$CC --preprocess $c_file -o $BUILD_DIR/preprocess/${1%.c}.i
+}
+
+
+function main() {
+	preprocess $@
+	compile $@
+	assemble $@
+	link $@
+}
+main $@
