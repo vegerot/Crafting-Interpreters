@@ -1,21 +1,19 @@
 #!/usr/bin/env zsh -x
 set -e -u -o pipefail
 
-
 CC=${CC:-cc}
 BUILD_DIR=$(mktemp -d)
 CFLAGS=${CFLAGS:-""}
+CFLAGS="$CFLAGS -Wno-gnu-line-marker"
 
 function preprocess() {
 	mkdir $BUILD_DIR/preprocess
 	while read c_file; do
 		local preprocessed_file=${$(basename $c_file)%.c}.i
 		local out=$BUILD_DIR/preprocess/$preprocessed_file
-		if type cpp > /dev/null 2>&1; then
-			cpp $c_file > $out
-		else
-			$CC --preprocess $c_file -o $out
-		fi
+		# I couldn't figure out how to make it worth with `cpp`.  Use `cc` because I'm a failure
+		# cpp $c_file > $out
+		$CC ${=CFLAGS} --preprocess $c_file -o $out
 		echo $out
 	done
 }
@@ -25,7 +23,7 @@ function compile-to-asm() {
 	while read preprocessed_file; do
 		local assembly_file=${$(basename $preprocessed_file)%.i}.S
 		local out=$BUILD_DIR/assembly/$assembly_file
-		cc --assemble $preprocessed_file -o $out
+		cc ${=CFLAGS} --assemble $preprocessed_file -o $out
 		echo $out
 	done
 }
@@ -35,7 +33,7 @@ function assemble() {
 	while read assembly_file; do
 		local compiled_file=${$(basename $assembly_file)%.S}.o
 		local out=$BUILD_DIR/compiled/$compiled_file
-		$CC --compile $assembly_file -o $out
+		$CC ${=CFLAGS} --compile $assembly_file -o $out
 		echo $out
 	done
 }
@@ -47,17 +45,16 @@ function link() {
 		compiled_file_names="${compiled_file_names} $compiled_file"
 	done
 	local out=$BUILD_DIR/linked/a.out
-	if ! type ld > /dev/null 2>&1; then
+	if type ld > /dev/null 2>&1; then
 		ld -arch arm64 -platform_version macos 14.5 14.5\
 			-L /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib -lSystem \
 			${=compiled_file_names}\
 			-o $out;
 	else
-		$CC ${=compiled_file_names} -o $out
+		$CC ${=CFLAGS} ${=compiled_file_names} -o $out
 	fi
 	echo $out
 }
-
 
 function main() {
 	echo $@ \
