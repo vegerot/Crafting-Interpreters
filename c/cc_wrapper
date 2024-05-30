@@ -1,49 +1,59 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env zsh -x
 set -e -u -o pipefail
 
 
 CC=${CC:-cc}
 BUILD_DIR=$(mktemp -d)
+CFLAGS=${CFLAGS:-""}
 
 function preprocess() {
 	mkdir $BUILD_DIR/preprocess
-	read c_file
-	local preprocessed_file=${c_file%.c}.i
-	local out=$BUILD_DIR/preprocess/$preprocessed_file
-	$CC --preprocess $c_file -o $out
-	echo $out
+	while read c_file; do
+		local preprocessed_file=${$(basename $c_file)%.c}.i
+		local out=$BUILD_DIR/preprocess/$preprocessed_file
+		if type cpp > /dev/null 2>&1; then
+			cpp $c_file > $out
+		else
+			$CC --preprocess $c_file -o $out
+		fi
+		echo $out
+	done
 }
 
 function compile-to-asm() {
 	mkdir $BUILD_DIR/assembly
-	read preprocessed_file
-	local assembly_file=${$(basename $preprocessed_file)%.i}.S
-	local out=$BUILD_DIR/assembly/$assembly_file
-	cc --assemble $preprocessed_file -o $out
-	echo $out
+	while read preprocessed_file; do
+		local assembly_file=${$(basename $preprocessed_file)%.i}.S
+		local out=$BUILD_DIR/assembly/$assembly_file
+		cc --assemble $preprocessed_file -o $out
+		echo $out
+	done
 }
 
 function assemble() {
 	mkdir $BUILD_DIR/compiled
-	read assembly_file
-	local compiled_file=${$(basename $assembly_file)%.S}.o
-	local out=$BUILD_DIR/compiled/$compiled_file
-	$CC --compile $assembly_file -o $out
-	echo $out
+	while read assembly_file; do
+		local compiled_file=${$(basename $assembly_file)%.S}.o
+		local out=$BUILD_DIR/compiled/$compiled_file
+		$CC --compile $assembly_file -o $out
+		echo $out
+	done
 }
 
 function link() {
 	mkdir $BUILD_DIR/linked
-	read compiled_file
-	local linked_file=${$(basename $compiled_file)%.o}.out
-	local out=$BUILD_DIR/linked/$linked_file
-	if type ld64.lld > /dev/null 2>&1; then
-		ld64.lld -arch arm64 -platform_version macos 14.7 14.5 \
+	local compiled_file_names=""
+	while read compiled_file; do
+		compiled_file_names="${compiled_file_names} $compiled_file"
+	done
+	local out=$BUILD_DIR/linked/a.out
+	if ! type ld > /dev/null 2>&1; then
+		ld -arch arm64 -platform_version macos 14.5 14.5\
 			-L /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib -lSystem \
-			$compiled_file\
-			-o $out
+			${=compiled_file_names}\
+			-o $out;
 	else
-		$CC $compiled_file -o $out
+		$CC ${=compiled_file_names} -o $out
 	fi
 	echo $out
 }
@@ -51,6 +61,7 @@ function link() {
 
 function main() {
 	echo $@ \
+		| tr ' ' '\n' \
 		| preprocess \
 		| compile-to-asm \
 		| assemble \
