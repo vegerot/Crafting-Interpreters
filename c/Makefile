@@ -3,7 +3,7 @@ CFLAGS= -std=gnu2x -g -Wall -Wextra -Wpedantic -Werror -Wno-gnu-statement-expres
 SRC_FILES= src/compiler.c src/scanner.c src/chunk.c src/debug.c src/memory.c src/stack.c src/value.c src/vm.c
 
 lox: $(SRC_FILES) src/*.h src/main.c
-	$(CC) $(CFLAGS) -D DEBUG_TRACE_EXECUTION -D DEBUG_PRINT_CODE src/main.c $(SRC_FILES) -o lox
+	$(CC) $(CFLAGS) -DDEBUG_TRACE_EXECUTION -DDEBUG_PRINT_CODE src/main.c $(SRC_FILES) -o lox
 
 all: lox test lint
 test: test/test-stack test/test-vm test/test-scanner test/test-compiler
@@ -29,6 +29,6 @@ format: $(SRC_FILES) src/*.h test/*.c
 
 clangd:
 	printf "[" > compile_commands.json
-	clang $(CFLAGS) -Wno-error -MJ /dev/stdout -D DEBUG_TRACE_EXECUTION src/main.c $(SRC_FILES) -o lox | sed '$$s|.$$||' >> compile_commands.json
+	clang $(CFLAGS) -Wno-error -MJ /dev/stdout -DDEBUG_TRACE_EXECUTION src/main.c $(SRC_FILES) -o lox | sed '$$s|.$$||' >> compile_commands.json
 	printf "]" >> compile_commands.json
 
