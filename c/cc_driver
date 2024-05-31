@@ -22,7 +22,7 @@ function compile-to-asm() {
 	while read preprocessed_file; do
 		local assembly_file=${$(basename $preprocessed_file)%.i}.S
 		local out=$BUILD_DIR/assembly/$assembly_file
-		cc ${=CFLAGS} --assemble $preprocessed_file -o $out
+		$C_COMPILER ${=CFLAGS} --assemble $preprocessed_file -o $out
 		echo $out
 	done
 }
