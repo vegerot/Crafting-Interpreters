@@ -81,6 +81,10 @@ function main() {
 		esac
 	done
 	CFLAGS="$CFLAGS -Wno-gnu-line-marker"
+	if [[ -z $files ]]; then
+		echo "Usage: $0 [-o OUTFILE] [-CFLAGS] FILES"
+		exit 1
+	fi
 	echo $files \
 		| tr ' ' '\n' \
 		| preprocess \
