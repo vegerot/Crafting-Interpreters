@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh -x
+#!/usr/bin/env zsh
 set -e -u -o pipefail
 
 CC=${CC:-cc}
@@ -12,6 +12,7 @@ function preprocess() {
 		local out=$BUILD_DIR/preprocess/$preprocessed_file
 		# I couldn't figure out how to make it worth with `cpp`.  Use `cc` because I'm a failure
 		# cpp $c_file > $out
+		printf "Preprocessing %s\n" $c_file 1>&2
 		$CC ${=CFLAGS} --preprocess $c_file -o $out
 		echo $out
 	done
@@ -22,6 +23,7 @@ function compile-to-asm() {
 	while read preprocessed_file; do
 		local assembly_file=${$(basename $preprocessed_file)%.i}.S
 		local out=$BUILD_DIR/assembly/$assembly_file
+		printf "Compiling %s to ASM\n" $preprocessed_file 1>&2
 		$C_COMPILER ${=CFLAGS} --assemble $preprocessed_file -o $out
 		echo $out
 	done
@@ -33,6 +35,7 @@ function assemble() {
 		local compiled_file=${$(basename $assembly_file)%.S}.o
 		local out=$BUILD_DIR/compiled/$compiled_file
 		# $CC ${=CFLAGS} --compile $assembly_file -o $out
+		printf "Assembling %s\n" $assembly_file 1>&2
 		as $assembly_file -o $out
 		echo $out
 	done
@@ -45,6 +48,7 @@ function link() {
 		compiled_file_names="${compiled_file_names} $compiled_file"
 	done
 	local out=$BUILD_DIR/linked/a.out
+	printf "Linking %s\n" $compiled_file_names 1>&2
 	if type ld > /dev/null 2>&1; then
 		ld -arch arm64 -platform_version macos 14.5 14.5\
 			-L /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib -lSystem \
