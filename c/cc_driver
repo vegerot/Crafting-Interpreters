@@ -57,6 +57,14 @@ function link() {
 	echo $OUTFILE
 }
 
+function driver() {
+	echo $files_separated_by_newline \
+		| preprocess \
+		| compile-to-asm \
+		| assemble \
+		| link
+}
+
 function main() {
 	local files=""
 	while [[ $# -gt 0 ]]; do
@@ -88,11 +96,7 @@ function main() {
 		echo "Usage: $0 [-o OUTFILE] [-CFLAGS] FILES"
 		exit 1
 	fi
-	echo $files \
-		| tr ' ' '\n' \
-		| preprocess \
-		| compile-to-asm \
-		| assemble \
-		| link
+	local files_separated_by_newline=$(echo $files | tr ' ' '\n')
+	driver $files_separated_by_newline
 }
 main $@
