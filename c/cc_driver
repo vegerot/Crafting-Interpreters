@@ -1,5 +1,7 @@
 #!/usr/bin/env zsh
-set -e -u -o pipefail
+set -o errexit
+set -o nounset
+set -o pipefail
 
 C_COMPILER=${C_COMPILER:-cc}
 BUILD_DIR=$(mktemp -d)
@@ -93,7 +95,7 @@ function main() {
 		esac
 	done
 	CFLAGS="$CFLAGS -Wno-gnu-line-marker"
-	if [[ -z $OUTFILE ]]; then
+	if [[ -z ${OUTFILE:-""} ]]; then
 		OUTFILE=a.out
 	fi
 	if [[ -z $files ]]; then
