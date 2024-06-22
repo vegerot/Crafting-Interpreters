@@ -176,6 +176,24 @@ static void Binary() {
 	ParsePrecedence(rule->precedence + 1);
 
 	switch (operatorType) {
+	case TOKEN_EQUAL_EQUAL:
+		EmitBytes(OP_EQUAL);
+		break;
+	case TOKEN_BANG_EQUAL:
+		EmitBytes(OP_EQUAL, OP_NOT);
+		break;
+	case TOKEN_GREATER:
+		EmitBytes(OP_GREATER);
+		break;
+	case TOKEN_GREATER_EQUAL:
+		EmitBytes(OP_LESS, OP_NOT);
+		break;
+	case TOKEN_LESS:
+		EmitBytes(OP_LESS);
+		break;
+	case TOKEN_LESS_EQUAL:
+		EmitBytes(OP_GREATER, OP_NOT);
+		break;
 	case TOKEN_PLUS:
 		EmitBytes(OP_ADD);
 		break;
@@ -189,7 +207,7 @@ static void Binary() {
 		EmitBytes(OP_DIVIDE);
 		break;
 	default:
-		LOX_UNREACHABLE("unreachable");
+		LOX_UNREACHABLE("invalid binary operator");
 		return;
 	}
 }
@@ -255,13 +273,13 @@ static ParseRule const rules[] = {
 	[TOKEN_SLASH] = {NULL, Binary, PREC_FACTOR},
 	[TOKEN_STAR] = {NULL, Binary, PREC_FACTOR},
 	[TOKEN_BANG] = {Unary, NULL, PREC_NONE},
-	[TOKEN_BANG_EQUAL] = {NULL, NULL, PREC_NONE},
+	[TOKEN_BANG_EQUAL] = {NULL, Binary, PREC_EQUALITY},
 	[TOKEN_EQUAL] = {NULL, NULL, PREC_NONE},
-	[TOKEN_EQUAL_EQUAL] = {NULL, NULL, PREC_NONE},
-	[TOKEN_GREATER] = {NULL, NULL, PREC_NONE},
-	[TOKEN_GREATER_EQUAL] = {NULL, NULL, PREC_NONE},
-	[TOKEN_LESS] = {NULL, NULL, PREC_NONE},
-	[TOKEN_LESS_EQUAL] = {NULL, NULL, PREC_NONE},
+	[TOKEN_EQUAL_EQUAL] = {NULL, Binary, PREC_EQUALITY},
+	[TOKEN_GREATER] = {NULL, Binary, PREC_COMPARISON},
+	[TOKEN_GREATER_EQUAL] = {NULL, Binary, PREC_COMPARISON},
+	[TOKEN_LESS] = {NULL, Binary, PREC_COMPARISON},
+	[TOKEN_LESS_EQUAL] = {NULL, Binary, PREC_COMPARISON},
 	[TOKEN_IDENTIFIER] = {NULL, NULL, PREC_NONE},
 	[TOKEN_STRING] = {NULL, NULL, PREC_NONE},
 	[TOKEN_NUMBER] = {Number, NULL, PREC_NONE},

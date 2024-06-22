@@ -114,6 +114,12 @@ int writeDisassembledInstruction(string* out, Chunk* chunk, int offset) {
 		return constantInstruction(out, "CONST", chunk, offset);
 	case OP_TRUE:
 		return simpleInstruction(out, "TRUE", offset);
+	case OP_EQUAL:
+		return simpleInstruction(out, "EQUAL", offset);
+	case OP_GREATER:
+		return simpleInstruction(out, "GREATER", offset);
+	case OP_LESS:
+		return simpleInstruction(out, "LESS", offset);
 	case OP_ADD:
 		return simpleInstruction(out, "ADD", offset);
 	case OP_SUBTRACT:
@@ -133,7 +139,7 @@ int writeDisassembledInstruction(string* out, Chunk* chunk, int offset) {
 	default:
 		fflush(stdout);
 		fprintf(stderr, "Unknown opcode 0x%x\n", instruction);
-		exit(1);
+		LOX_ASSERT(false);
 	}
 }
 
@@ -274,6 +280,101 @@ void testCompileNot(void) {
 	freeString(&out);
 }
 
+void testCompileComparison(void) {
+	Chunk chunk;
+
+	string out;
+	initChunk(&chunk);
+	{
+		bool success = compile("(true == true)", &chunk);
+		LOX_ASSERT(success);
+
+		char* want = "TRUE;TRUE;EQUAL;RET;";
+
+		initString(&out);
+		writeDisassembledChunk(&out, &chunk);
+		char* got = out.data;
+
+		LOX_ASSERT(strcmp(got, want) == 0);
+	}
+	freeString(&out);
+
+	initChunk(&chunk);
+	{
+		bool success = compile("(true != true)", &chunk);
+		LOX_ASSERT(success);
+
+		char* want = "TRUE;TRUE;EQUAL;NOT;RET;";
+
+		initString(&out);
+		writeDisassembledChunk(&out, &chunk);
+		char* got = out.data;
+
+		LOX_ASSERT(strcmp(got, want) == 0);
+	}
+	freeString(&out);
+
+	initChunk(&chunk);
+	{
+		bool s = compile("1 > 2", &chunk);
+		LOX_ASSERT(s);
+
+		char* want = "CONST 1.0;CONST 2.0;GREATER;RET;";
+
+		initString(&out);
+		writeDisassembledChunk(&out, &chunk);
+		char* got = out.data;
+
+		LOX_ASSERT(strcmp(got, want) == 0);
+	}
+	freeString(&out);
+
+	initChunk(&chunk);
+	{
+		bool s = compile("3<4", &chunk);
+		LOX_ASSERT(s);
+
+		char* want = "CONST 3.0;CONST 4.0;LESS;RET;";
+
+		initString(&out);
+		writeDisassembledChunk(&out, &chunk);
+		char* got = out.data;
+
+		LOX_ASSERT(strcmp(got, want) == 0);
+	}
+	freeString(&out);
+
+	initChunk(&chunk);
+	{
+		bool success = compile("5>=6", &chunk);
+		LOX_ASSERT(success);
+
+		char* want = "CONST 5.0;CONST 6.0;LESS;NOT;RET;";
+
+		initString(&out);
+		writeDisassembledChunk(&out, &chunk);
+		char* got = out.data;
+
+		LOX_ASSERT(strcmp(got, want) == 0);
+	}
+	freeString(&out);
+
+	initChunk(&chunk);
+	{
+		bool s = compile("7<=8", &chunk);
+		LOX_ASSERT(s);
+
+		char* want = "CONST 7.0;CONST 8.0;GREATER;NOT;RET;";
+
+		initString(&out);
+		writeDisassembledChunk(&out, &chunk);
+		char* got = out.data;
+
+		LOX_ASSERT(strcmp(got, want) == 0);
+	}
+	freeString(&out);
+}
+
 int main() {
 	// testing testing tests
 	{
@@ -291,5 +392,6 @@ int main() {
 		testCompileTernarySimple();
 		testCompileTernaryComplex();
 		testCompileNot();
+		testCompileComparison();
 	}
 }

@@ -17,7 +17,7 @@ test/test-scanner: test/test-scanner.c src/scanner.h src/scanner.c src/lox_asser
 	$(CC) $(CFLAGS) -Wno-error test/test-scanner.c $(SRC_FILES) -o test/test-scanner
 	test/test-scanner || mv test/test-scanner test/test-scanner.failed
 test/test-compiler: test/test-compiler.c src/compiler.h src/compiler.c src/scanner.h src/scanner.c src/chunk.h src/chunk.c src/value.h src/value.c
-	$(CC) $(CFLAGS) -Wno-error test/test-compiler.c $(SRC_FILES) -o test/test-compiler
+	$(CC) $(CFLAGS) -DDEBUG_TRACE_EXECUTION -Wno-error test/test-compiler.c $(SRC_FILES) -o test/test-compiler
 	test/test-compiler || mv -v test/test-compiler test/test-compiler.failed
 
 

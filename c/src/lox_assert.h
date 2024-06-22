@@ -52,6 +52,7 @@
 
 #endif
 
+#ifndef DEBUG_TRACE_EXECUTION
 #define LOX_UNREACHABLE(reason)                                                \
 	__extension__({                                                            \
 		__builtin_unreachable();                                               \
@@ -60,3 +61,12 @@
 				__FILE__, __LINE__, __func__, reason);                         \
 		abort();                                                               \
 	})
+#else
+#define LOX_UNREACHABLE(reason)                                                \
+	__extension__({                                                            \
+		fflush(stdout);                                                        \
+		fprintf(stderr, "\n%s:%d: %s: Unreachable code reached: %s\n",         \
+				__FILE__, __LINE__, __func__, reason);                         \
+		abort();                                                               \
+	})
+#endif
