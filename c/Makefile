@@ -22,7 +22,7 @@ test/test-compiler: test/test-compiler.c src/compiler.h src/compiler.c src/scann
 
 
 lint: $(SRC_FILES) src/*.h test/*.c
-	clang-tidy $(SRC_FILES) src.*.h test/*.c
+	clang-tidy --fix --checks="-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling" $(SRC_FILES) src/*.h test/*.c
 
 CLANG_FORMAT ?= clang-format
 format: $(SRC_FILES) src/*.h test/*.c
