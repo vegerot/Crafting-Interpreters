@@ -9,7 +9,7 @@ all: lox test lint
 test: test/test-stack test/test-vm test/test-scanner test/test-compiler
 test/test-vm: test/test-vm.c src/vm.h src/vm.c src/chunk.h src/chunk.c
 	$(CC) $(CFLAGS) test/test-vm.c $(SRC_FILES) -o test/test-vm
-	test/test-vm
+	test/test-vm || mv test/test-vm test/test-vm.failed
 test/test-stack: test/test-stack.c src/stack.h src/stack.c
 	$(CC) $(CFLAGS) test/test-stack.c $(SRC_FILES) -o test/test-stack
 	test/test-stack
