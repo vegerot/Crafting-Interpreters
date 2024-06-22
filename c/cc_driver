@@ -52,10 +52,15 @@ function link() {
 	local out=$BUILD_DIR/linked/a.out
 	printf "Linking %s\n" $compiled_file_names 1>&2
 	if type ld > /dev/null 2>&1; then
-		ld -arch arm64 -platform_version macos 14.5 14.5\
-			-L /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib -lSystem \
-			${=compiled_file_names}\
-			-o $out;
+		if [[ $OSTYPE == "darwin"* ]]; then
+			ld -arch arm64 -platform_version macos 14.5 14.5\
+				-L /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib -lSystem \
+				${=compiled_file_names}\
+				-o $out;
+		else
+			ld ${=compiled_file_names} -o $out \
+				-lc -dynamic-linker /lib64/ld-linux-x86-64.so.2 /usr/lib/gcc/x86_64-linux-gnu/12/../../../x86_64-linux-gnu/Scrt1.o -L/usr/lib/gcc/x86_64-linux-gnu/12
+		fi
 	else
 		$C_COMPILER ${=CFLAGS} ${=compiled_file_names} -o $out
 	fi

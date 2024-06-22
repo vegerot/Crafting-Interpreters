@@ -6,16 +6,16 @@
 /** -((1.2+3.4)/5.6)*/
 void negativeOnepoint2PlusThreepoint4DividedbyFivepoint6(Chunk* chunk) {
 	writeChunk(chunk, OP_CONSTANT, 1);
-	int constant = addConstant(chunk, 1.2);
+	int constant = addConstant(chunk, NUMBER_VAL(1.2));
 	writeChunk(chunk, constant, 2);
 
-	constant = addConstant(chunk, 3.4);
+	constant = addConstant(chunk, NUMBER_VAL(3.4));
 	writeChunk(chunk, OP_CONSTANT, 1);
 	writeChunk(chunk, constant, 42);
 
 	writeChunk(chunk, OP_ADD, 1);
 
-	constant = addConstant(chunk, 5.6);
+	constant = addConstant(chunk, NUMBER_VAL(5.6));
 	writeChunk(chunk, OP_CONSTANT, 1);
 	writeChunk(chunk, constant, 1);
 
@@ -28,17 +28,17 @@ void negativeOnepoint2PlusThreepoint4DividedbyFivepoint6(Chunk* chunk) {
 
 /** 1*2+3 */
 void OneTimesTwoPlusThree(Chunk* chunk) {
-	int constant = addConstant(chunk, 1);
+	int constant = addConstant(chunk, NUMBER_VAL(1));
 	writeChunk(chunk, OP_CONSTANT, 2);
 	writeChunk(chunk, constant, 2);
 
-	constant = addConstant(chunk, 2);
+	constant = addConstant(chunk, NUMBER_VAL(2));
 	writeChunk(chunk, OP_CONSTANT, 2);
 	writeChunk(chunk, constant, 2);
 
 	writeChunk(chunk, OP_MULTIPLY, 2);
 
-	constant = addConstant(chunk, 3);
+	constant = addConstant(chunk, NUMBER_VAL(3));
 	writeChunk(chunk, OP_CONSTANT, 2);
 	writeChunk(chunk, constant, 2);
 
@@ -49,15 +49,15 @@ void OneTimesTwoPlusThree(Chunk* chunk) {
 
 /** 1+2*3 */
 void OnePlusTwoTimesThree(Chunk* chunk) {
-	int constant = addConstant(chunk, 1);
+	int constant = addConstant(chunk, NUMBER_VAL(1));
 	writeChunkNoLine(chunk, OP_CONSTANT);
 	writeChunkNoLine(chunk, constant);
 
-	constant = addConstant(chunk, 2);
+	constant = addConstant(chunk, NUMBER_VAL(2));
 	writeChunkNoLine(chunk, OP_CONSTANT);
 	writeChunkNoLine(chunk, constant);
 
-	constant = addConstant(chunk, 3);
+	constant = addConstant(chunk, NUMBER_VAL(3));
 	writeChunkNoLine(chunk, OP_CONSTANT);
 	writeChunkNoLine(chunk, constant);
 
@@ -68,17 +68,17 @@ void OnePlusTwoTimesThree(Chunk* chunk) {
 
 /** 3-2-1*/
 void ThreeMinusTwoMinusOne(Chunk* chunk) {
-	int constant = addConstant(chunk, 3);
+	int constant = addConstant(chunk, NUMBER_VAL(3));
 	writeChunkNoLine(chunk, OP_CONSTANT);
 	writeChunkNoLine(chunk, constant);
 
-	constant = addConstant(chunk, 2);
+	constant = addConstant(chunk, NUMBER_VAL(2));
 	writeChunkNoLine(chunk, OP_CONSTANT);
 	writeChunkNoLine(chunk, constant);
 
 	writeChunkNoLine(chunk, OP_SUBTRACT);
 
-	constant = addConstant(chunk, 1);
+	constant = addConstant(chunk, NUMBER_VAL(1));
 	writeChunkNoLine(chunk, OP_CONSTANT);
 	writeChunkNoLine(chunk, constant);
 
@@ -89,26 +89,26 @@ void ThreeMinusTwoMinusOne(Chunk* chunk) {
 
 /** 1+2*3-4/-5*/
 void OnePlusTwoTimesThreeMinusFourDivididedNegativeFive(Chunk* chunk) {
-	int constant = addConstant(chunk, 1);
+	int constant = addConstant(chunk, NUMBER_VAL(1));
 	writeChunkNoLine(chunk, OP_CONSTANT);
 	writeChunkNoLine(chunk, constant);
 
-	constant = addConstant(chunk, 2);
+	constant = addConstant(chunk, NUMBER_VAL(2));
 	writeChunkNoLine(chunk, OP_CONSTANT);
 	writeChunkNoLine(chunk, constant);
 
-	constant = addConstant(chunk, 3);
+	constant = addConstant(chunk, NUMBER_VAL(3));
 	writeChunkNoLine(chunk, OP_CONSTANT);
 	writeChunkNoLine(chunk, constant);
 
 	writeChunkNoLine(chunk, OP_MULTIPLY);
 	writeChunkNoLine(chunk, OP_ADD);
 
-	constant = addConstant(chunk, 4);
+	constant = addConstant(chunk, NUMBER_VAL(4));
 	writeChunkNoLine(chunk, OP_CONSTANT);
 	writeChunkNoLine(chunk, constant);
 
-	constant = addConstant(chunk, 5);
+	constant = addConstant(chunk, NUMBER_VAL(5));
 	writeChunkNoLine(chunk, OP_CONSTANT);
 	writeChunkNoLine(chunk, constant);
 
@@ -120,19 +120,19 @@ void OnePlusTwoTimesThreeMinusFourDivididedNegativeFive(Chunk* chunk) {
 }
 
 void FourMinusThreeTimesNegativeTwo_without_negate(Chunk* chunk) {
-	int constant = addConstant(chunk, 4);
+	int constant = addConstant(chunk, NUMBER_VAL(4));
 	writeChunkNoLine(chunk, OP_CONSTANT);
 	writeChunkNoLine(chunk, constant);
 
-	constant = addConstant(chunk, 3);
+	constant = addConstant(chunk, NUMBER_VAL(3));
 	writeChunkNoLine(chunk, OP_CONSTANT);
 	writeChunkNoLine(chunk, constant);
 
-	constant = addConstant(chunk, 0);
+	constant = addConstant(chunk, NUMBER_VAL(0));
 	writeChunkNoLine(chunk, OP_CONSTANT);
 	writeChunkNoLine(chunk, constant);
 
-	constant = addConstant(chunk, 2);
+	constant = addConstant(chunk, NUMBER_VAL(2));
 	writeChunkNoLine(chunk, OP_CONSTANT);
 	writeChunkNoLine(chunk, constant);
 
@@ -144,17 +144,17 @@ void FourMinusThreeTimesNegativeTwo_without_negate(Chunk* chunk) {
 }
 
 void FourMinusThreeTimesNegativeTwo_without_subtract(Chunk* chunk) {
-	int constant = addConstant(chunk, 4);
+	int constant = addConstant(chunk, NUMBER_VAL(4));
 	writeChunkNoLine(chunk, OP_CONSTANT);
 	writeChunkNoLine(chunk, constant);
 
-	constant = addConstant(chunk, 3);
+	constant = addConstant(chunk, NUMBER_VAL(3));
 	writeChunkNoLine(chunk, OP_CONSTANT);
 	writeChunkNoLine(chunk, constant);
 
 	writeChunkNoLine(chunk, OP_NEGATE);
 
-	constant = addConstant(chunk, 2);
+	constant = addConstant(chunk, NUMBER_VAL(2));
 	writeChunkNoLine(chunk, OP_CONSTANT);
 	writeChunkNoLine(chunk, constant);
 
@@ -177,11 +177,11 @@ void addToStack(void) {
 	Chunk chunk;
 	initChunk(&chunk);
 	{
-		int constant = addConstant(&chunk, 42);
+		int constant = addConstant(&chunk, NUMBER_VAL(42));
 		writeChunkNoLine(&chunk, OP_CONSTANT);
 		writeChunkNoLine(&chunk, constant);
 
-		constant = addConstant(&chunk, 69);
+		constant = addConstant(&chunk, NUMBER_VAL(69));
 		writeChunkNoLine(&chunk, OP_CONSTANT);
 		writeChunkNoLine(&chunk, constant);
 
@@ -189,8 +189,8 @@ void addToStack(void) {
 	}
 	interpret_bytecode_(&chunk);
 	VM vm = getVM_();
-	LOX_ASSERT(peekStack(&vm, 0) == 69);
-	LOX_ASSERT(peekStack(&vm, 1) == 42);
+	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0) , NUMBER_VAL(69));
+	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 1) , NUMBER_VAL(42));
 }
 
 void addition(void) {
@@ -198,11 +198,11 @@ void addition(void) {
 	Chunk chunk;
 	initChunk(&chunk);
 	{
-		int constant = addConstant(&chunk, 42);
+		int constant = addConstant(&chunk, NUMBER_VAL(42));
 		writeChunkNoLine(&chunk, OP_CONSTANT);
 		writeChunkNoLine(&chunk, constant);
 
-		constant = addConstant(&chunk, 27);
+		constant = addConstant(&chunk, NUMBER_VAL(27));
 		writeChunkNoLine(&chunk, OP_CONSTANT);
 		writeChunkNoLine(&chunk, constant);
 
@@ -212,7 +212,7 @@ void addition(void) {
 	}
 	interpret_bytecode_(&chunk);
 	VM vm = getVM_();
-	LOX_ASSERT(peekStack(&vm, 0) == 69);
+	LOX_ASSERT(peekStack(&vm, 0) == NUMBER_VAL(69));
 }
 
 void subtraction(void) {
@@ -220,11 +220,11 @@ void subtraction(void) {
 	Chunk chunk;
 	initChunk(&chunk);
 	{
-		int constant = addConstant(&chunk, 7);
+		int constant = addConstant(&chunk, NUMBER_VAL(7));
 		writeChunkNoLine(&chunk, OP_CONSTANT);
 		writeChunkNoLine(&chunk, constant);
 
-		constant = addConstant(&chunk, 3);
+		constant = addConstant(&chunk, NUMBER_VAL(3));
 		writeChunkNoLine(&chunk, OP_CONSTANT);
 		writeChunkNoLine(&chunk, constant);
 
@@ -234,7 +234,7 @@ void subtraction(void) {
 	}
 	interpret_bytecode_(&chunk);
 	VM vm = getVM_();
-	LOX_ASSERT(peekStack(&vm, 0) == 4);
+	LOX_ASSERT(peekStack(&vm, 0) == NUMBER_VAL(4));
 }
 
 void negation(void) {
@@ -242,7 +242,7 @@ void negation(void) {
 	Chunk chunk;
 	initChunk(&chunk);
 	{
-		int constant = addConstant(&chunk, 7);
+		int constant = addConstant(&chunk, NUMBER_VAL(7));
 		writeChunkNoLine(&chunk, OP_CONSTANT);
 		writeChunkNoLine(&chunk, constant);
 
@@ -252,7 +252,7 @@ void negation(void) {
 	}
 	interpret_bytecode_(&chunk);
 	VM vm = getVM_();
-	LOX_ASSERT(peekStack(&vm, 0) == -7);
+	LOX_ASSERT(peekStack(&vm, 0) == NUMBER_VAL(-)7);
 }
 
 void multiplication(void) {
@@ -260,11 +260,11 @@ void multiplication(void) {
 	Chunk chunk;
 	initChunk(&chunk);
 	{
-		int constant = addConstant(&chunk, 210);
+		int constant = addConstant(&chunk, NUMBER_VAL(210));
 		writeChunkNoLine(&chunk, OP_CONSTANT);
 		writeChunkNoLine(&chunk, constant);
 
-		constant = addConstant(&chunk, 2);
+		constant = addConstant(&chunk, NUMBER_VAL(2));
 		writeChunkNoLine(&chunk, OP_CONSTANT);
 		writeChunkNoLine(&chunk, constant);
 
@@ -274,7 +274,7 @@ void multiplication(void) {
 	}
 	interpret_bytecode_(&chunk);
 	VM vm = getVM_();
-	LOX_ASSERT(peekStack(&vm, 0) == 420);
+	LOX_ASSERT(peekStack(&vm, 0) == NUMBER_VAL(420));
 }
 
 void division(void) {
@@ -282,11 +282,11 @@ void division(void) {
 	Chunk chunk;
 	initChunk(&chunk);
 	{
-		int constant = addConstant(&chunk, 420);
+		int constant = addConstant(&chunk, NUMBER_VAL(420));
 		writeChunkNoLine(&chunk, OP_CONSTANT);
 		writeChunkNoLine(&chunk, constant);
 
-		constant = addConstant(&chunk, 10);
+		constant = addConstant(&chunk, NUMBER_VAL(10));
 		writeChunkNoLine(&chunk, OP_CONSTANT);
 		writeChunkNoLine(&chunk, constant);
 
@@ -296,7 +296,7 @@ void division(void) {
 	}
 	interpret_bytecode_(&chunk);
 	VM vm = getVM_();
-	LOX_ASSERT(peekStack(&vm, 0) == 42);
+	LOX_ASSERT(peekStack(&vm, 0) == NUMBER_VAL(42));
 }
 
 int main(void) {

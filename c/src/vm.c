@@ -28,8 +28,16 @@ InterpretResult run(void) {
 #define BINARY_OP(op)                                                          \
 	do {                                                                       \
 		Value b = stack_pop(&vm.stack);                                        \
+		LOX_ASSERT_EQUALS(b.type, VAL_NUMBER);                                 \
+		double b_val = b.as.number;                                            \
 		Value a = stack_pop(&vm.stack);                                        \
-		stack_push(&vm.stack, a op b);                                         \
+		LOX_ASSERT_EQUALS(a.type, VAL_NUMBER);                                 \
+		double a_val = a.as.number;                                            \
+		Value result = {                                                       \
+			.type = VAL_NUMBER,                                                \
+			.as.number = a_val op b_val,                                       \
+		};                                                                     \
+		stack_push(&vm.stack, result);                                         \
 	} while (false)
 
 	for (;;) {
@@ -77,7 +85,7 @@ InterpretResult run(void) {
 			// stack_push(&vm.stack, -1 * constant);
 			// HACK: edit the stack directly
 			// this is a bonus challenge in chapter 15
-			*(vm.stack.top - 1) *= -1;
+			(*(vm.stack.top - 1)).as.number *= -1;
 			break;
 		}
 		case OP_RETURN:
