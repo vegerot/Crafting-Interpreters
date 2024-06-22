@@ -4,3 +4,4 @@ lox
 test/test-*
 !test/test-*.c
 .cache/
+.lint-stamp

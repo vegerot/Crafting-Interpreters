@@ -21,8 +21,12 @@ test/test-compiler: test/test-compiler.c src/compiler.h src/compiler.c src/scann
 	test/test-compiler || mv -v test/test-compiler test/test-compiler.failed
 
 
-lint: $(SRC_FILES) src/*.h test/*.c
-	clang-tidy --fix --checks="-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling" $(SRC_FILES) src/*.h test/*.c
+# NOTE: if you're seeing a bunch of errors about unknown clang flags, make
+# sure `make clangd` uses the same llvm version as `make lint`
+lint: .lint-stamp
+.lint-stamp: $(SRC_FILES) src/*.h test/*.c
+	clang-tidy --fix-errors --checks="-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling" $(SRC_FILES) src/*.h test/*.c 
+	touch .lint-stamp
 
 CLANG_FORMAT ?= clang-format
 format: $(SRC_FILES) src/*.h test/*.c
