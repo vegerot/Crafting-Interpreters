@@ -189,8 +189,8 @@ void addToStack(void) {
 	}
 	interpret_bytecode_(&chunk);
 	VM vm = getVM_();
-	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0) , NUMBER_VAL(69));
-	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 1) , NUMBER_VAL(42));
+	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0), NUMBER_VAL(69));
+	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 1), NUMBER_VAL(42));
 }
 
 void addition(void) {
@@ -212,7 +212,7 @@ void addition(void) {
 	}
 	interpret_bytecode_(&chunk);
 	VM vm = getVM_();
-	LOX_ASSERT(peekStack(&vm, 0) == NUMBER_VAL(69));
+	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0), NUMBER_VAL(69));
 }
 
 void subtraction(void) {
@@ -234,7 +234,8 @@ void subtraction(void) {
 	}
 	interpret_bytecode_(&chunk);
 	VM vm = getVM_();
-	LOX_ASSERT(peekStack(&vm, 0) == NUMBER_VAL(4));
+	LOX_ASSERT_EQUALS(peekStack(&vm, 0).type, VAL_NUMBER);
+	LOX_ASSERT_EQUALS(peekStack(&vm, 0).as.number, 4);
 }
 
 void negation(void) {
@@ -252,7 +253,7 @@ void negation(void) {
 	}
 	interpret_bytecode_(&chunk);
 	VM vm = getVM_();
-	LOX_ASSERT(peekStack(&vm, 0) == NUMBER_VAL(-)7);
+	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0) , NUMBER_VAL(-7));
 }
 
 void multiplication(void) {
@@ -274,7 +275,7 @@ void multiplication(void) {
 	}
 	interpret_bytecode_(&chunk);
 	VM vm = getVM_();
-	LOX_ASSERT(peekStack(&vm, 0) == NUMBER_VAL(420));
+	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0) , NUMBER_VAL(420));
 }
 
 void division(void) {
@@ -296,7 +297,7 @@ void division(void) {
 	}
 	interpret_bytecode_(&chunk);
 	VM vm = getVM_();
-	LOX_ASSERT(peekStack(&vm, 0) == NUMBER_VAL(42));
+	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0) , NUMBER_VAL(42));
 }
 
 int main(void) {
