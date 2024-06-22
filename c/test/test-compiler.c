@@ -18,7 +18,7 @@ void appendToString(string* this, char const* that, size_t that_len) {
 		this->cap = that_len * 2;
 		this->data = malloc(this->cap * sizeof(char));
 		this->len = that_len;
-		strcpy(this->data, that);
+		strncpy(this->data, that, that_len);
 		return;
 	}
 
@@ -67,11 +67,12 @@ void testGrowString(void) {
 	LOX_ASSERT(s.cap >= s.len);
 	LOX_ASSERT(strcmp(s.data, "the quick brown fox jumps over the lazy dog") ==
 			   0);
+	freeString(&s);
 }
 
 void testStringAppend(void) {
 	char* s1data = (char*)malloc(sizeof("hello"));
-	strcpy(s1data, "hello");
+	strncpy(s1data, "hello", strlen("hello") + 1);
 	string s1 = {
 		.data = s1data,
 		.len = 5,
@@ -82,6 +83,7 @@ void testStringAppend(void) {
 
 	LOX_ASSERT_EQUALS((int)s1.len, 11);
 	LOX_ASSERT(strcmp(s1.data, "hello world") == 0 && s1.data);
+	freeString(&s1);
 }
 
 // STRING end
