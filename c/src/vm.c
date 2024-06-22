@@ -1,3 +1,4 @@
+#include <stdarg.h>
 #include <stdio.h>
 
 #include "compiler.h"
@@ -9,6 +10,20 @@
 static VM vm; // NOLINT
 
 static void resetStack(void) { vm.stack.top = vm.stack.bottom; }
+
+static void runtimeError(char const* format, ...) {
+	va_list args;
+	va_start(args, format);
+	vfprintf( // NOLINT(clang-analyzer-valist.Uninitialized): bug in clang-tidy
+		stderr, format, args);
+	va_end(args);
+	fputs("\n", stderr);
+
+	size_t instruction = vm.ip - vm.chunk->code - 1;
+	int line = vm.chunk->lines[instruction];
+	fprintf(stderr, "[line %d] in script\n", line);
+	resetStack();
+}
 
 void initVM(void) {
 	new_stack(&vm.stack);
@@ -82,11 +97,12 @@ InterpretResult run(void) {
 			break;
 		case OP_NEGATE: {
 			// Value constant = stack_pop(&vm.stack);
-			// stack_push(&vm.stack, -1 * constant);
+			// stack_push(&vm.stack, NUMBER_VAL(-AS_NUMBER(constant)));
 			// HACK: edit the stack directly
 			// this is a bonus challenge in chapter 15
 			Value top_of_stack = stack_peek(&vm.stack, 0);
 			if (!IS_NUMBER(top_of_stack)) {
+				runtimeError("Operand must be a number.");
 				return INTERPRET_RUNTIME_ERROR;
 			}
 			(vm.stack.top - 1)->as.number *= -1;
