@@ -100,9 +100,8 @@ static void EmitByte(uint8_t byte) {
 #define EmitBytes(...)                                                         \
 	do {                                                                       \
 		uint8_t bytes[] = {__VA_ARGS__};                                       \
-		_Pragma("GCC unroll 3") for (size_t i = 0;                             \
-									 i < sizeof(bytes) / sizeof(bytes[0]);     \
-									 ++i) {                                    \
+		/* TODO: figure out how to unroll loop*/                               \
+		for (size_t i = 0; i < sizeof(bytes) / sizeof(bytes[0]); ++i) {        \
 			EmitByte(bytes[i]);                                                \
 		}                                                                      \
 	} while (0)
