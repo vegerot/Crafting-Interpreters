@@ -24,11 +24,13 @@ test/test-compiler: test/test-compiler.c src/compiler.h src/compiler.c src/scann
 lint: $(SRC_FILES) src/*.h test/*.c
 	clang-tidy $(SRC_FILES) src.*.h test/*.c
 
+CLANG_FORMAT ?= clang-format
 format: $(SRC_FILES) src/*.h test/*.c
-	clang-format -i $(SRC_FILES) src/*.h test/*.c
+	$(CLANG_FORMAT) -i $(SRC_FILES) src/*.h test/*.c
 
+CLANG ?= clang
 clangd:
 	printf "[" > compile_commands.json
-	clang $(CFLAGS) -Wno-error -MJ /dev/stdout -DDEBUG_TRACE_EXECUTION src/main.c $(SRC_FILES) -o lox | sed '$$s|.$$||' >> compile_commands.json
+	$(CLANG) $(CFLAGS) -Wno-error -MJ /dev/stdout -DDEBUG_TRACE_EXECUTION src/main.c $(SRC_FILES) -o lox | sed '$$s|.$$||' >> compile_commands.json
 	printf "]" >> compile_commands.json
 
