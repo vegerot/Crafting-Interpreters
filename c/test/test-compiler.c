@@ -144,6 +144,7 @@ int writeDisassembledInstruction(string* out, Chunk* chunk, int offset) {
 }
 
 void writeDisassembledChunk(string* out, Chunk* chunk) {
+	LOX_ASSERT(chunk->count > 0);
 	for (int offset = 0; offset < chunk->count;) {
 		offset = writeDisassembledInstruction(out, chunk, offset);
 	}
