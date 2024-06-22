@@ -13,7 +13,7 @@ typedef struct {
 } string;
 
 void appendToString(string* this, char const* that, size_t that_len) {
-	if (this->data == NULL) {
+	if (this->data == NULL || this->cap == 0) {
 		// initialize string
 		this->cap = that_len * 2;
 		this->data = malloc(this->cap * sizeof(char));
@@ -28,8 +28,8 @@ void appendToString(string* this, char const* that, size_t that_len) {
 
 	if (remaining_space <= that_len) {
 		this->cap = (this->cap + that_len) * 2;
-		this->data = realloc(
-			this->data, this->cap); // NOLINT(bugprone-suspicious-realloc-usage)
+		this->data = realloc( // NOLINT(bugprone-suspicious-realloc-usage)
+			this->data, this->cap);
 	}
 
 	strncat(this->data, that, this->cap);
@@ -37,6 +37,8 @@ void appendToString(string* this, char const* that, size_t that_len) {
 					  that_len + this->len); // string accidentally truncated
 	this->len += that_len;
 }
+
+void freeString(string* this) { free(this->data); }
 
 void initString(string* this) {
 	this->len = 0;
@@ -52,6 +54,7 @@ void testNewString(void) {
 	LOX_ASSERT_EQUALS(s.len, 5);
 	LOX_ASSERT(s.cap >= s.len);
 	LOX_ASSERT(strcmp(s.data, "hello") == 0);
+	freeString(&s);
 }
 
 void testGrowString(void) {
@@ -159,6 +162,7 @@ void testDisassembleSimple(void) {
 	char* got = out.data;
 
 	LOX_ASSERT(strcmp(got, want) == 0);
+	freeString(&out);
 }
 
 void testDisassemble(void) {
@@ -195,6 +199,7 @@ void testDisassemble(void) {
 	// TODO: instead of `strcmp`, walk through both strings for better
 	// failure messages
 	LOX_ASSERT(strcmp(got, want) == 0);
+	freeString(&out);
 }
 
 // DISASSEMBLER end
@@ -213,6 +218,7 @@ void testCompile1plus1(void) {
 	char* got = out.data;
 
 	LOX_ASSERT(strcmp(got, want) == 0);
+	freeString(&out);
 }
 
 void testCompileTernarySimple(void) {
@@ -229,6 +235,7 @@ void testCompileTernarySimple(void) {
 	char* got = out.data;
 
 	LOX_ASSERT(strcmp(got, want) == 0);
+	freeString(&out);
 }
 
 void testCompileTernaryComplex(void) {
@@ -247,6 +254,7 @@ void testCompileTernaryComplex(void) {
 	char* got = out.data;
 
 	LOX_ASSERT(strcmp(got, want) == 0);
+	freeString(&out);
 }
 
 void testCompileNot(void) {
