@@ -230,6 +230,9 @@ static void Unary() {
 	ParsePrecedence(PREC_UNARY);
 
 	switch (operatorType) {
+	case TOKEN_BANG:
+		EmitBytes(OP_NOT);
+		break;
 	case TOKEN_MINUS:
 		EmitBytes(OP_NEGATE);
 		break;
@@ -251,7 +254,7 @@ static ParseRule const rules[] = {
 	[TOKEN_SEMICOLON] = {NULL, NULL, PREC_NONE},
 	[TOKEN_SLASH] = {NULL, Binary, PREC_FACTOR},
 	[TOKEN_STAR] = {NULL, Binary, PREC_FACTOR},
-	[TOKEN_BANG] = {NULL, NULL, PREC_NONE},
+	[TOKEN_BANG] = {Unary, NULL, PREC_NONE},
 	[TOKEN_BANG_EQUAL] = {NULL, NULL, PREC_NONE},
 	[TOKEN_EQUAL] = {NULL, NULL, PREC_NONE},
 	[TOKEN_EQUAL_EQUAL] = {NULL, NULL, PREC_NONE},

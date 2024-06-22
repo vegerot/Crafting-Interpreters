@@ -109,6 +109,8 @@ int writeDisassembledInstruction(string* out, Chunk* chunk, int offset) {
 	switch (instruction) {
 	case OP_CONSTANT:
 		return constantInstruction(out, "CONST", chunk, offset);
+	case OP_TRUE:
+		return simpleInstruction(out, "TRUE", offset);
 	case OP_ADD:
 		return simpleInstruction(out, "ADD", offset);
 	case OP_SUBTRACT:
@@ -117,6 +119,8 @@ int writeDisassembledInstruction(string* out, Chunk* chunk, int offset) {
 		return simpleInstruction(out, "MULT", offset);
 	case OP_DIVIDE:
 		return simpleInstruction(out, "DIV", offset);
+	case OP_NOT:
+		return simpleInstruction(out, "NOT", offset);
 	case OP_NEGATE:
 		return simpleInstruction(out, "NEG", offset);
 	case OP_RETURN:
@@ -244,6 +248,24 @@ void testCompileTernaryComplex(void) {
 
 	LOX_ASSERT(strcmp(got, want) == 0);
 }
+
+void testCompileNot(void) {
+	Chunk chunk;
+	initChunk(&chunk);
+
+	compile("!true", &chunk);
+
+	char* want = "TRUE;NOT;RET;";
+
+	string out;
+	initString(&out);
+	writeDisassembledChunk(&out, &chunk);
+	char* got = out.data;
+
+	LOX_ASSERT(strcmp(got, want) == 0);
+	freeString(&out);
+}
+
 int main() {
 	// testing testing tests
 	{
@@ -260,5 +282,6 @@ int main() {
 		testCompile1plus1();
 		testCompileTernarySimple();
 		testCompileTernaryComplex();
+		testCompileNot();
 	}
 }
