@@ -1,5 +1,5 @@
 CC ?= cc
-CFLAGS= -std=gnu2x -g -Wall -Wextra -Wpedantic -Werror -Wno-gnu-statement-expression -Wno-strict-prototypes
+CFLAGS= -std=gnu2x -g -Wall -Wextra -Wpedantic -Wimplicit-fallthrough -Werror -Wno-gnu-statement-expression -Wno-strict-prototypes
 SRC_FILES= src/compiler.c src/scanner.c src/chunk.c src/debug.c src/memory.c src/stack.c src/value.c src/vm.c
 
 lox: $(SRC_FILES) src/*.h src/main.c
