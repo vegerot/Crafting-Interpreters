@@ -40,19 +40,16 @@ VM getVM_(void) { return vm; }
 InterpretResult run(void) {
 #define READ_BYTE() (*vm.ip++)
 #define READ_CONSTANT() (vm.chunk->constants.values[READ_BYTE()])
-#define BINARY_OP(op)                                                          \
+#define BINARY_OP(valueType, op)                                               \
 	do {                                                                       \
-		Value b = stack_pop(&vm.stack);                                        \
-		LOX_ASSERT_EQUALS(b.type, VAL_NUMBER);                                 \
-		double b_val = b.as.number;                                            \
-		Value a = stack_pop(&vm.stack);                                        \
-		LOX_ASSERT_EQUALS(a.type, VAL_NUMBER);                                 \
-		double a_val = a.as.number;                                            \
-		Value result = {                                                       \
-			.type = VAL_NUMBER,                                                \
-			.as.number = a_val op b_val,                                       \
-		};                                                                     \
-		stack_push(&vm.stack, result);                                         \
+		if (!(IS_NUMBER(stack_peek(&vm.stack, 0)) &&                           \
+			  IS_NUMBER(stack_peek(&vm.stack, 1)))) {                          \
+			runtimeError("Operands must be numbers to binary op");             \
+			return INTERPRET_RUNTIME_ERROR;                                    \
+		}                                                                      \
+		double b = AS_NUMBER(stack_pop(&vm.stack));                            \
+		double a = AS_NUMBER(stack_pop(&vm.stack));                            \
+		stack_push(&vm.stack, valueType(a op b));                              \
 	} while (false)
 
 	for (;;) {
@@ -84,16 +81,16 @@ InterpretResult run(void) {
 			break;
 		}
 		case OP_ADD:
-			BINARY_OP(+);
+			BINARY_OP(NUMBER_VAL, +);
 			break;
 		case OP_SUBTRACT:
-			BINARY_OP(-);
+			BINARY_OP(NUMBER_VAL, -);
 			break;
 		case OP_MULTIPLY:
-			BINARY_OP(*);
+			BINARY_OP(NUMBER_VAL, *);
 			break;
 		case OP_DIVIDE:
-			BINARY_OP(/);
+			BINARY_OP(NUMBER_VAL, /);
 			break;
 		case OP_NEGATE: {
 			// Value constant = stack_pop(&vm.stack);
