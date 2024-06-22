@@ -102,6 +102,18 @@ InterpretResult run(void) {
 		case OP_TRUE:
 			stack_push(&vm.stack, BOOL_VAL(true));
 			break;
+		case OP_EQUAL: {
+			Value b = stack_pop(&vm.stack);
+			Value a = stack_pop(&vm.stack);
+			stack_push(&vm.stack, BOOL_VAL(valuesEqual(a, b)));
+			break;
+		}
+		case OP_GREATER:
+			BINARY_OP(BOOL_VAL, >);
+			break;
+		case OP_LESS:
+			BINARY_OP(BOOL_VAL, <);
+			break;
 		case OP_ADD:
 			BINARY_OP(NUMBER_VAL, +);
 			break;
@@ -137,6 +149,7 @@ InterpretResult run(void) {
 			printf("\n");
 			return INTERPRET_OK;
 		default:
+			runtimeError("Unknown instruction: 0x%02x", instruction);
 			return INTERPRET_RUNTIME_ERROR;
 		}
 	}

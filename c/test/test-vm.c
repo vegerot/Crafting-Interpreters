@@ -354,6 +354,83 @@ void not(void) {
 	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0), BOOL_VAL(true));
 }
 
+static void comparison() {
+	initVM();
+	Chunk chunk;
+	initChunk(&chunk);
+	{
+		writeChunkNoLine(&chunk, OP_TRUE);
+		writeChunkNoLine(&chunk, OP_TRUE);
+		writeChunkNoLine(&chunk, OP_EQUAL);
+
+		int constant = addConstant(&chunk, NUMBER_VAL(0));
+		writeChunkNoLine(&chunk, OP_CONSTANT);
+		writeChunkNoLine(&chunk, constant);
+		constant = addConstant(&chunk, NUMBER_VAL(1));
+		writeChunkNoLine(&chunk, OP_CONSTANT);
+		writeChunkNoLine(&chunk, constant);
+		writeChunkNoLine(&chunk, OP_EQUAL);
+
+		constant = addConstant(&chunk, NUMBER_VAL(0));
+		writeChunkNoLine(&chunk, OP_CONSTANT);
+		writeChunkNoLine(&chunk, constant);
+		writeChunkNoLine(&chunk, OP_FALSE);
+		writeChunkNoLine(&chunk, OP_EQUAL);
+
+		constant = addConstant(&chunk, NUMBER_VAL(0.1));
+		writeChunkNoLine(&chunk, OP_CONSTANT);
+		writeChunkNoLine(&chunk, constant);
+		constant = addConstant(&chunk, NUMBER_VAL(1.5));
+		writeChunkNoLine(&chunk, OP_CONSTANT);
+		writeChunkNoLine(&chunk, constant);
+		writeChunkNoLine(&chunk, OP_GREATER);
+
+		constant = addConstant(&chunk, NUMBER_VAL(69.42));
+		writeChunkNoLine(&chunk, OP_CONSTANT);
+		writeChunkNoLine(&chunk, constant);
+		constant = addConstant(&chunk, NUMBER_VAL(42.69));
+		writeChunkNoLine(&chunk, OP_CONSTANT);
+		writeChunkNoLine(&chunk, constant);
+		writeChunkNoLine(&chunk, OP_GREATER);
+
+		constant = addConstant(&chunk, NUMBER_VAL(1.5));
+		writeChunkNoLine(&chunk, OP_CONSTANT);
+		writeChunkNoLine(&chunk, constant);
+		constant = addConstant(&chunk, NUMBER_VAL(0.1));
+		writeChunkNoLine(&chunk, OP_CONSTANT);
+		writeChunkNoLine(&chunk, constant);
+		writeChunkNoLine(&chunk, OP_LESS);
+
+		constant = addConstant(&chunk, NUMBER_VAL(42.69));
+		writeChunkNoLine(&chunk, OP_CONSTANT);
+		writeChunkNoLine(&chunk, constant);
+		constant = addConstant(&chunk, NUMBER_VAL(69.42));
+		writeChunkNoLine(&chunk, OP_CONSTANT);
+		writeChunkNoLine(&chunk, constant);
+		writeChunkNoLine(&chunk, OP_LESS);
+
+		writeChunkNoLine(&chunk, OP_RETURN);
+	}
+	InterpretResult result = interpret_bytecode_(&chunk);
+	LOX_ASSERT_EQUALS(result, INTERPRET_OK);
+	VM vm = getVM_();
+
+	// true==true is true
+	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 6), BOOL_VAL(true));
+	// 0==1 is false
+	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 5), BOOL_VAL(false));
+	// 0==false is false
+	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 4), BOOL_VAL(false));
+	// 0.1>1.5 is false
+	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 3), BOOL_VAL(false));
+	// 69.42 > 42.69 is true
+	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 2), BOOL_VAL(true));
+	// 1.5 < 0.1 is false
+	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 1), BOOL_VAL(false));
+	// 42.69 < 69.42 is true
+	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0), BOOL_VAL(true));
+}
+
 int main(void) {
 	addToStack();
 	addition();
@@ -362,4 +439,5 @@ int main(void) {
 	multiplication();
 	division();
 	not();
+	comparison();
 }
