@@ -7,7 +7,7 @@ lox: $(SRC_FILES) src/*.h src/main.c
 
 all: lox test lint
 test: test/test-stack test/test-vm test/test-scanner test/test-compiler
-test/test-vm: test/test-vm.c src/vm.h src/vm.c src/chunk.h src/chunk.c
+test/test-vm: test/test-vm.c src/vm.h src/vm.c src/chunk.h src/chunk.c src/value.h src/value.c
 	$(CC) $(CFLAGS) test/test-vm.c $(SRC_FILES) -o test/test-vm
 	test/test-vm || mv test/test-vm test/test-vm.failed
 test/test-stack: test/test-stack.c src/stack.h src/stack.c
@@ -16,7 +16,7 @@ test/test-stack: test/test-stack.c src/stack.h src/stack.c
 test/test-scanner: test/test-scanner.c src/scanner.h src/scanner.c src/lox_assert.h
 	$(CC) $(CFLAGS) -Wno-error test/test-scanner.c $(SRC_FILES) -o test/test-scanner
 	test/test-scanner || mv test/test-scanner test/test-scanner.failed
-test/test-compiler: test/test-compiler.c src/compiler.h src/compiler.c src/scanner.h src/scanner.c src/chunk.h src/chunk.c
+test/test-compiler: test/test-compiler.c src/compiler.h src/compiler.c src/scanner.h src/scanner.c src/chunk.h src/chunk.c src/value.h src/value.c
 	$(CC) $(CFLAGS) -Wno-error test/test-compiler.c $(SRC_FILES) -o test/test-compiler
 	test/test-compiler || mv -v test/test-compiler test/test-compiler.failed
 
