@@ -305,6 +305,55 @@ void division(void) {
 	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0), NUMBER_VAL(42));
 }
 
+void not(void) {
+	initVM();
+	Chunk chunk;
+	initChunk(&chunk);
+	{
+		writeChunkNoLine(&chunk, OP_TRUE);
+		writeChunkNoLine(&chunk, OP_NOT);
+
+		writeChunkNoLine(&chunk, OP_TRUE);
+		writeChunkNoLine(&chunk, OP_NOT);
+		writeChunkNoLine(&chunk, OP_NOT);
+
+		writeChunkNoLine(&chunk, OP_FALSE);
+		writeChunkNoLine(&chunk, OP_NOT);
+
+		writeChunkNoLine(&chunk, OP_NIL);
+		writeChunkNoLine(&chunk, OP_NOT);
+
+		int constant = addConstant(&chunk, NUMBER_VAL(0));
+		writeChunkNoLine(&chunk, OP_CONSTANT);
+		writeChunkNoLine(&chunk, constant);
+		writeChunkNoLine(&chunk, OP_NOT);
+		writeChunkNoLine(&chunk, OP_NOT);
+
+		constant = addConstant(&chunk, NUMBER_VAL(1));
+		writeChunkNoLine(&chunk, OP_CONSTANT);
+		writeChunkNoLine(&chunk, constant);
+		writeChunkNoLine(&chunk, OP_NOT);
+		writeChunkNoLine(&chunk, OP_NOT);
+
+		constant = addConstant(&chunk, NUMBER_VAL(-1));
+		writeChunkNoLine(&chunk, OP_CONSTANT);
+		writeChunkNoLine(&chunk, constant);
+		writeChunkNoLine(&chunk, OP_NOT);
+		writeChunkNoLine(&chunk, OP_NOT);
+
+		writeChunkNoLine(&chunk, OP_RETURN);
+	}
+	interpret_bytecode_(&chunk);
+	VM vm = getVM_();
+	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 6), BOOL_VAL(false));
+	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 5), BOOL_VAL(true));
+	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 4), BOOL_VAL(true));
+	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 3), BOOL_VAL(true));
+	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 2), BOOL_VAL(false));
+	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 1), BOOL_VAL(true));
+	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0), BOOL_VAL(true));
+}
+
 int main(void) {
 	addToStack();
 	addition();
@@ -312,4 +361,5 @@ int main(void) {
 	negation();
 	multiplication();
 	division();
+	not();
 }

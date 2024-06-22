@@ -14,6 +14,7 @@ typedef enum {
 	OP_MULTIPLY,
 	OP_CONDITIONAL_PLACEHOLDER, // See Note[ConditionalOperator]
 	OP_DIVIDE,
+	OP_NOT,
 	OP_NEGATE,
 	OP_RETURN,
 } OpCode;

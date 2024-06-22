@@ -25,6 +25,19 @@ static void runtimeError(char const* format, ...) {
 	resetStack();
 }
 
+static bool isTruthy(Value value) {
+	switch (value.type) {
+	case VAL_BOOL:
+		return value.as.boolean;
+	case VAL_NIL:
+		return false;
+	case VAL_NUMBER:
+		return AS_NUMBER(value) != 0.0;
+	default:
+		return true;
+	}
+}
+
 void initVM(void) {
 	new_stack(&vm.stack);
 	resetStack();
@@ -101,6 +114,11 @@ InterpretResult run(void) {
 		case OP_DIVIDE:
 			BINARY_OP(NUMBER_VAL, /);
 			break;
+		case OP_NOT: {
+			bool is_top_of_stack_truthy = isTruthy(stack_pop(&vm.stack));
+			stack_push(&vm.stack, BOOL_VAL(!is_top_of_stack_truthy));
+			break;
+		}
 		case OP_NEGATE: {
 			// Value constant = stack_pop(&vm.stack);
 			// stack_push(&vm.stack, NUMBER_VAL(-AS_NUMBER(constant)));
