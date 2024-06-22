@@ -89,7 +89,6 @@ InterpretResult run(void) {
 			if (!IS_NUMBER(top_of_stack)) {
 				return INTERPRET_RUNTIME_ERROR;
 			}
-			printf("the top of stack is: %d\n", top_of_stack.type);
 			(vm.stack.top - 1)->as.number *= -1;
 			break;
 		}
