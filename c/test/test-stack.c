@@ -63,6 +63,6 @@ void push_and_pop(void) {
 
 int main(void) {
 	basic();
-	stack_grows(); 
+	stack_grows();
 	push_and_pop();
 }

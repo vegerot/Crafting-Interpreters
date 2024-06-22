@@ -21,9 +21,9 @@
 	(((got) != (want)) ? LOX_ASSERT_EQUALS_FAIL(__func__, __FILE__, __LINE__,  \
 												#got, got, #want, want)        \
 					   : (void)0);
-#define LOX_ASSERT_VALUE_EQUALS(g, want)                                     \
+#define LOX_ASSERT_VALUE_EQUALS(g, want)                                       \
 	do {                                                                       \
-		Value got = g;\
+		Value got = g;                                                         \
 		LOX_ASSERT_EQUALS(got.type, (want).type);                              \
 		switch ((want).type) {                                                 \
 		case (VAL_BOOL):                                                       \
@@ -34,9 +34,8 @@
 			break;                                                             \
 		case (VAL_NIL):                                                        \
 			break;                                                             \
-		case (VAL_ERR):                                                        \
+		default:                                                               \
 			LOX_ASSERT(false && "wtf?!");                                      \
-			break;                                                             \
 		}                                                                      \
 	} while (0);
 
