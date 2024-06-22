@@ -80,6 +80,15 @@ InterpretResult run(void) {
 #endif
 			break;
 		}
+		case OP_NIL:
+			stack_push(&vm.stack, NIL_VAL);
+			break;
+		case OP_FALSE:
+			stack_push(&vm.stack, BOOL_VAL(false));
+			break;
+		case OP_TRUE:
+			stack_push(&vm.stack, BOOL_VAL(true));
+			break;
 		case OP_ADD:
 			BINARY_OP(NUMBER_VAL, +);
 			break;

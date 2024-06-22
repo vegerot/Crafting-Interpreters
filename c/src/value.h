@@ -15,11 +15,11 @@ typedef struct {
 	} as;
 } Value;
 
-#define BOOL_VAL(value) ((Value){.type = VAL_VAL_BOOL, .as.bool = (value)})
+#define BOOL_VAL(value) ((Value){.type = VAL_BOOL, .as.boolean = (value)})
 #define NUMBER_VAL(value) ((Value){.type = VAL_NUMBER, .as.number = (value)})
 #define NIL_VAL ((Value){.type = VAL_NIL})
 
-#define AS_BOOL(value) ((value).as.bool)
+#define AS_BOOL(value) ((value).as.boolean)
 // TODO: in debug builds, check that the value is a bool before returning it
 #define AS_NUMBER(value) ((value).as.number)
 //((value).type==VAL_NUMBER ? (value).as.number : abort() && 0)

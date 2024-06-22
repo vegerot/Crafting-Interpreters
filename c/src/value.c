@@ -37,7 +37,7 @@ void printValue(Value value) {
 		break;
 	}
 	case VAL_BOOL: {
-		printf("type: bool, value: %s\n", value.as.boolean ? "true" : "false");
+		printf("type: bool, value: %s\n", AS_BOOL(value) ? "true" : "false");
 		break;
 	}
 	case VAL_NIL: {

@@ -194,6 +194,23 @@ static void Binary() {
 	}
 }
 
+static void Literal() {
+	// perfnote: we could use separate functions for each of these
+	switch (parser.previous.type) {
+	case TOKEN_FALSE:
+		EmitByte(OP_FALSE);
+		break;
+	case TOKEN_TRUE:
+		EmitByte(OP_TRUE);
+		break;
+	case TOKEN_NIL:
+		EmitByte(OP_NIL);
+		break;
+	default:
+		LOX_UNREACHABLE("invalid literal");
+	}
+}
+
 static void Grouping() {
 	Expression();
 	consume_or_error(TOKEN_RIGHT_PAREN, "Expected ')' after expression");
@@ -248,17 +265,17 @@ static ParseRule const rules[] = {
 	[TOKEN_AND] = {NULL, NULL, PREC_NONE},
 	[TOKEN_CLASS] = {NULL, NULL, PREC_NONE},
 	[TOKEN_ELSE] = {NULL, NULL, PREC_NONE},
-	[TOKEN_FALSE] = {NULL, NULL, PREC_NONE},
+	[TOKEN_FALSE] = {Literal, NULL, PREC_NONE},
 	[TOKEN_FOR] = {NULL, NULL, PREC_NONE},
 	[TOKEN_FUN] = {NULL, NULL, PREC_NONE},
 	[TOKEN_IF] = {NULL, NULL, PREC_NONE},
-	[TOKEN_NIL] = {NULL, NULL, PREC_NONE},
+	[TOKEN_NIL] = {Literal, NULL, PREC_NONE},
 	[TOKEN_OR] = {NULL, NULL, PREC_NONE},
 	[TOKEN_PRINT] = {NULL, NULL, PREC_NONE},
 	[TOKEN_RETURN] = {NULL, NULL, PREC_NONE},
 	[TOKEN_SUPER] = {NULL, NULL, PREC_NONE},
 	[TOKEN_THIS] = {NULL, NULL, PREC_NONE},
-	[TOKEN_TRUE] = {NULL, NULL, PREC_NONE},
+	[TOKEN_TRUE] = {Literal, NULL, PREC_NONE},
 	[TOKEN_VAR] = {NULL, NULL, PREC_NONE},
 	[TOKEN_WHILE] = {NULL, NULL, PREC_NONE},
 	[TOKEN_ERROR] = {NULL, NULL, PREC_NONE},
