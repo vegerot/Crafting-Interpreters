@@ -16,7 +16,7 @@ typedef struct {
 typedef struct {
 	Obj obj;
 	int length;
-	char* chars;
+	char chars[];
 } ObjString;
 
 typedef enum { VAL_ERR = 0, VAL_BOOL, VAL_NIL, VAL_NUMBER, VAL_OBJ } ValueType;
