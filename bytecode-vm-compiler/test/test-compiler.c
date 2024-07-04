@@ -378,6 +378,23 @@ void testCompileComparison(void) {
 	freeString(&out);
 }
 
+void testString(void) {
+	Chunk chunk;
+	initChunk(&chunk);
+
+	compile("\"string\" + \"append\"", &chunk);
+
+	char* want = "";
+
+	string out;
+	initString(&out);
+	writeDisassembledChunk(&out, &chunk);
+	char* got = out.data;
+
+	LOX_ASSERT(strcmp(got, want) == 0);
+	freeString(&out);
+}
+
 int main() {
 	// testing testing tests
 	{
@@ -396,5 +413,6 @@ int main() {
 		testCompileTernaryComplex();
 		testCompileNot();
 		testCompileComparison();
+		testString();
 	}
 }

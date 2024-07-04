@@ -5,6 +5,20 @@
 
 #include "common.h"
 
+typedef enum {
+	OBJ_STRING,
+} ObjType;
+
+typedef struct {
+	ObjType type;
+} Obj;
+
+typedef struct {
+	Obj obj;
+	int length;
+	char* chars;
+} ObjString;
+
 typedef enum { VAL_ERR = 0, VAL_BOOL, VAL_NIL, VAL_NUMBER, VAL_OBJ } ValueType;
 
 typedef struct {
@@ -31,6 +45,17 @@ typedef struct {
 #define IS_NUMBER(value) ((value).type == VAL_NUMBER)
 #define IS_NIL(value) ((value).type == VAL_NIL)
 #define IS_OBJ(value) ((value).type == VAL_OBJ)
+
+static inline bool isObjType(Value value, ObjType type) {
+	return IS_OBJ(value) && AS_OBJ(value)->type == type;
+}
+
+#define OBJ_TYPE(value) (AS_OBJ(value)->type)
+
+#define IS_STRING(value) isObjType(value, OBJ_STRING);
+
+#define AS_STRING(value) ((ObjString*)(value).as.obj)
+#define AS_CSTRING(value) (AS_STRING(value)->chars)
 
 typedef struct {
 	int capacity;
