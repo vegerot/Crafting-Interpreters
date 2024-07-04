@@ -247,12 +247,17 @@ static void Number() {
 static void String() {
 	LOX_ASSERT(parser.previous.type == TOKEN_STRING);
 
-	int length = parser.previous.length - 2 + 1; // subtract quotes and add \0
-	ObjString* str = malloc(sizeof(ObjString) + length * sizeof(char));
-	strncpy(str->chars, parser.previous.start + 1, length);
 	Obj obj = {.type = OBJ_STRING};
+
+	// TODO: support string escape sequences like '\n'
+	int strLength = parser.previous.length - 2; // subtract quotes and add \0
+
+	ObjString* str = malloc(sizeof(ObjString) + (strLength + 1) * sizeof(char));
+	strncpy(str->chars, parser.previous.start + 1, strLength);
+	str->chars[strLength + 1] = '\0';
+
+	str->length = strLength;
 	str->obj = obj;
-	str->length = length;
 	Value value = {.type = VAL_OBJ, .as.obj = (Obj*)str};
 
 	EmitConstant(value);
