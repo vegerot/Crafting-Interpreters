@@ -1,9 +1,11 @@
-#include "compiler.h"
-#include "chunk.h"
-#include "lox_assert.h"
-#include "scanner.h"
 #include <stdio.h>
 #include <string.h>
+
+#include "chunk.h"
+#include "compiler.h"
+#include "lox_assert.h"
+#include "object.h"
+#include "scanner.h"
 
 #ifdef DEBUG_PRINT_CODE
 #include "debug.h"
@@ -247,18 +249,15 @@ static void Number() {
 static void String() {
 	LOX_ASSERT(parser.previous.type == TOKEN_STRING);
 
-	Obj obj = {.type = OBJ_STRING};
+	LoxObj obj = {.type = OBJ_STRING};
 
 	// TODO: support string escape sequences like '\n'
-	int strLength = parser.previous.length - 2; // subtract quotes and add \0
+	int strLength = parser.previous.length - 2; // subtract quotes
 
-	ObjString* str = malloc(sizeof(ObjString) + (strLength + 1) * sizeof(char));
-	strncpy(str->chars, parser.previous.start + 1, strLength);
-	str->chars[strLength + 1] = '\0';
-
-	str->length = strLength;
+	LoxString* str = fromCString(parser.previous.start + 1, strLength);
 	str->obj = obj;
-	Value value = {.type = VAL_OBJ, .as.obj = (Obj*)str};
+
+	Value value = {.type = VAL_OBJ, .as.obj = (LoxObj*)str};
 
 	EmitConstant(value);
 }

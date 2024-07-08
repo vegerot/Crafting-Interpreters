@@ -1,6 +1,6 @@
 CC ?= cc
 CFLAGS= -std=gnu2x -g -Wall -Wextra -Wpedantic -Wimplicit-fallthrough -Werror -Wno-gnu-statement-expression -Wno-strict-prototypes
-SRC_FILES= src/compiler.c src/scanner.c src/chunk.c src/debug.c src/memory.c src/stack.c src/value.c src/vm.c
+SRC_FILES= src/chunk.c src/compiler.c src/debug.c src/memory.c src/object.c src/scanner.c src/stack.c src/value.c src/vm.c
 
 lox: $(SRC_FILES) src/*.h src/main.c
 	$(CC) $(CFLAGS) -DDEBUG_TRACE_EXECUTION -DDEBUG_PRINT_CODE src/main.c $(SRC_FILES) -o lox

@@ -5,19 +5,7 @@
 
 #include "common.h"
 
-typedef enum {
-	OBJ_STRING,
-} ObjType;
-
-typedef struct {
-	ObjType type;
-} Obj;
-
-typedef struct {
-	Obj obj;
-	int length;
-	char chars[];
-} ObjString;
+typedef struct LoxObj LoxObj;
 
 typedef enum { VAL_ERR = 0, VAL_BOOL, VAL_NIL, VAL_NUMBER, VAL_OBJ } ValueType;
 
@@ -26,14 +14,14 @@ typedef struct {
 	union {
 		bool boolean;
 		double number;
-		Obj* obj;
+		LoxObj* obj;
 	} as;
 } Value;
 
 #define BOOL_VAL(value) ((Value){.type = VAL_BOOL, .as.boolean = (value)})
 #define NUMBER_VAL(value) ((Value){.type = VAL_NUMBER, .as.number = (value)})
 #define NIL_VAL ((Value){.type = VAL_NIL})
-#define OBJ_VAL(object) ((Value){.type = OBJ_VAL, .as.obj = (Obj*)(object))
+#define OBJ_VAL(object) ((Value){.type = OBJ_VAL, .as.obj = (LoxObj*)(object))
 
 #define AS_BOOL(value) ((value).as.boolean)
 // TODO: in debug builds, check that the value is a bool before returning it
@@ -45,17 +33,6 @@ typedef struct {
 #define IS_NUMBER(value) ((value).type == VAL_NUMBER)
 #define IS_NIL(value) ((value).type == VAL_NIL)
 #define IS_OBJ(value) ((value).type == VAL_OBJ)
-
-static inline bool isObjType(Value value, ObjType type) {
-	return IS_OBJ(value) && AS_OBJ(value)->type == type;
-}
-
-#define OBJ_TYPE(value) (AS_OBJ(value)->type)
-
-#define IS_STRING(value) isObjType(value, OBJ_STRING);
-
-#define AS_STRING(value) ((ObjString*)(value).as.obj)
-#define AS_CSTRING(value) (AS_STRING(value)->chars)
 
 typedef struct {
 	int capacity;

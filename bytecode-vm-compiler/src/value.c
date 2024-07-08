@@ -1,8 +1,12 @@
-#include "value.h"
-#include "lox_assert.h"
-#include "memory.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#include "value.h"
+
+#include "lox_assert.h"
+#include "memory.h"
+#include "object.h"
 
 void initValueArray(ValueArray* array) {
 #define VALUE_ARRAY_INIT_CAPACITY 0
@@ -44,8 +48,35 @@ void printValue(Value value) {
 		printf("type: NIL\n");
 		break;
 	}
+	case VAL_OBJ: {
+		printObject(value);
+		break;
+	}
 	default: {
-		LOX_ASSERT(false && "unknown type");
+		LOX_UNREACHABLE("cannot print unknown value type");
+	}
+	}
+}
+
+static bool compareLoxStrings(LoxString* a, LoxString* b) {
+	if (a == b)
+		return true;
+	if (a->length != b->length)
+		return false;
+
+	return memcmp(a->chars, b->chars, a->length) == 0;
+}
+
+static bool compareObjectsByValue(LoxObj* a, LoxObj* b) {
+	if (a->type != b->type)
+		return false;
+
+	switch (a->type) {
+	case OBJ_STRING: {
+		return compareLoxStrings((LoxString*)a, (LoxString*)b);
+	}
+	default: {
+		LOX_UNREACHABLE("cannot compare unknown object types");
 	}
 	}
 }
@@ -60,6 +91,9 @@ bool valuesEqual(Value a, Value b) {
 		return AS_NUMBER(a) == AS_NUMBER(b);
 	case VAL_NIL:
 		return true;
+	case VAL_OBJ:
+		return compareObjectsByValue(AS_OBJ(a), AS_OBJ(b));
+
 	default:
 		LOX_UNREACHABLE("invalid comparison");
 	}
