@@ -39,9 +39,13 @@ int addConstant(Chunk* chunk, Value value) {
 
 static void freeAllocator(LoxObj* start) {
 	LoxObj* curr = start;
+#ifdef DEBUG_TRACE_EXECUTION
 	static int i = 0;
+#endif
 	while (curr) {
-		printf("Freeing %d: %p\n", i++, curr);
+#ifdef DEBUG_TRACE_EXECUTION
+		printf("Freeing %d: %p\n", i++, (void*)curr);
+#endif
 		LoxObj* next = curr->next;
 		free(curr);
 		curr = next;

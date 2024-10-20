@@ -37,7 +37,9 @@ static void freeLoxObject(LoxObj* obj) {
 }
 
 void freeObjects(VM* vm) {
+#ifdef DEBUG_TRACE_EXECUTION
 	printf("freeing objects\n");
+#endif
 	LoxObj* curr = vm->objects;
 	LoxObj* next = NULL;
 	while (curr) {
