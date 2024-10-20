@@ -10,6 +10,8 @@ void initScanner(Scanner* scanner, char const* source);
 
 // clang-format off
 #define TOKEN_TYPES \
+	/* make first token ERROR to detect null tokens */\
+	X(TOKEN_ERROR) \
 	/* Single-character tokens.*/ \
 	X(TOKEN_LEFT_PAREN) X(TOKEN_RIGHT_PAREN) X(TOKEN_LEFT_BRACE) X(TOKEN_RIGHT_BRACE) \
 	X(TOKEN_COMMA) X(TOKEN_DOT) X(TOKEN_MINUS) X(TOKEN_PLUS) X(TOKEN_SEMICOLON) \
@@ -24,7 +26,6 @@ void initScanner(Scanner* scanner, char const* source);
 	X(TOKEN_IF) X(TOKEN_NIL) X(TOKEN_OR) X(TOKEN_PRINT) X(TOKEN_RETURN) X(TOKEN_SUPER) \
 	X(TOKEN_THIS) X(TOKEN_TRUE) X(TOKEN_VAR) X(TOKEN_WHILE) \
  \
-	X(TOKEN_ERROR) \
 	X(TOKEN_EOF)
 
 // clang-format on

@@ -49,14 +49,13 @@ static char peekNext(Scanner* scanner) {
 
 static Token scanString(Scanner* s) {
 	LOX_ASSERT(s->current[-1] == '"');
-	while (!isAtEnd(s) && *s->current++ != '"') {
-		if (peek(s) == '\n')
+	while (*s->current++ != '"') {
+		if (isAtEnd(s)) {
+			return errorToken(s, "Unterminated string",
+							  strlen("Unterminated string"));
+		} else if (peek(s) == '\n')
 			++s->line;
 	};
-	if (isAtEnd(s)) {
-		return errorToken(s, "Unterminated string",
-						  strlen("Unterminated string"));
-	}
 	return makeToken(s, TOKEN_STRING);
 }
 

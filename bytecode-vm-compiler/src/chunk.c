@@ -1,5 +1,7 @@
 #include "chunk.h"
 #include "memory.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 void initChunk(Chunk* chunk) {
 	chunk->count = 0;
@@ -7,6 +9,7 @@ void initChunk(Chunk* chunk) {
 	(*chunk).capacity = 0;
 	chunk->code = NULL;
 	chunk->lines = NULL;
+	chunk->allocatorStart = NULL;
 	initValueArray(&(chunk->constants));
 }
 
@@ -34,9 +37,22 @@ int addConstant(Chunk* chunk, Value value) {
 	return chunk->constants.count - 1;
 }
 
+static void freeAllocator(LoxObj* start) {
+	LoxObj* curr = start;
+	static int i = 0;
+	while (curr) {
+		printf("Freeing %d: %p\n", i++, curr);
+		LoxObj* next = curr->next;
+		free(curr);
+		curr = next;
+	}
+	return;
+}
+
 void freeChunk(Chunk* chunk) {
 	FREE_ARRAY(uint8_t, chunk->code, chunk->capacity);
 	FREE_ARRAY(int, chunk->lines, chunk->capacity);
 	freeValueArray(&((*chunk).constants));
+	freeAllocator(chunk->allocatorStart);
 	initChunk(chunk);
 }

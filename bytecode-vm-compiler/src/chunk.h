@@ -27,6 +27,7 @@ typedef struct {
 	int capacity;
 	uint8_t* code;
 	int* lines;
+	LoxObj* allocatorStart;
 	ValueArray constants;
 } Chunk;
 

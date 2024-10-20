@@ -19,6 +19,7 @@ void appendToString(string* this, char const* that, size_t that_len) {
 		this->data = malloc(this->cap * sizeof(char));
 		this->len = that_len;
 		strncpy(this->data, that, that_len);
+		this->data[this->len] = '\0';
 		return;
 	}
 
@@ -32,10 +33,11 @@ void appendToString(string* this, char const* that, size_t that_len) {
 			this->data, this->cap);
 	}
 
-	strncat(this->data, that, this->cap);
+	strncat(this->data, that, strlen(that));
 	LOX_ASSERT_EQUALS(strlen(this->data),
 					  that_len + this->len); // string accidentally truncated
 	this->len += that_len;
+	this->data[this->len] = '\0';
 }
 
 void freeString(string* this) { free(this->data); }
@@ -53,6 +55,7 @@ void testNewString(void) {
 
 	LOX_ASSERT_EQUALS(s.len, 5);
 	LOX_ASSERT(s.cap >= s.len);
+	// LOX_ASSERT_STRING_EQUALS(s.data, "hello")
 	LOX_ASSERT(strcmp(s.data, "hello") == 0);
 	freeString(&s);
 }
@@ -71,15 +74,14 @@ void testGrowString(void) {
 }
 
 void testStringAppend(void) {
-	char* s1data = (char*)malloc(sizeof("hello"));
-	strncpy(s1data, "hello", strlen("hello") + 1);
 	string s1 = {
-		.data = s1data,
-		.len = 5,
+		.data = NULL,
+		.len = 0,
 		.cap = 15,
 	};
 
-	appendToString(&s1, " world", 6);
+	appendToString(&s1, "hello", strlen("hello"));
+	appendToString(&s1, " world", strlen(" world"));
 
 	LOX_ASSERT_EQUALS((int)s1.len, 11);
 	LOX_ASSERT(strcmp(s1.data, "hello world") == 0 && s1.data);
@@ -90,16 +92,40 @@ void testStringAppend(void) {
 
 // DISASSEMBLER start
 
-static int constantInstruction(string* out, char const* name, Chunk* chunk,
-							   int offset) {
-	uint8_t constantIndex = chunk->code[offset + 1];
-	appendToString(out, name, strlen(name));
-	char constantAsStr[40];
-	snprintf(constantAsStr, 40, " %.1f",
-			 AS_NUMBER(chunk->constants.values[constantIndex]));
-	appendToString(out, constantAsStr, strlen(constantAsStr));
-	appendToString(out, ";", 1);
-	return offset + 2;
+static void appendObjectToString(char* buf, size_t maxsize, Value value) {
+	switch (OBJ_TYPE(value)) {
+	case OBJ_STRING:
+		snprintf(buf, maxsize, "%.*s", AS_STRING(value)->length,
+				 AS_CSTRING(value));
+		break;
+	default:
+		fprintf(stderr, "Cannot print object type %d\n", OBJ_TYPE(value));
+		LOX_UNREACHABLE("cannot print this object type");
+	}
+}
+
+static void appendValueToString(char* buf, size_t maxsize, Value value) {
+	switch (value.type) {
+	case VAL_NUMBER: {
+		snprintf(buf, maxsize, "%.1f", value.as.number);
+		break;
+	}
+	case VAL_BOOL: {
+		snprintf(buf, maxsize, "%s", AS_BOOL(value) ? "true" : "false");
+		break;
+	}
+	case VAL_NIL: {
+		snprintf(buf, maxsize, "NIL");
+		break;
+	}
+	case VAL_OBJ: {
+		appendObjectToString(buf, maxsize, value);
+		break;
+	}
+	default: {
+		LOX_UNREACHABLE("cannot print unknown value type");
+	}
+	}
 }
 
 static int simpleInstruction(string* out, char const* name, int offset) {
@@ -108,7 +134,19 @@ static int simpleInstruction(string* out, char const* name, int offset) {
 	return offset + 1;
 }
 
-int writeDisassembledInstruction(string* out, Chunk* chunk, int offset) {
+static int constantInstruction(string* out, char const* name, Chunk* chunk,
+							   int offset) {
+	uint8_t constantIndex = chunk->code[offset + 1];
+	appendToString(out, name, strlen(name));
+	char constantAsStr[40] = " ";
+	appendValueToString(constantAsStr + 1, sizeof(constantAsStr),
+						chunk->constants.values[constantIndex]);
+	appendToString(out, constantAsStr, strlen(constantAsStr));
+	appendToString(out, ";", 1);
+	return offset + 2;
+}
+
+static int writeDisassembledInstruction(string* out, Chunk* chunk, int offset) {
 	uint8_t instruction = chunk->code[offset];
 
 	switch (instruction) {
@@ -145,7 +183,7 @@ int writeDisassembledInstruction(string* out, Chunk* chunk, int offset) {
 	}
 }
 
-void writeDisassembledChunk(string* out, Chunk* chunk) {
+static void writeDisassembledChunk(string* out, Chunk* chunk) {
 	LOX_ASSERT(chunk->count > 0);
 	for (int offset = 0; offset < chunk->count;) {
 		offset = writeDisassembledInstruction(out, chunk, offset);
@@ -170,7 +208,7 @@ void testDisassembleSimple(void) {
 	writeDisassembledChunk(&out, &chunk);
 	char* got = out.data;
 
-	LOX_ASSERT(strcmp(got, want) == 0);
+	LOX_ASSERT_STRING_EQUALS(got, want);
 	freeString(&out);
 }
 
@@ -208,6 +246,31 @@ void testDisassemble(void) {
 	// TODO: instead of `strcmp`, walk through both strings for better
 	// failure messages
 	LOX_ASSERT(strcmp(got, want) == 0);
+	freeString(&out);
+}
+
+void testDisassembleString() {
+	Chunk chunk;
+	initChunk(&chunk);
+
+	// 1*2 + 3
+	{
+		int constant = addConstant(
+			&chunk, (Value){.type = VAL_OBJ,
+							.as.obj = (LoxObj*)fromCString("hello", 5)});
+		writeChunk(&chunk, OP_CONSTANT, 2);
+		writeChunk(&chunk, constant, 2);
+
+		writeChunkNoLine(&chunk, OP_RETURN);
+	}
+
+	char* want = "CONST hello;RET;";
+	string out;
+	initString(&out);
+	writeDisassembledChunk(&out, &chunk);
+	char* got = out.data;
+
+	LOX_ASSERT_STRING_EQUALS(got, want);
 	freeString(&out);
 }
 
@@ -378,6 +441,40 @@ void testCompileComparison(void) {
 	freeString(&out);
 }
 
+void testStringSimple(void) {
+	Chunk chunk;
+	initChunk(&chunk);
+
+	compile("\"string\"\n", &chunk);
+
+	char* want = "CONST string;RET;";
+
+	string out;
+	initString(&out);
+	writeDisassembledChunk(&out, &chunk);
+	char* got = out.data;
+
+	LOX_ASSERT_STRING_EQUALS(got, want);
+	freeString(&out);
+}
+
+void testStringAdd() {
+	Chunk chunk;
+	initChunk(&chunk);
+
+	compile("\"string\" + \"append\"", &chunk);
+
+	char* want = "CONST string;CONST append;ADD;RET;";
+
+	string out;
+	initString(&out);
+	writeDisassembledChunk(&out, &chunk);
+	char* got = out.data;
+
+	LOX_ASSERT_STRING_EQUALS(got, want);
+	freeString(&out);
+}
+
 int main() {
 	// testing testing tests
 	{
@@ -386,6 +483,7 @@ int main() {
 		testGrowString();
 		testDisassembleSimple();
 		testDisassemble();
+		testDisassembleString();
 	}
 
 	// actual compiler tests
@@ -396,5 +494,7 @@ int main() {
 		testCompileTernaryComplex();
 		testCompileNot();
 		testCompileComparison();
+		testStringSimple();
+		testStringAdd();
 	}
 }

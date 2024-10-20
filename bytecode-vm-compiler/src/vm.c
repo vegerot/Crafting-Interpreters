@@ -1,11 +1,16 @@
 #include <stdarg.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "compiler.h"
 #include "debug.h"
 #include "lox_assert.h"
+#include "memory.h"
+#include "object.h"
+#include "value.h"
 #include "vm.h"
 
+LoxString* allocateString(VM* vm, char const* cString, int length);
 // TODO: make this a parameter
 static VM vm; // NOLINT
 
@@ -41,9 +46,14 @@ static bool isTruthy(Value value) {
 void initVM(void) {
 	new_stack(&vm.stack);
 	resetStack();
+	vm.objects = NULL;
 }
+void freeStack(Stack* stack) { free(stack->bottom); }
 
-void freeVM(void) {}
+void freeVM(void) {
+	freeObjects(&vm);
+	freeStack(&vm.stack);
+}
 
 /**
  * hack: only used for tests
@@ -55,23 +65,55 @@ InterpretResult run(void) {
 #define READ_CONSTANT() (vm.chunk->constants.values[READ_BYTE()])
 #define BINARY_OP(valueType, op)                                               \
 	do {                                                                       \
-		if (!(IS_NUMBER(stack_peek(&vm.stack, 0)) &&                           \
-			  IS_NUMBER(stack_peek(&vm.stack, 1)))) {                          \
-			runtimeError("Operands must be numbers to binary op");             \
+		bool operands_have_same_type =                                         \
+			stack_peek(&vm.stack, 0).type == stack_peek(&vm.stack, 1).type;    \
+		if (!(operands_have_same_type)) {                                      \
+			runtimeError("Operands must have same type to binary op");         \
 			return INTERPRET_RUNTIME_ERROR;                                    \
 		}                                                                      \
-		double b = AS_NUMBER(stack_pop(&vm.stack));                            \
-		double a = AS_NUMBER(stack_pop(&vm.stack));                            \
-		stack_push(&vm.stack, valueType(a op b));                              \
+		Value b = stack_pop(&vm.stack);                                        \
+		Value a = stack_pop(&vm.stack);                                        \
+		switch (b.type) {                                                      \
+		case VAL_NUMBER: {                                                     \
+			double b_num = AS_NUMBER(b);                                       \
+			double a_num = AS_NUMBER(a);                                       \
+			stack_push(&vm.stack, valueType(a_num op b_num));                  \
+			break;                                                             \
+		}                                                                      \
+		case VAL_OBJ: {                                                        \
+			LoxObj* b_obj = AS_OBJ(b);                                         \
+			LoxObj* a_obj = AS_OBJ(a);                                         \
+			bool operands_have_same_obj_type = a_obj->type == b_obj->type;     \
+			if (!(operands_have_same_obj_type)) {                              \
+				/* maybe this should return false instead*/                    \
+				runtimeError("Operands must have same obj type to binary op"); \
+				return INTERPRET_RUNTIME_ERROR;                                \
+			}                                                                  \
+			switch (b_obj->type) {                                             \
+			case OBJ_STRING: {                                                 \
+				break;                                                         \
+			}                                                                  \
+			default: {                                                         \
+				LOX_ASSERT(false &&                                            \
+						   "unknown operand type to binary operation");        \
+			}                                                                  \
+			}                                                                  \
+			break;                                                             \
+		}                                                                      \
+		default: {                                                             \
+			LOX_ASSERT(false && "unknown operand type to binary operation");   \
+		}                                                                      \
+		}                                                                      \
 	} while (false)
 
 	for (;;) {
 #ifdef DEBUG_TRACE_EXECUTION
-		printf("\t\t");
+		printf("\nstack: \t\t");
 		if (stack_is_empty(&vm.stack))
 			printf("[empty]");
 		for (Value* slot = vm.stack.top - 1; slot >= vm.stack.bottom; --slot) {
 			printf("[ ");
+			// TODO: wrap strings in quotes
 			printValue(*slot);
 			printf(" ]");
 		}
@@ -114,9 +156,43 @@ InterpretResult run(void) {
 		case OP_LESS:
 			BINARY_OP(BOOL_VAL, <);
 			break;
-		case OP_ADD:
-			BINARY_OP(NUMBER_VAL, +);
+		case OP_ADD: {
+			bool operands_have_same_type =
+				stack_peek(&vm.stack, 0).type == stack_peek(&vm.stack, 1).type;
+			if (!(operands_have_same_type)) {
+				runtimeError("Operands must have same type to binary op");
+				return INTERPRET_RUNTIME_ERROR;
+			}
+			Value b = stack_pop(&vm.stack);
+			Value a = stack_pop(&vm.stack);
+			if (IS_NUMBER(b)) {
+				double b_num = AS_NUMBER(b);
+				double a_num = a.as.number;
+				stack_push(&vm.stack, NUMBER_VAL(a_num + b_num));
+			} else if (IS_STRING(b)) {
+				LoxString* b_str = AS_STRING(b);
+				LoxString* a_str = AS_STRING(a);
+				size_t finalStringLength = b_str->length + a_str->length;
+				char* tmpNewCString =
+					(char*)malloc(sizeof(char) * (finalStringLength + 1));
+				strncpy(tmpNewCString, a_str->chars, a_str->length);
+				strncpy(tmpNewCString + a_str->length, b_str->chars,
+						b_str->length);
+				// paranoid
+				tmpNewCString[finalStringLength] = '\0';
+				printf("strlen(newCString): %lu\n", strlen(tmpNewCString));
+				// perfNote: we should move `tmpNewCString` instead of copying
+				// it again
+				LoxString* addedLoxStr = allocateString(
+					&vm, tmpNewCString, (int)finalStringLength + 1);
+				free(tmpNewCString);
+				stack_push(&vm.stack, OBJ_VAL(addedLoxStr));
+			} else {
+				runtimeError(
+					"Operands to + must be two numbers or two strings");
+			}
 			break;
+		}
 		case OP_SUBTRACT:
 			BINARY_OP(NUMBER_VAL, -);
 			break;
@@ -179,5 +255,6 @@ InterpretResult interpret(char const* source) {
 
 	InterpretResult result = run();
 	freeChunk(&chunk);
+	freeVM();
 	return result;
 }

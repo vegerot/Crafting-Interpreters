@@ -1,8 +1,11 @@
-#include "compiler.h"
-#include "chunk.h"
-#include "lox_assert.h"
-#include "scanner.h"
 #include <stdio.h>
+#include <string.h>
+
+#include "chunk.h"
+#include "compiler.h"
+#include "lox_assert.h"
+#include "object.h"
+#include "scanner.h"
 
 #ifdef DEBUG_PRINT_CODE
 #include "debug.h"
@@ -33,6 +36,8 @@ typedef enum {
 typedef void (*ParseFn)();
 
 typedef struct {
+	/// prefix is a function that is called when the token is the first token in
+	/// an expression.  It is used for unary operators and literals.
 	void (*prefix)();
 	ParseFn infix;
 	Precedence precedence;
@@ -72,6 +77,21 @@ static void error(char const* message) {
 		return;
 	errorAt(&parser.previous, message);
 	parser.had_error = true;
+}
+
+LoxString* fromCString(char const* cString, int length) {
+	LoxString* str = malloc(sizeof(LoxString) + (length + 1) * sizeof(char));
+	printf("Allocating string: %p, %.*s\n", str, length, cString);
+	str->obj.type = OBJ_STRING;
+	str->obj.next = currentChunk()->allocatorStart;
+
+	currentChunk()->allocatorStart = (LoxObj*)str;
+
+	strncpy(str->chars, cString, length);
+	str->chars[length + 1] = '\0';
+
+	str->length = length;
+	return str;
 }
 
 void advance() {
@@ -241,6 +261,22 @@ static void Number() {
 	EmitConstant(value);
 }
 
+static void String() {
+	LOX_ASSERT(parser.previous.type == TOKEN_STRING);
+
+	// TODO: support string escape sequences like '\n'
+	int strLength = parser.previous.length - 2; // subtract quotes
+
+	// FIXME: This sucks.  We need to embed the string into the bytecode
+	// directly instead of allocating on the heap because now the bytecode
+	// isn't portable.
+	LoxString* str = fromCString(parser.previous.start + 1, strLength);
+
+	Value value = {.type = VAL_OBJ, .as.obj = (LoxObj*)str};
+
+	EmitConstant(value);
+}
+
 static void Unary() {
 	TokenType operatorType = parser.previous.type;
 
@@ -281,7 +317,7 @@ static ParseRule const rules[] = {
 	[TOKEN_LESS] = {NULL, Binary, PREC_COMPARISON},
 	[TOKEN_LESS_EQUAL] = {NULL, Binary, PREC_COMPARISON},
 	[TOKEN_IDENTIFIER] = {NULL, NULL, PREC_NONE},
-	[TOKEN_STRING] = {NULL, NULL, PREC_NONE},
+	[TOKEN_STRING] = {String, NULL, PREC_NONE},
 	[TOKEN_NUMBER] = {Number, NULL, PREC_NONE},
 	[TOKEN_AND] = {NULL, NULL, PREC_NONE},
 	[TOKEN_CLASS] = {NULL, NULL, PREC_NONE},

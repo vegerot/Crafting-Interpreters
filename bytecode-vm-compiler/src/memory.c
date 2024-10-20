@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "lox_assert.h"
 #include "memory.h"
 
 void* reallocate(void* pointer, size_t newSize) {
@@ -18,4 +19,30 @@ void* reallocate(void* pointer, size_t newSize) {
 		exit(1);
 	}
 	return result;
+}
+
+static void freeLoxObject(LoxObj* obj) {
+	switch (obj->type) {
+	case OBJ_STRING: {
+		// I don't need to free the chars separately since the chars are inside
+		// the LoxString struct
+		// LoxString* string = (LoxString*)obj;
+		// free(string->chars);
+		free(obj);
+		break;
+	}
+	default:
+		LOX_ASSERT(false && "unknown object type")
+	}
+}
+
+void freeObjects(VM* vm) {
+	printf("freeing objects\n");
+	LoxObj* curr = vm->objects;
+	LoxObj* next = NULL;
+	while (curr) {
+		next = curr->next;
+		freeLoxObject(curr);
+		curr = next;
+	}
 }

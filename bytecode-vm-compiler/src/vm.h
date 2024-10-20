@@ -2,13 +2,16 @@
 #define clox_vm_h
 
 #include "chunk.h"
+#include "object.h"
 #include "stack.h"
 
+typedef struct LoxObj LoxObj;
 typedef struct {
 	Chunk* chunk;
 	/// actual location in memory of ip instead of offset into `chunk`
 	uint8_t* ip;
 	Stack stack;
+	LoxObj* objects;
 } VM;
 
 typedef enum {

@@ -1,4 +1,5 @@
 #include "../src/chunk.h"
+#include "../src/compiler.h"
 #include "../src/lox_assert.h"
 #include "../src/vm.h"
 #include <string.h>
@@ -191,6 +192,8 @@ void addToStack(void) {
 	VM vm = getVM_();
 	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0), NUMBER_VAL(69));
 	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 1), NUMBER_VAL(42));
+	freeChunk(&chunk);
+	freeVM();
 }
 
 void addition(void) {
@@ -213,6 +216,30 @@ void addition(void) {
 	interpret_bytecode_(&chunk);
 	VM vm = getVM_();
 	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0), NUMBER_VAL(69));
+	freeChunk(&chunk);
+	freeVM();
+}
+
+void additionWithCompile(void) {
+	initVM();
+	Chunk chunk;
+	initChunk(&chunk);
+
+	compile("1+2", &chunk);
+
+	InterpretResult result = interpret_bytecode_(&chunk);
+
+	LOX_ASSERT_EQUALS(result, INTERPRET_OK);
+
+	VM vm = getVM_();
+
+	int want = 3;
+
+	Value go = peekStack(&vm, 0);
+
+	LOX_ASSERT_VALUE_EQUALS(go, NUMBER_VAL(want));
+	freeChunk(&chunk);
+	freeVM();
 }
 
 void subtraction(void) {
@@ -236,6 +263,8 @@ void subtraction(void) {
 	VM vm = getVM_();
 	LOX_ASSERT_EQUALS(peekStack(&vm, 0).type, VAL_NUMBER);
 	LOX_ASSERT_EQUALS(peekStack(&vm, 0).as.number, 4);
+	freeChunk(&chunk);
+	freeVM();
 }
 
 static void assert_vm_exit_ok(InterpretResult result) {
@@ -259,6 +288,8 @@ void negation(void) {
 	VM vm = getVM_();
 	assert_vm_exit_ok(status);
 	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0), NUMBER_VAL(-7));
+	freeChunk(&chunk);
+	freeVM();
 }
 
 void multiplication(void) {
@@ -281,6 +312,8 @@ void multiplication(void) {
 	interpret_bytecode_(&chunk);
 	VM vm = getVM_();
 	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0), NUMBER_VAL(420));
+	freeChunk(&chunk);
+	freeVM();
 }
 
 void division(void) {
@@ -303,6 +336,8 @@ void division(void) {
 	interpret_bytecode_(&chunk);
 	VM vm = getVM_();
 	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0), NUMBER_VAL(42));
+	freeChunk(&chunk);
+	freeVM();
 }
 
 void not(void) {
@@ -352,6 +387,8 @@ void not(void) {
 	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 2), BOOL_VAL(false));
 	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 1), BOOL_VAL(true));
 	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0), BOOL_VAL(true));
+	freeChunk(&chunk);
+	freeVM();
 }
 
 static void comparison() {
@@ -429,15 +466,78 @@ static void comparison() {
 	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 1), BOOL_VAL(false));
 	// 42.69 < 69.42 is true
 	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0), BOOL_VAL(true));
+	freeChunk(&chunk);
+	freeVM();
+}
+
+static void stringComp() {
+	Chunk chunk;
+	goto second;
+	{
+		initVM();
+		initChunk(&chunk);
+
+		compile("\"abc\" == \"abc\"", &chunk);
+
+		InterpretResult result = interpret_bytecode_(&chunk);
+
+		LOX_ASSERT_EQUALS(result, INTERPRET_OK);
+
+		VM vm = getVM_();
+
+		LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0), BOOL_VAL(true));
+		freeChunk(&chunk);
+		freeVM();
+	}
+second: {
+	initVM();
+	initChunk(&chunk);
+
+	compile("\"abc\" == \"def\"", &chunk);
+	freeChunk(&chunk);
+	return;
+
+	InterpretResult result = interpret_bytecode_(&chunk);
+
+	LOX_ASSERT_EQUALS(result, INTERPRET_OK);
+
+	VM vm = getVM_();
+
+	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0), BOOL_VAL(false));
+}
+}
+
+static void stringAdd() {
+	Chunk chunk;
+	initChunk(&chunk);
+
+	compile("\"string\" + \" append\"", &chunk);
+
+	InterpretResult result = interpret_bytecode_(&chunk);
+
+	LOX_ASSERT_EQUALS(result, INTERPRET_OK);
+
+	VM vm = getVM_();
+
+	char const* want = "string append";
+
+	char* got = AS_CSTRING(peekStack(&vm, 0));
+
+	LOX_ASSERT_STRING_EQUALS(got, want);
+	freeChunk(&chunk);
+	freeVM();
 }
 
 int main(void) {
 	addToStack();
 	addition();
+	additionWithCompile();
 	subtraction();
 	negation();
 	multiplication();
 	division();
 	not();
 	comparison();
+	stringComp();
+	stringAdd();
 }
