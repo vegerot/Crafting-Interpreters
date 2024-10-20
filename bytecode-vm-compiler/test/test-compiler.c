@@ -210,6 +210,7 @@ void testDisassembleSimple(void) {
 
 	LOX_ASSERT_STRING_EQUALS(got, want);
 	freeString(&out);
+	freeChunk(&chunk);
 }
 
 void testDisassemble(void) {
@@ -247,11 +248,13 @@ void testDisassemble(void) {
 	// failure messages
 	LOX_ASSERT(strcmp(got, want) == 0);
 	freeString(&out);
+	freeChunk(&chunk);
 }
 
 void testDisassembleString() {
 	Chunk chunk;
 	initChunk(&chunk);
+	setCompilingChunk(&chunk);
 
 	// 1*2 + 3
 	{
@@ -272,6 +275,7 @@ void testDisassembleString() {
 
 	LOX_ASSERT_STRING_EQUALS(got, want);
 	freeString(&out);
+	freeChunk(&chunk);
 }
 
 // DISASSEMBLER end
@@ -291,6 +295,7 @@ void testCompile1plus1(void) {
 
 	LOX_ASSERT(strcmp(got, want) == 0);
 	freeString(&out);
+	freeChunk(&chunk);
 }
 
 void testCompileTernarySimple(void) {
@@ -308,6 +313,7 @@ void testCompileTernarySimple(void) {
 
 	LOX_ASSERT(strcmp(got, want) == 0);
 	freeString(&out);
+	freeChunk(&chunk);
 }
 
 void testCompileTernaryComplex(void) {
@@ -327,6 +333,7 @@ void testCompileTernaryComplex(void) {
 
 	LOX_ASSERT(strcmp(got, want) == 0);
 	freeString(&out);
+	freeChunk(&chunk);
 }
 
 void testCompileNot(void) {
@@ -344,6 +351,7 @@ void testCompileNot(void) {
 
 	LOX_ASSERT(strcmp(got, want) == 0);
 	freeString(&out);
+	freeChunk(&chunk);
 }
 
 void testCompileComparison(void) {
@@ -362,6 +370,7 @@ void testCompileComparison(void) {
 		char* got = out.data;
 
 		LOX_ASSERT(strcmp(got, want) == 0);
+		freeChunk(&chunk);
 	}
 	freeString(&out);
 
@@ -377,6 +386,7 @@ void testCompileComparison(void) {
 		char* got = out.data;
 
 		LOX_ASSERT(strcmp(got, want) == 0);
+		freeChunk(&chunk);
 	}
 	freeString(&out);
 
@@ -392,6 +402,7 @@ void testCompileComparison(void) {
 		char* got = out.data;
 
 		LOX_ASSERT(strcmp(got, want) == 0);
+		freeChunk(&chunk);
 	}
 	freeString(&out);
 
@@ -407,6 +418,7 @@ void testCompileComparison(void) {
 		char* got = out.data;
 
 		LOX_ASSERT(strcmp(got, want) == 0);
+		freeChunk(&chunk);
 	}
 	freeString(&out);
 
@@ -422,6 +434,7 @@ void testCompileComparison(void) {
 		char* got = out.data;
 
 		LOX_ASSERT(strcmp(got, want) == 0);
+		freeChunk(&chunk);
 	}
 	freeString(&out);
 
@@ -439,6 +452,7 @@ void testCompileComparison(void) {
 		LOX_ASSERT(strcmp(got, want) == 0);
 	}
 	freeString(&out);
+	freeChunk(&chunk);
 }
 
 void testStringSimple(void) {
@@ -456,6 +470,7 @@ void testStringSimple(void) {
 
 	LOX_ASSERT_STRING_EQUALS(got, want);
 	freeString(&out);
+	freeChunk(&chunk);
 }
 
 void testStringAdd() {
@@ -473,6 +488,7 @@ void testStringAdd() {
 
 	LOX_ASSERT_STRING_EQUALS(got, want);
 	freeString(&out);
+	freeChunk(&chunk);
 }
 
 int main() {

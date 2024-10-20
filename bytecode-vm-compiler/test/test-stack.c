@@ -17,6 +17,7 @@ void basic(void) {
 	LOX_ASSERT_EQUALS(n.as.number, 42);
 	LOX_ASSERT_EQUALS(AS_NUMBER(n), 42);
 	LOX_ASSERT_VALUE_EQUALS(n, NUMBER_VAL(42));
+	free(stack.bottom);
 }
 
 void stack_grows(void) {
@@ -46,6 +47,7 @@ void stack_grows(void) {
 	LOX_ASSERT_VALUE_EQUALS(stack_pop(&stack), NUMBER_VAL(3.));
 	LOX_ASSERT_VALUE_EQUALS(stack_pop(&stack), NUMBER_VAL(2.));
 	LOX_ASSERT_VALUE_EQUALS(stack_pop(&stack), NUMBER_VAL(1.));
+	free(stack.bottom);
 }
 
 void push_and_pop(void) {
@@ -59,6 +61,7 @@ void push_and_pop(void) {
 	stack_push(&stack, NUMBER_VAL(3));
 	LOX_ASSERT_VALUE_EQUALS(stack_pop(&stack), NUMBER_VAL(3));
 	LOX_ASSERT_VALUE_EQUALS(stack_pop(&stack), NUMBER_VAL(1));
+	free(stack.bottom);
 }
 
 int main(void) {

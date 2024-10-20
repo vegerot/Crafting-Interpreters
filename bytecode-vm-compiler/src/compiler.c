@@ -44,7 +44,7 @@ typedef struct {
 } ParseRule;
 
 static Parser parser;					   // NOLINT
-static Chunk* compilingChunk; // NOLINT
+static Chunk* compilingChunk = (Chunk*)69; // NOLINT
 
 static Chunk* currentChunk() { return compilingChunk; }
 
@@ -81,7 +81,6 @@ static void error(char const* message) {
 
 LoxString* fromCString(char const* cString, int length) {
 	LoxString* str = malloc(sizeof(LoxString) + (length + 1) * sizeof(char));
-	printf("Allocating string: %p, %.*s\n", str, length, cString);
 	str->obj.type = OBJ_STRING;
 	str->obj.next = currentChunk()->allocatorStart;
 
@@ -366,11 +365,12 @@ static ParseRule const* GetRule(TokenType type) { return &rules[type]; }
 
 static void Expression() { ParsePrecedence(PREC_ASSIGNMENT); }
 
+void setCompilingChunk(Chunk* chunk) { compilingChunk = chunk; }
+
 bool compile(char const* source, Chunk* chunk) {
-	(void)chunk;
 	Scanner scanner;
 	initScanner(&scanner, source);
-	compilingChunk = chunk;
+	setCompilingChunk(chunk);
 	initParser(&scanner);
 
 	advance();
