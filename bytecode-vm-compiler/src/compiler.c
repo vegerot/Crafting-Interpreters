@@ -38,7 +38,7 @@ typedef struct {
 	Precedence precedence;
 } ParseRule;
 
-static Parser parser;		  // NOLINT
+static Parser parser;					   // NOLINT
 static Chunk* compilingChunk; // NOLINT
 
 static Chunk* currentChunk() { return compilingChunk; }
