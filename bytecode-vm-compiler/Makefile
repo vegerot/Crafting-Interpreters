@@ -3,7 +3,7 @@ CFLAGS= -std=gnu2x -g -Wall -Wextra -Wpedantic -Wimplicit-fallthrough -Werror -W
 SRC_FILES= src/chunk.c src/compiler.c src/debug.c src/memory.c src/object.c src/scanner.c src/stack.c src/value.c src/vm.c
 
 lox: $(SRC_FILES) src/*.h src/main.c
-	$(CC) $(CFLAGS) -DDEBUG_TRACE_EXECUTION -DDEBUG_PRINT_CODE src/main.c $(SRC_FILES) -o lox
+	$(CC) $(CFLAGS) -DDEBUG_TRACE_EXECUTION -DDEBUG_PRINT_CODE -fsanitize=address src/main.c $(SRC_FILES) -o lox
 
 all: lox test lint
 test: test/test-stack test/test-vm test/test-scanner test/test-compiler
