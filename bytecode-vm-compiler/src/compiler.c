@@ -180,14 +180,18 @@ static void Ternary() {
 
 	// 2. compile true branch
 	// for now, just write the bytecode for the true branch
-	{ ParsePrecedence(rule->precedence + 1); }
+	{
+		ParsePrecedence(rule->precedence + 1);
+	}
 
 	consume_or_error(TOKEN_COLON,
 					 "Missing ':' before false branch of ternary operator");
 
 	// 3. compile false branch
 	// for now, just write the bytecode for the false branch
-	{ ParsePrecedence(PREC_ASSIGNMENT); }
+	{
+		ParsePrecedence(PREC_ASSIGNMENT);
+	}
 }
 
 static void Binary() {

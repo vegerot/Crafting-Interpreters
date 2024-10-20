@@ -16,6 +16,7 @@ static void repl(void) {
 	char line[1024];
 	while (true) {
 		printf("> ");
+		// TODO: support pressing up to see previous command
 		if (!fgets(line, sizeof(line), stdin)) {
 			printf("\n");
 			break;
