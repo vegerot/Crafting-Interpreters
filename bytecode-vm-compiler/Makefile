@@ -1,5 +1,5 @@
 CC ?= cc
-CFLAGS= -std=gnu2x -g -Wall -Wextra -Wpedantic -Wimplicit-fallthrough -Werror -Wno-gnu-statement-expression -Wno-strict-prototypes
+CFLAGS ?= -std=gnu2x -g -Wall -Wextra -Wpedantic -Wimplicit-fallthrough -Werror -Wno-gnu-statement-expression -Wno-strict-prototypes
 SRC_FILES= src/chunk.c src/compiler.c src/debug.c src/memory.c src/object.c src/scanner.c src/stack.c src/value.c src/vm.c
 
 lox: $(SRC_FILES) src/*.h src/main.c
@@ -8,16 +8,16 @@ lox: $(SRC_FILES) src/*.h src/main.c
 all: lox test lint
 test: test/test-stack test/test-vm test/test-scanner test/test-compiler
 test/test-vm: test/test-vm.c src/vm.h src/vm.c src/chunk.h src/chunk.c src/value.h src/value.c src/compiler.h src/compiler.c
-	$(CC) $(CFLAGS) -fsanitize=address -Wno-error test/test-vm.c $(SRC_FILES) -o test/test-vm
+	$(CC) -fsanitize=address $(CFLAGS)  -Wno-error test/test-vm.c $(SRC_FILES) -o test/test-vm
 	test/test-vm || (mv test/test-vm test/test-vm.failed && false)
 test/test-stack: test/test-stack.c src/stack.h src/stack.c
-	$(CC) $(CFLAGS) -fsanitize=address test/test-stack.c $(SRC_FILES) -o test/test-stack
+	$(CC) -fsanitize=address $(CFLAGS)  test/test-stack.c $(SRC_FILES) -o test/test-stack
 	test/test-stack
 test/test-scanner: test/test-scanner.c src/scanner.h src/scanner.c src/lox_assert.h
-	$(CC) $(CFLAGS) -fsanitize=address -Wno-error test/test-scanner.c $(SRC_FILES) -o test/test-scanner
+	$(CC) -fsanitize=address $(CFLAGS)  -Wno-error test/test-scanner.c $(SRC_FILES) -o test/test-scanner
 	test/test-scanner || mv test/test-scanner test/test-scanner.failed
 test/test-compiler: test/test-compiler.c src/compiler.h src/compiler.c src/scanner.h src/scanner.c src/chunk.h src/chunk.c src/value.h src/value.c
-	$(CC) $(CFLAGS) -DDEBUG_TRACE_EXECUTION -fsanitize=address -Wno-error test/test-compiler.c $(SRC_FILES) -o test/test-compiler
+	$(CC) -DDEBUG_TRACE_EXECUTION -fsanitize=address $(CFLAGS)  -Wno-error test/test-compiler.c $(SRC_FILES) -o test/test-compiler
 	test/test-compiler || mv -v test/test-compiler test/test-compiler.failed
 
 
