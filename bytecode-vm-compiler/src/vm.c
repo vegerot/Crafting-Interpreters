@@ -10,7 +10,7 @@
 #include "value.h"
 #include "vm.h"
 
-LoxString* allocateString(VM* vm, char const* cString, int length);
+LoxString* allocateEmptyString(VM* vm, int length);
 // TODO: make this a parameter
 static VM vm; // NOLINT
 
@@ -173,19 +173,13 @@ InterpretResult run(void) {
 				LoxString* b_str = AS_STRING(b);
 				LoxString* a_str = AS_STRING(a);
 				size_t finalStringLength = b_str->length + a_str->length;
-				char* tmpNewCString =
-					(char*)malloc(sizeof(char) * (finalStringLength + 1));
-				strncpy(tmpNewCString, a_str->chars, a_str->length);
-				strncpy(tmpNewCString + a_str->length, b_str->chars,
+				LoxString* addedLoxStr =
+					allocateEmptyString(&vm, (int)finalStringLength + 1);
+				strncpy(addedLoxStr->chars, a_str->chars, a_str->length);
+				strncpy(&addedLoxStr->chars[a_str->length], b_str->chars,
 						b_str->length);
 				// paranoid
-				tmpNewCString[finalStringLength] = '\0';
-				printf("strlen(newCString): %lu\n", strlen(tmpNewCString));
-				// perfNote: we should move `tmpNewCString` instead of copying
-				// it again
-				LoxString* addedLoxStr = allocateString(
-					&vm, tmpNewCString, (int)finalStringLength + 1);
-				free(tmpNewCString);
+				addedLoxStr->chars[finalStringLength] = '\0';
 				stack_push(&vm.stack, OBJ_VAL(addedLoxStr));
 			} else {
 				runtimeError(

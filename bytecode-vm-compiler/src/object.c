@@ -38,3 +38,13 @@ LoxString* allocateString(VM* vm, char const* cString, int length) {
 	str->length = length;
 	return str;
 }
+
+LoxString* allocateEmptyString(VM* vm, int length) {
+	LoxString* str = (LoxString*)allocateObj(
+		vm, sizeof(LoxString) + (length + 1) * sizeof(char), OBJ_STRING);
+
+	str->chars[length + 1] = '\0';
+
+	str->length = length;
+	return str;
+}
