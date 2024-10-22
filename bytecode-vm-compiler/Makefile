@@ -31,6 +31,8 @@ lint: .lint-stamp
 CLANG_FORMAT ?= clang-format
 format: $(SRC_FILES) src/*.h test/*.c .clang-format
 	$(CLANG_FORMAT) -i $(SRC_FILES) src/*.h test/*.c
+format-check: $(SRC_FILES) src/*.h test/*.c .clang-format
+	$(CLANG_FORMAT) --Werror -n $(SRC_FILES) src/*.h test/*.c
 
 CLANG ?= clang
 clangd:
