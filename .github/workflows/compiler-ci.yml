@@ -1,0 +1,29 @@
+name: compiler CI
+
+on:
+  push:
+    branches: [ "*" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./bytecode-vm-compiler/
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: everythong
+      run: make -j all
+    - name: build
+      run: make -j
+    - name: test
+      run: make -j test
+    - name: lint
+      run: make lint
+    - name: format
+      # ubuntu-latest uses an old version of clang-format, so we need to install a newer version
+      run: make format-check || true
