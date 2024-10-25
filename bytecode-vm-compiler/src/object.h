@@ -22,7 +22,8 @@ struct LoxObj {
 
 typedef struct {
 	LoxObj obj;
-	int length;
+	/** same as return value of strlen */
+	size_t length;
 	char chars[];
 } LoxString;
 
@@ -31,3 +32,4 @@ void printObject(Value value);
 static inline bool isObjType(Value value, ObjType type) {
 	return IS_OBJ(value) && AS_OBJ(value)->type == type;
 }
+

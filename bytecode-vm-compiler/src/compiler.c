@@ -79,7 +79,7 @@ static void error(char const* message) {
 	parser.had_error = true;
 }
 
-LoxString* fromCString(char const* cString, int length) {
+LoxString* fromCString(char const* cString, size_t length) {
 	LoxString* str = malloc(sizeof(LoxString) + (length + 1) * sizeof(char));
 	str->obj.type = OBJ_STRING;
 	str->obj.next = currentChunk()->allocatorStart;
