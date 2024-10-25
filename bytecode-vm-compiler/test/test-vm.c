@@ -472,7 +472,6 @@ static void comparison() {
 
 static void stringComp() {
 	Chunk chunk;
-	goto second;
 	{
 		initVM();
 		initChunk(&chunk);
@@ -489,22 +488,22 @@ static void stringComp() {
 		freeChunk(&chunk);
 		freeVM();
 	}
-second: {
-	initVM();
-	initChunk(&chunk);
+	{
+		initVM();
+		initChunk(&chunk);
 
-	compile("\"abc\" == \"def\"", &chunk);
-	freeChunk(&chunk);
-	return;
+		compile("\"abc\" == \"def\"", &chunk);
+		freeChunk(&chunk);
+		return;
 
-	InterpretResult result = interpret_bytecode_(&chunk);
+		InterpretResult result = interpret_bytecode_(&chunk);
 
-	LOX_ASSERT_EQUALS(result, INTERPRET_OK);
+		LOX_ASSERT_EQUALS(result, INTERPRET_OK);
 
-	VM vm = getVM_();
+		VM vm = getVM_();
 
-	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0), BOOL_VAL(false));
-}
+		LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0), BOOL_VAL(false));
+	}
 }
 
 static void stringAdd() {
