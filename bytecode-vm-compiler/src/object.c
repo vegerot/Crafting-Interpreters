@@ -34,7 +34,7 @@ LoxString* allocateString(VM* vm, char const* cString, size_t length) {
 		vm, sizeof(LoxString) + (length + 1) * sizeof(char), OBJ_STRING);
 
 	strncpy(str->chars, cString, length);
-	str->chars[length + 1] = '\0';
+	str->chars[length] = '\0';
 
 	str->length = length;
 	return str;
@@ -44,7 +44,7 @@ LoxString* allocateEmptyString(VM* vm, size_t length) {
 	LoxString* str = (LoxString*)allocateObj(
 		vm, sizeof(LoxString) + (length + 1) * sizeof(char), OBJ_STRING);
 
-	str->chars[length + 1] = '\0';
+	str->chars[length] = '\0';
 
 	str->length = length;
 	return str;

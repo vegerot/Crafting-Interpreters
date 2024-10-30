@@ -87,7 +87,7 @@ LoxString* fromCString(char const* cString, size_t length) {
 	currentChunk()->allocatorStart = (LoxObj*)str;
 
 	strncpy(str->chars, cString, length);
-	str->chars[length + 1] = '\0';
+	str->chars[length] = '\0';
 
 	str->length = length;
 	return str;
