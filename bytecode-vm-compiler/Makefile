@@ -25,7 +25,7 @@ test/test-compiler: test/test-compiler.c src/compiler.h src/compiler.c src/scann
 # sure `make clangd` uses the same llvm version as `make lint`
 lint: .lint-stamp
 .lint-stamp: $(SRC_FILES) src/*.h test/*.c .clang-tidy
-	clang-tidy --fix-errors --checks="-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling" $(SRC_FILES) src/*.h test/*.c 
+	clang-tidy --warnings-as-errors='*' --fix-errors --checks="-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling" $(SRC_FILES) src/*.h test/*.c
 	touch .lint-stamp
 
 CLANG_FORMAT ?= clang-format
