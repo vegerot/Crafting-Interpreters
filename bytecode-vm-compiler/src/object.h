@@ -22,7 +22,8 @@ struct LoxObj {
 
 typedef struct {
 	LoxObj obj;
-	int length;
+	/** same as return value of strlen */
+	size_t length;
 	char chars[];
 } LoxString;
 

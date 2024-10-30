@@ -9,7 +9,7 @@
 void printObject(Value value) {
 	switch (OBJ_TYPE(value)) {
 	case OBJ_STRING:
-		printf("%.*s", AS_STRING(value)->length, AS_CSTRING(value));
+		printf("%.*s", (int)AS_STRING(value)->length, AS_CSTRING(value));
 		break;
 	default:
 		printf("\n obj type: %u\n", OBJ_TYPE(value));
@@ -28,7 +28,8 @@ static LoxObj* allocateObj(VM* vm, size_t size, ObjType type) {
 	return object;
 }
 
-LoxString* allocateString(VM* vm, char const* cString, int length) {
+// TODO: refactor to use `allocateEmptyString`
+LoxString* allocateString(VM* vm, char const* cString, size_t length) {
 	LoxString* str = (LoxString*)allocateObj(
 		vm, sizeof(LoxString) + (length + 1) * sizeof(char), OBJ_STRING);
 
@@ -39,7 +40,7 @@ LoxString* allocateString(VM* vm, char const* cString, int length) {
 	return str;
 }
 
-LoxString* allocateEmptyString(VM* vm, int length) {
+LoxString* allocateEmptyString(VM* vm, size_t length) {
 	LoxString* str = (LoxString*)allocateObj(
 		vm, sizeof(LoxString) + (length + 1) * sizeof(char), OBJ_STRING);
 

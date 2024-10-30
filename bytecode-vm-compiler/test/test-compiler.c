@@ -95,7 +95,7 @@ void testStringAppend(void) {
 static void appendObjectToString(char* buf, size_t maxsize, Value value) {
 	switch (OBJ_TYPE(value)) {
 	case OBJ_STRING:
-		snprintf(buf, maxsize, "%.*s", AS_STRING(value)->length,
+		snprintf(buf, maxsize, "%.*s", (int)AS_STRING(value)->length,
 				 AS_CSTRING(value));
 		break;
 	default:
