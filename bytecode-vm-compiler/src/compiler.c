@@ -87,6 +87,11 @@ LoxString* fromCString(char const* cString, size_t length) {
 	currentChunk()->allocatorStart = (LoxObj*)str;
 
 	strncpy(str->chars, cString, length);
+	// NOTE[why-LoxString-null-terminates]: This line does NOTHING because Lox
+	// only uses the string's `.length`. We only set the null terminator to make
+	// DEBUGGING IN GDB easier.
+	// I'm writing this note because I once confused myself into thinking this
+	// had a purpose other than improving GDB debugging
 	str->chars[length] = '\0';
 
 	str->length = length;

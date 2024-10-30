@@ -179,6 +179,8 @@ InterpretResult run(void) {
 				strncpy(&addedLoxStr->chars[a_str->length], b_str->chars,
 						b_str->length);
 				// paranoid
+				// This line does NOTHING.
+				// See NOTE[why-LoxString-null-terminates]
 				addedLoxStr->chars[finalStringLength] = '\0';
 				stack_push(&vm.stack, OBJ_VAL(addedLoxStr));
 			} else {

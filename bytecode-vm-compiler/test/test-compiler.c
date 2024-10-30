@@ -19,6 +19,8 @@ void appendToString(string* this, char const* that, size_t that_len) {
 		this->data = malloc(this->cap * sizeof(char));
 		this->len = that_len;
 		strncpy(this->data, that, that_len);
+		// This line does NOTHING.
+		// See NOTE[why-LoxString-null-terminates]
 		this->data[this->len] = '\0';
 		return;
 	}
