@@ -22,16 +22,22 @@
 		 ? LOX_ASSERT_NUMBER_EQUALS_FAIL(__func__, __FILE__, __LINE__, #got,   \
 										 got, #want, want)                     \
 		 : (void)0);
-#define LOX_ASSERT_VALUE_EQUALS(g, want)                                       \
+#define LOX_ASSERT_VALUE_EQUALS(_got, want)                                    \
 	do {                                                                       \
-		Value got = g;                                                         \
-		LOX_ASSERT_EQUALS(got.type, (want).type);                              \
+		/** Assign `_got` to a variable to avoid rerunning a function if       \
+		 * `_got` has side effects*/                                           \
+		/** TODO: do the same thing for `want`*/                               \
+		/** BUG: this makes the error message not helpful because it doesn't   \
+		 * show the expression, just `got`. TODO: make the error message       \
+		 * better */                                                           \
+		Value got = _got;                                                      \
+		LOX_ASSERT_EQUALS((got).type, (want).type);                            \
 		switch ((want).type) {                                                 \
 		case (VAL_BOOL):                                                       \
-			LOX_ASSERT_EQUALS(got.as.boolean, (want).as.boolean);              \
+			LOX_ASSERT_EQUALS((got).as.boolean, (want).as.boolean);            \
 			break;                                                             \
 		case (VAL_NUMBER):                                                     \
-			LOX_ASSERT_EQUALS(got.as.number, (want).as.number)                 \
+			LOX_ASSERT_EQUALS((got).as.number, (want).as.number)               \
 			break;                                                             \
 		case (VAL_NIL):                                                        \
 			break;                                                             \
