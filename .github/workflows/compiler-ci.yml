@@ -22,9 +22,9 @@ jobs:
       run: make -j test
     - name: lint
       run: make lint
-    - name: format
+    - name: format (disabled)
       # ubuntu-latest uses an old version of clang-format, so we need to install a newer version
       run: make format-check || true
-    - name: everythong
+    - name: everythong (disabled)
       # ubuntu-latest uses an old version of clang-format, so we need to install a newer version
       run: make -j all || true
