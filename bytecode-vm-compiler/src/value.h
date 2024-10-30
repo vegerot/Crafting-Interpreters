@@ -7,7 +7,7 @@
 
 typedef struct LoxObj LoxObj;
 
-typedef enum { VAL_ERR = 0, VAL_BOOL, VAL_NIL, VAL_NUMBER, VAL_OBJ } ValueType;
+typedef enum { VAL_ERR = 0, VAL_NIL, VAL_BOOL, VAL_NUMBER, VAL_OBJ } ValueType;
 
 typedef struct {
 	ValueType type;
