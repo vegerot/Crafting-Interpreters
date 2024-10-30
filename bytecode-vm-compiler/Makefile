@@ -5,7 +5,7 @@ SRC_FILES= src/chunk.c src/compiler.c src/debug.c src/memory.c src/object.c src/
 lox: $(SRC_FILES) src/*.h src/main.c
 	$(CC) $(CFLAGS) -DDEBUG_TRACE_EXECUTION -DDEBUG_PRINT_CODE -fsanitize=address src/main.c $(SRC_FILES) -o lox
 
-all: lox test lint
+all: lox test lint clangd format-check format
 test: test/test-stack test/test-vm test/test-scanner test/test-compiler
 test/test-vm: test/test-vm.c src/vm.h src/vm.c src/chunk.h src/chunk.c src/value.h src/value.c src/compiler.h src/compiler.c
 	$(CC) -fsanitize=address $(CFLAGS)  -Wno-error test/test-vm.c $(SRC_FILES) -o test/test-vm
@@ -30,7 +30,7 @@ lint: .lint-stamp
 
 CLANG_FORMAT ?= clang-format
 format: $(SRC_FILES) src/*.h test/*.c .clang-format
-	$(CLANG_FORMAT) -i $(SRC_FILES) src/*.h test/*.c
+	$(CLANG_FORMAT) --Werror -i $(SRC_FILES) src/*.h test/*.c
 format-check: $(SRC_FILES) src/*.h test/*.c .clang-format
 	$(CLANG_FORMAT) --Werror -n $(SRC_FILES) src/*.h test/*.c
 
