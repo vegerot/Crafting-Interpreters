@@ -10,7 +10,7 @@
 #include "value.h"
 #include "vm.h"
 
-LoxString* allocateEmptyString(VM* vm, int length);
+LoxString* newEmptyLoxString(VM* vm, int length);
 // TODO: make this a parameter
 static VM vm; // NOLINT
 
@@ -174,7 +174,7 @@ InterpretResult run(void) {
 				LoxString* a_str = AS_STRING(a);
 				size_t finalStringLength = b_str->length + a_str->length;
 				LoxString* addedLoxStr =
-					allocateEmptyString(&vm, (int)finalStringLength + 1);
+					newEmptyLoxString(&vm, (int)finalStringLength + 1);
 				strncpy(addedLoxStr->chars, a_str->chars, a_str->length);
 				strncpy(&addedLoxStr->chars[a_str->length], b_str->chars,
 						b_str->length);

@@ -28,8 +28,8 @@ static LoxObj* allocateObj(VM* vm, size_t size, ObjType type) {
 	return object;
 }
 
-// TODO: refactor to use `allocateEmptyString`
-LoxString* allocateString(VM* vm, char const* cString, size_t length) {
+// TODO: refactor to use `newEmptyLoxString`
+LoxString* newLoxStringFromCString(VM* vm, char const* cString, size_t length) {
 	LoxString* str = (LoxString*)allocateObj(
 		vm, sizeof(LoxString) + (length + 1) * sizeof(char), OBJ_STRING);
 
@@ -42,7 +42,7 @@ LoxString* allocateString(VM* vm, char const* cString, size_t length) {
 	return str;
 }
 
-LoxString* allocateEmptyString(VM* vm, size_t length) {
+LoxString* newEmptyLoxString(VM* vm, size_t length) {
 	LoxString* str = (LoxString*)allocateObj(
 		vm, sizeof(LoxString) + (length + 1) * sizeof(char), OBJ_STRING);
 
