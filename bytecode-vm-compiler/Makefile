@@ -24,6 +24,9 @@ test/test-scanner: test/test-scanner.c src/scanner.h src/scanner.c src/lox_asser
 test/test-compiler: test/test-compiler.c src/compiler.h src/compiler.c src/scanner.h src/scanner.c src/chunk.h src/chunk.c src/value.h src/value.c
 	$(CC) -DDEBUG_TRACE_EXECUTION -fsanitize=address $(CFLAGS)  -Wno-error test/test-compiler.c $(SRC_FILES) -o test/test-compiler
 	test/test-compiler || mv -v test/test-compiler test/test-compiler.failed
+test/test-table: test/test-table.c test/test-vm
+	$(CC) -fsanitize=address $(CFLAGS)  -Wno-error test/test-table.c $(SRC_FILES) -o test/test-table
+	test/test-table || mv test/test-table test/test-table.failed
 
 
 # NOTE: if you're seeing a bunch of errors about unknown clang flags, make

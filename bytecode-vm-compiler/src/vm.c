@@ -11,7 +11,7 @@
 #include "vm.h"
 
 LoxString* newEmptyLoxString(VM* vm, int length);
-// TODO: make this a parameter
+// TODO: don't use a global variable for the VM
 static VM vm; // NOLINT
 
 static void resetStack(void) { vm.stack.top = vm.stack.bottom; }
@@ -43,6 +43,7 @@ static bool isTruthy(Value value) {
 	}
 }
 
+// TODO: add VM as a parameter
 void initVM(void) {
 	new_stack(&vm.stack);
 	resetStack();
@@ -57,6 +58,8 @@ void freeVM(void) {
 
 /**
  * hack: only used for tests
+ * q: does this copy the VM?  Looking through the properties of the VM, the only
+ * property that might actually be copied is `vm.stack.cap`
  */
 VM getVM_(void) { return vm; }
 
