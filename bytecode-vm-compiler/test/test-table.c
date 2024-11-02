@@ -9,7 +9,6 @@
 #include <string.h>
 LoxString* newLoxStringFromCString(VM* vm, char const* cString, size_t length);
 
-#include "../src/common.h"
 #include "../src/memory.h"
 #include "../src/value.h"
 
@@ -24,11 +23,41 @@ typedef struct {
 	TableEntry* entries;
 } LoxTable;
 
-void tableInit(LoxTable* table);
-void tableInit(LoxTable* table) {
-	table->count = 0;
-	table->capacity = table->count;
-	table->entries = NULL;
+void tableInit(LoxTable* this, size_t initialCapacity);
+bool tableSet(LoxTable* table, LoxString* key, Value value);
+void tableAddAll(LoxTable* from, LoxTable* to);
+static void adjustCapacity(LoxTable* this, size_t newCapacity) {
+	TableEntry* newEntries = ALLOCATE(TableEntry, newCapacity);
+
+	// init each entry
+	for (size_t i = 0; i < newCapacity; ++i) {
+		newEntries[i].key = NULL;
+		newEntries[i].value = NIL_VAL;
+	}
+	LoxTable newThis = {
+		.capacity = newCapacity,
+		.count = this->count,
+		.entries = newEntries,
+	};
+
+	bool isEntriesUninitialized = this->entries == NULL;
+	if (!isEntriesUninitialized) {
+		tableAddAll(this, &newThis);
+		free(this->entries);
+	}
+
+	this->capacity = newThis.capacity;
+	this->entries = newThis.entries;
+}
+
+void tableInit(LoxTable* this, size_t initialCapacity) {
+	/** this->capacity is set in `adjustCapacity` */
+	this->capacity = 0;
+	this->count = 0;
+	this->entries = NULL;
+	if (initialCapacity > 0) {
+		adjustCapacity(this, initialCapacity);
+	}
 }
 void tableFree(LoxTable* table);
 void tableFree(LoxTable* table) {
@@ -38,57 +67,53 @@ void tableFree(LoxTable* table) {
 	FREE_ARRAY(Entry, table->entries, table->capacity);
 }
 
-static TableEntry* findEntry(LoxTable const* table, LoxString const* key) {
-	uint32_t index = key->hash % table->capacity;
+static TableEntry* findEntry(LoxTable const* this, LoxString const* key) {
+	uint32_t index = key->hash % this->capacity;
 	while (true) {
 		// printf("index: %u\n", index);
-		TableEntry* curr = &table->entries[index];
+		TableEntry* curr = &this->entries[index];
 		if (curr->key == NULL || curr->key->hash == key->hash)
 			return curr;
-		index = (index + 1) % (table->capacity);
+		index = (index + 1) % (this->capacity);
 	}
 }
 
-static void adjustCapacity(LoxTable* table, size_t newCapacity) {
-	TableEntry* newEntries = ALLOCATE(TableEntry, newCapacity);
-
-	// init each entry
-	for (size_t i = 0; i < newCapacity; ++i) {
-		newEntries[i].key = NULL;
-		newEntries[i].value = NIL_VAL;
+void tableAddAll(LoxTable* from, LoxTable* to) {
+	if (from->count == 0)
+		return;
+	for (size_t i = 0; i < from->capacity; ++i) {
+		TableEntry* entry = &from->entries[i];
+		if (entry->key != NULL) {
+			tableSet(to, entry->key, entry->value);
+		}
 	}
-
-	table->capacity = newCapacity;
-	table->entries = newEntries;
 }
-
-bool tableSet(LoxTable* table, LoxString* key, Value value);
 #define TABLE_MAX_LOAD_RATIO 0.69
-bool tableSet(LoxTable* table, LoxString* key, Value value) {
+bool tableSet(LoxTable* this, LoxString* key, Value value) {
 	// FIXME: this conversion looks weird.  Probably should multiply and divide
 	// whole numbers instead
-	if (table->count + 1 >
-		(size_t)((int)table->capacity * TABLE_MAX_LOAD_RATIO)) {
-		size_t newCapacity = GROW_CAPACITY(table->capacity);
-		adjustCapacity(table, newCapacity);
+	if (this->count + 1 >
+		(size_t)((int)this->capacity * TABLE_MAX_LOAD_RATIO)) {
+		size_t newCapacity = GROW_CAPACITY(this->capacity);
+		adjustCapacity(this, newCapacity);
 	}
-	TableEntry* entry = findEntry(table, key);
-	++table->count;
+	TableEntry* entry = findEntry(this, key);
+	++this->count;
 
 	entry->key = key;
 	entry->value = value;
 	return true;
 }
 Value* tableGet(LoxTable* table, LoxString* key);
-Value* tableGet(LoxTable* table, LoxString* key) {
-	return &findEntry(table, key)->value;
+Value* tableGet(LoxTable* this, LoxString* key) {
+	return &findEntry(this, key)->value;
 }
 
 static void basic(void) {
 	initVM();
 	VM* vm = getVM_();
 	LoxTable table;
-	tableInit(&table);
+	tableInit(&table, 0);
 	char const* k = "key";
 	LoxString* key = newLoxStringFromCString(vm, "key", strlen(k));
 	Value want = NUMBER_VAL(42.0);
@@ -105,7 +130,7 @@ static void overwrite(void) {
 	initVM();
 	VM* vm = getVM_();
 	LoxTable table;
-	tableInit(&table);
+	tableInit(&table, 0);
 	char const* k = "key";
 	LoxString* key = newLoxStringFromCString(vm, "key", strlen(k));
 	Value one = NUMBER_VAL(1);
@@ -124,6 +149,28 @@ static void overwrite(void) {
 	freeVM();
 }
 
+static void grow(void) {
+	initVM();
+	VM* vm = getVM_();
+	LoxTable table;
+	tableInit(&table, 1);
+	LOX_ASSERT_EQUALS(table.capacity, 1);
+
+	char const* k = "key";
+	LoxString* key = newLoxStringFromCString(vm, "key", strlen(k));
+	Value one = NUMBER_VAL(1);
+	tableSet(&table, key, one);
+
+	Value* res = tableGet(&table, key);
+	LOX_ASSERT_VALUE_EQUALS(*res, one);
+	LOX_ASSERT_EQUALS(table.capacity, 8);
+
+	res = tableGet(&table, key);
+
+	tableFree(&table);
+	freeVM();
+}
+
 /**
  * This test no longer does what it was designed for.
  * When I wrote this test, the hash function was hardcoded to always return 69,
@@ -133,7 +180,7 @@ static void collision(void) {
 	initVM();
 	VM* vm = getVM_();
 	LoxTable table;
-	tableInit(&table);
+	tableInit(&table, 0);
 	char const* k1 = "costarring";
 	LoxString* key1 = newLoxStringFromCString(vm, k1, strlen(k1));
 	Value one = NUMBER_VAL(1);
@@ -154,10 +201,10 @@ static void collision(void) {
 }
 
 int main(void) {
-	basic();
-	overwrite();
+	// basic();
+	// overwrite();
 	// delete();
-	// grow();
+	grow();
 
 	// FIXME: how do I test collisions?
 	// ideas:
@@ -168,5 +215,5 @@ int main(void) {
 	//
 	// Currently, when I want to test this function, I change the
 	// `computeHashOfCString` function to always return 69.  That works too...
-	collision();
+	// collision();
 }
