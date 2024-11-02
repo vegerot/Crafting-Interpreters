@@ -17,14 +17,13 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: build
-      run: make -j
+      run: make
     - name: test
-      run: make -j test
+      run: make test
     - name: lint
-      run: make lint
+      run: make lint-check
+    - name: ci
+      run: make -j ci
     - name: format (disabled)
       # ubuntu-latest uses an old version of clang-format, so we need to install a newer version
       run: make format-check || true
-    - name: everythong (disabled)
-      # ubuntu-latest uses an old version of clang-format, so we need to install a newer version
-      run: make -j all || true

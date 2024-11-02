@@ -30,8 +30,8 @@ int main(int argc, char* argv[]) {
 		repl();
 	} else if (argc == 2) {
 		runFile(argv[1]);
-	} else if (argc == 3 && argv[1][0] == '-' && argv[1][1]=='e') {
-			interpret(argv[2]);
+	} else if (argc == 3 && argv[1][0] == '-' && argv[1][1] == 'e') {
+		interpret(argv[2]);
 	} else {
 		fprintf(stderr, "Usage: clox [path]\n");
 	}
