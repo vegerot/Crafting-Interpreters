@@ -29,8 +29,8 @@ static LoxObj* allocateObj(VM* vm, size_t size, ObjType type) {
 }
 
 // TODO: refactor to use `newEmptyLoxString`
-LoxString* newLoxStringFromCString(VM* vm, char const* cString, size_t length,
-								   uint32_t hash) {
+LoxString* newLoxStringFromCStringAndHash(VM* vm, char const* cString,
+										  size_t length, uint32_t hash) {
 	LoxString* str = (LoxString*)allocateObj(
 		vm, sizeof(LoxString) + (length + 1) * sizeof(char), OBJ_STRING);
 
@@ -54,6 +54,11 @@ LoxString* newEmptyLoxString(VM* vm, size_t length) {
 
 	str->length = length;
 	return str;
+}
+
+LoxString* newLoxStringFromCString(VM* vm, char const* cString, size_t length) {
+	uint32_t hash = computeHashOfCString(cString, length);
+	return newLoxStringFromCStringAndHash(vm, cString, length, hash);
 }
 
 uint32_t computeHashOfCString(char const* chars, size_t length) {
