@@ -189,9 +189,9 @@ void addToStack(void) {
 		writeChunkNoLine(&chunk, OP_RETURN);
 	}
 	interpret_bytecode_(&chunk);
-	VM vm = getVM_();
-	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0), NUMBER_VAL(69));
-	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 1), NUMBER_VAL(42));
+	VM* vm = getVM_();
+	LOX_ASSERT_VALUE_EQUALS(peekStack(vm, 0), NUMBER_VAL(69));
+	LOX_ASSERT_VALUE_EQUALS(peekStack(vm, 1), NUMBER_VAL(42));
 	freeChunk(&chunk);
 	freeVM();
 }
@@ -214,8 +214,8 @@ void addition(void) {
 		writeChunkNoLine(&chunk, OP_RETURN);
 	}
 	interpret_bytecode_(&chunk);
-	VM vm = getVM_();
-	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0), NUMBER_VAL(69));
+	VM* vm = getVM_();
+	LOX_ASSERT_VALUE_EQUALS(peekStack(vm, 0), NUMBER_VAL(69));
 	freeChunk(&chunk);
 	freeVM();
 }
@@ -231,11 +231,11 @@ void additionWithCompile(void) {
 
 	LOX_ASSERT_EQUALS(result, INTERPRET_OK);
 
-	VM vm = getVM_();
+	VM* vm = getVM_();
 
 	int want = 3;
 
-	Value go = peekStack(&vm, 0);
+	Value go = peekStack(vm, 0);
 
 	LOX_ASSERT_VALUE_EQUALS(go, NUMBER_VAL(want));
 	freeChunk(&chunk);
@@ -260,9 +260,9 @@ void subtraction(void) {
 		writeChunkNoLine(&chunk, OP_RETURN);
 	}
 	interpret_bytecode_(&chunk);
-	VM vm = getVM_();
-	LOX_ASSERT_EQUALS(peekStack(&vm, 0).type, VAL_NUMBER);
-	LOX_ASSERT_EQUALS(peekStack(&vm, 0).as.number, 4);
+	VM* vm = getVM_();
+	LOX_ASSERT_EQUALS(peekStack(vm, 0).type, VAL_NUMBER);
+	LOX_ASSERT_EQUALS(peekStack(vm, 0).as.number, 4);
 	freeChunk(&chunk);
 	freeVM();
 }
@@ -285,9 +285,9 @@ void negation(void) {
 		writeChunkNoLine(&chunk, OP_RETURN);
 	}
 	InterpretResult status = interpret_bytecode_(&chunk);
-	VM vm = getVM_();
+	VM* vm = getVM_();
 	assert_vm_exit_ok(status);
-	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0), NUMBER_VAL(-7));
+	LOX_ASSERT_VALUE_EQUALS(peekStack(vm, 0), NUMBER_VAL(-7));
 	freeChunk(&chunk);
 	freeVM();
 }
@@ -310,8 +310,8 @@ void multiplication(void) {
 		writeChunkNoLine(&chunk, OP_RETURN);
 	}
 	interpret_bytecode_(&chunk);
-	VM vm = getVM_();
-	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0), NUMBER_VAL(420));
+	VM* vm = getVM_();
+	LOX_ASSERT_VALUE_EQUALS(peekStack(vm, 0), NUMBER_VAL(420));
 	freeChunk(&chunk);
 	freeVM();
 }
@@ -334,8 +334,8 @@ void division(void) {
 		writeChunkNoLine(&chunk, OP_RETURN);
 	}
 	interpret_bytecode_(&chunk);
-	VM vm = getVM_();
-	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0), NUMBER_VAL(42));
+	VM* vm = getVM_();
+	LOX_ASSERT_VALUE_EQUALS(peekStack(vm, 0), NUMBER_VAL(42));
 	freeChunk(&chunk);
 	freeVM();
 }
@@ -379,14 +379,14 @@ void not(void) {
 		writeChunkNoLine(&chunk, OP_RETURN);
 	}
 	interpret_bytecode_(&chunk);
-	VM vm = getVM_();
-	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 6), BOOL_VAL(false));
-	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 5), BOOL_VAL(true));
-	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 4), BOOL_VAL(true));
-	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 3), BOOL_VAL(true));
-	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 2), BOOL_VAL(false));
-	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 1), BOOL_VAL(true));
-	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0), BOOL_VAL(true));
+	VM* vm = getVM_();
+	LOX_ASSERT_VALUE_EQUALS(peekStack(vm, 6), BOOL_VAL(false));
+	LOX_ASSERT_VALUE_EQUALS(peekStack(vm, 5), BOOL_VAL(true));
+	LOX_ASSERT_VALUE_EQUALS(peekStack(vm, 4), BOOL_VAL(true));
+	LOX_ASSERT_VALUE_EQUALS(peekStack(vm, 3), BOOL_VAL(true));
+	LOX_ASSERT_VALUE_EQUALS(peekStack(vm, 2), BOOL_VAL(false));
+	LOX_ASSERT_VALUE_EQUALS(peekStack(vm, 1), BOOL_VAL(true));
+	LOX_ASSERT_VALUE_EQUALS(peekStack(vm, 0), BOOL_VAL(true));
 	freeChunk(&chunk);
 	freeVM();
 }
@@ -450,22 +450,22 @@ static void comparison() {
 	}
 	InterpretResult result = interpret_bytecode_(&chunk);
 	LOX_ASSERT_EQUALS(result, INTERPRET_OK);
-	VM vm = getVM_();
+	VM* vm = getVM_();
 
 	// true==true is true
-	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 6), BOOL_VAL(true));
+	LOX_ASSERT_VALUE_EQUALS(peekStack(vm, 6), BOOL_VAL(true));
 	// 0==1 is false
-	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 5), BOOL_VAL(false));
+	LOX_ASSERT_VALUE_EQUALS(peekStack(vm, 5), BOOL_VAL(false));
 	// 0==false is false
-	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 4), BOOL_VAL(false));
+	LOX_ASSERT_VALUE_EQUALS(peekStack(vm, 4), BOOL_VAL(false));
 	// 0.1>1.5 is false
-	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 3), BOOL_VAL(false));
+	LOX_ASSERT_VALUE_EQUALS(peekStack(vm, 3), BOOL_VAL(false));
 	// 69.42 > 42.69 is true
-	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 2), BOOL_VAL(true));
+	LOX_ASSERT_VALUE_EQUALS(peekStack(vm, 2), BOOL_VAL(true));
 	// 1.5 < 0.1 is false
-	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 1), BOOL_VAL(false));
+	LOX_ASSERT_VALUE_EQUALS(peekStack(vm, 1), BOOL_VAL(false));
 	// 42.69 < 69.42 is true
-	LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0), BOOL_VAL(true));
+	LOX_ASSERT_VALUE_EQUALS(peekStack(vm, 0), BOOL_VAL(true));
 	freeChunk(&chunk);
 	freeVM();
 }
@@ -482,9 +482,9 @@ static void stringComp() {
 
 		LOX_ASSERT_EQUALS(result, INTERPRET_OK);
 
-		VM vm = getVM_();
+		VM* vm = getVM_();
 
-		LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0), BOOL_VAL(true));
+		LOX_ASSERT_VALUE_EQUALS(peekStack(vm, 0), BOOL_VAL(true));
 		freeChunk(&chunk);
 		freeVM();
 	}
@@ -500,9 +500,9 @@ static void stringComp() {
 
 		LOX_ASSERT_EQUALS(result, INTERPRET_OK);
 
-		VM vm = getVM_();
+		VM* vm = getVM_();
 
-		LOX_ASSERT_VALUE_EQUALS(peekStack(&vm, 0), BOOL_VAL(false));
+		LOX_ASSERT_VALUE_EQUALS(peekStack(vm, 0), BOOL_VAL(false));
 	}
 }
 
@@ -516,11 +516,11 @@ static void stringAdd() {
 
 	LOX_ASSERT_EQUALS(result, INTERPRET_OK);
 
-	VM vm = getVM_();
+	VM* vm = getVM_();
 
 	char const* want = "string append";
 
-	char* got = AS_CSTRING(peekStack(&vm, 0));
+	char* got = AS_CSTRING(peekStack(vm, 0));
 
 	LOX_ASSERT_STRING_EQUALS(got, want);
 	freeChunk(&chunk);

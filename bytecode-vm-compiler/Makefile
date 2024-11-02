@@ -2,7 +2,7 @@ SHELL=/bin/bash
 .SHELLFLAGS := -o pipefail -o errexit -o nounset -c
 
 CC ?= cc
-CFLAGS ?= -std=gnu2x -g -Wall -Wextra -Wpedantic -Wimplicit-fallthrough -Werror -Wno-gnu-statement-expression -Wno-strict-prototypes
+CFLAGS ?= -std=gnu2x -g -Wall -Wextra -Wpedantic -Wimplicit-fallthrough -Werror -Wno-gnu-statement-expression -Wno-strict-prototypes -Wno-unused-parameter
 SRC_FILES= src/chunk.c src/compiler.c src/debug.c src/memory.c src/object.c src/scanner.c src/stack.c src/value.c src/vm.c
 
 lox: src/main.c $(SRC_FILES) src/*.h
@@ -16,7 +16,7 @@ test/test-vm: test/test-vm.c src/vm.h src/vm.c src/chunk.h src/chunk.c src/value
 	$(CC) -fsanitize=address $(CFLAGS)  -Wno-error test/test-vm.c $(SRC_FILES) -o test/test-vm
 	test/test-vm || (mv test/test-vm test/test-vm.failed && false)
 test/test-stack: test/test-stack.c src/stack.h src/stack.c
-	$(CC) -fsanitize=address $(CFLAGS)  test/test-stack.c $(SRC_FILES) -o test/test-stack
+	$(CC) -fsanitize=address $(CFLAGS) -Wno-error test/test-stack.c $(SRC_FILES) -o test/test-stack
 	test/test-stack
 test/test-scanner: test/test-scanner.c src/scanner.h src/scanner.c src/lox_assert.h
 	$(CC) -fsanitize=address $(CFLAGS)  -Wno-error test/test-scanner.c $(SRC_FILES) -o test/test-scanner
@@ -25,7 +25,7 @@ test/test-compiler: test/test-compiler.c src/compiler.h src/compiler.c src/scann
 	$(CC) -DDEBUG_TRACE_EXECUTION -fsanitize=address $(CFLAGS)  -Wno-error test/test-compiler.c $(SRC_FILES) -o test/test-compiler
 	test/test-compiler || mv -v test/test-compiler test/test-compiler.failed
 test/test-table: test/test-table.c test/test-vm
-	$(CC) -fsanitize=address $(CFLAGS)  -Wno-error test/test-table.c $(SRC_FILES) -o test/test-table
+	$(CC) $(CFLAGS)  -fsanitize=address $(EXTRA_CFLAGS) -Wno-error test/test-table.c $(SRC_FILES) -o test/test-table
 	test/test-table || mv test/test-table test/test-table.failed
 
 

@@ -24,6 +24,7 @@ typedef struct {
 	LoxObj obj;
 	/** same as return value of strlen */
 	size_t length;
+	uint32_t hash;
 	char chars[];
 } LoxString;
 
@@ -32,3 +33,4 @@ void printObject(Value value);
 static inline bool isObjType(Value value, ObjType type) { // NOLINT
 	return IS_OBJ(value) && AS_OBJ(value)->type == type;
 }
+uint32_t computeHashOfCString(char const* chars, size_t length);

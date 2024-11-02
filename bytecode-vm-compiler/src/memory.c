@@ -44,6 +44,9 @@ void freeObjects(VM* vm) {
 	LoxObj* next = NULL;
 	while (curr) {
 		next = curr->next;
+#ifdef DEBUG_TRACE_EXECUTION
+		printObject(OBJ_VAL(curr));
+#endif
 		freeLoxObject(curr);
 		curr = next;
 	}

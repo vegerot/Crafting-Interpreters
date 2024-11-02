@@ -23,7 +23,7 @@ typedef enum {
 void initVM(void);
 void freeVM(void);
 
-VM getVM_(void);
+VM* getVM_(void);
 
 InterpretResult interpret_bytecode_(Chunk* chunk);
 InterpretResult interpret(char const* source);

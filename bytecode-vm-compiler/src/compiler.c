@@ -95,6 +95,7 @@ LoxString* fromCString(char const* cString, size_t length) {
 	str->chars[length] = '\0';
 
 	str->length = length;
+	str->hash = computeHashOfCString(cString, length);
 	return str;
 }
 
@@ -273,12 +274,13 @@ static void String() {
 	LOX_ASSERT(parser.previous.type == TOKEN_STRING);
 
 	// TODO: support string escape sequences like '\n'
+	char const* strStart = parser.previous.start + 1;
 	int strLength = parser.previous.length - 2; // subtract quotes
 
 	// FIXME: This sucks.  We need to embed the string into the bytecode
 	// directly instead of allocating on the heap because now the bytecode
 	// isn't portable.
-	LoxString* str = fromCString(parser.previous.start + 1, strLength);
+	LoxString* str = fromCString(strStart, strLength);
 
 	Value value = {.type = VAL_OBJ, .as.obj = (LoxObj*)str};
 

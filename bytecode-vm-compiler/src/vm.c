@@ -61,7 +61,7 @@ void freeVM(void) {
  * q: does this copy the VM?  Looking through the properties of the VM, the only
  * property that might actually be copied is `vm.stack.cap`
  */
-VM getVM_(void) { return vm; }
+VM* getVM_(void) { return &vm; }
 
 InterpretResult run(void) {
 #define READ_BYTE() (*vm.ip++)
@@ -185,6 +185,9 @@ InterpretResult run(void) {
 				// This line does NOTHING.
 				// See NOTE[why-LoxString-null-terminates]
 				addedLoxStr->chars[finalStringLength] = '\0';
+				uint32_t hash = computeHashOfCString(addedLoxStr->chars,
+													 addedLoxStr->length);
+				addedLoxStr->hash = hash;
 				stack_push(&vm.stack, OBJ_VAL(addedLoxStr));
 			} else {
 				runtimeError(
