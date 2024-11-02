@@ -1,3 +1,6 @@
+SHELL=/bin/bash
+.SHELLFLAGS := -o pipefail -o errexit -o nounset -c
+
 CC ?= cc
 CFLAGS ?= -std=gnu2x -g -Wall -Wextra -Wpedantic -Wimplicit-fallthrough -Werror -Wno-gnu-statement-expression -Wno-strict-prototypes
 SRC_FILES= src/chunk.c src/compiler.c src/debug.c src/memory.c src/object.c src/scanner.c src/stack.c src/value.c src/vm.c
