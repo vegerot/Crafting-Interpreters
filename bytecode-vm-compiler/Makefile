@@ -11,7 +11,7 @@ lox: src/main.c $(SRC_FILES) src/*.h
 all: format lint ci
 ci: lox test clangd lint-check # do not run format-check because GH A uses an incompatible version of clang-format
 
-test: test/test-stack test/test-vm test/test-scanner test/test-compiler
+test: test/test-stack test/test-vm test/test-scanner test/test-compiler test/test-table
 test/test-vm: test/test-vm.c src/vm.h src/vm.c src/chunk.h src/chunk.c src/value.h src/value.c src/compiler.h src/compiler.c
 	$(CC) -fsanitize=address $(CFLAGS)  -Wno-error test/test-vm.c $(SRC_FILES) -o test/test-vm
 	test/test-vm || (mv test/test-vm test/test-vm.failed && false)
