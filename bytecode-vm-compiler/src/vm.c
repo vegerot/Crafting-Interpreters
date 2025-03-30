@@ -11,7 +11,7 @@
 #include "vm.h"
 
 LoxString* newEmptyLoxString(VM* vm, int length);
-// TODO: make this a parameter
+// TODO: don't use a global variable for the VM
 static VM vm; // NOLINT
 
 static void resetStack(void) { vm.stack.top = vm.stack.bottom; }
@@ -43,22 +43,27 @@ static bool isTruthy(Value value) {
 	}
 }
 
+// TODO: add VM as a parameter
 void initVM(void) {
 	new_stack(&vm.stack);
 	resetStack();
 	vm.objects = NULL;
+	tableInit(&vm.strings, 1);
 }
 void freeStack(Stack* stack) { free(stack->bottom); }
 
 void freeVM(void) {
+	tableFree(&vm.strings);
 	freeObjects(&vm);
 	freeStack(&vm.stack);
 }
 
 /**
  * hack: only used for tests
+ * q: does this copy the VM?  Looking through the properties of the VM, the only
+ * property that might actually be copied is `vm.stack.cap`
  */
-VM getVM_(void) { return vm; }
+VM* getVM_(void) { return &vm; }
 
 InterpretResult run(void) {
 #define READ_BYTE() (*vm.ip++)
@@ -182,6 +187,11 @@ InterpretResult run(void) {
 				// This line does NOTHING.
 				// See NOTE[why-LoxString-null-terminates]
 				addedLoxStr->chars[finalStringLength] = '\0';
+				uint32_t hash = computeHashOfCString(addedLoxStr->chars,
+													 addedLoxStr->length);
+				addedLoxStr->hash = hash;
+				// LoxString* maybeInternedString = tableFindString(&vm.strings,
+				// addedLoxStr->chars, finalStringLength, hash);
 				stack_push(&vm.stack, OBJ_VAL(addedLoxStr));
 			} else {
 				runtimeError(

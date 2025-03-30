@@ -28,20 +28,13 @@ static LoxObj* allocateObj(VM* vm, size_t size, ObjType type) {
 	return object;
 }
 
-// TODO: refactor to use `newEmptyLoxString`
-LoxString* newLoxStringFromCString(VM* vm, char const* cString, size_t length) {
-	LoxString* str = (LoxString*)allocateObj(
-		vm, sizeof(LoxString) + (length + 1) * sizeof(char), OBJ_STRING);
-
-	strncpy(str->chars, cString, length);
-	// This line does NOTHING.
-	// See NOTE[why-LoxString-null-terminates]
-	str->chars[length] = '\0';
-
-	str->length = length;
-	return str;
+void internString(VM* vm, LoxString* str) {
+	tableSet(&vm->strings, str, NIL_VAL);
 }
 
+/*
+ * NOTE: you must remember to intern the string after filling it!
+ */
 LoxString* newEmptyLoxString(VM* vm, size_t length) {
 	LoxString* str = (LoxString*)allocateObj(
 		vm, sizeof(LoxString) + (length + 1) * sizeof(char), OBJ_STRING);
@@ -52,4 +45,32 @@ LoxString* newEmptyLoxString(VM* vm, size_t length) {
 
 	str->length = length;
 	return str;
+}
+
+LoxString* newLoxStringFromCStringAndHash(VM* vm, char const* cString,
+										  size_t length, uint32_t hash) {
+	LoxString* maybeInterned =
+		tableFindString(&vm->strings, cString, length, hash);
+	if (maybeInterned != NULL)
+		return maybeInterned;
+	LoxString* str = newEmptyLoxString(vm, length);
+
+	strncpy(str->chars, cString, length);
+	str->hash = hash;
+	internString(vm, str);
+	return str;
+}
+
+LoxString* newLoxStringFromCString(VM* vm, char const* cString, size_t length) {
+	uint32_t hash = computeHashOfCString(cString, length);
+	return newLoxStringFromCStringAndHash(vm, cString, length, hash);
+}
+
+uint32_t computeHashOfCString(char const* chars, size_t length) {
+	uint32_t hash = 2166136261u;
+	for (size_t i = 0; i < length; ++i) {
+		hash ^= (uint8_t)chars[i];
+		hash *= 16777619;
+	}
+	return hash;
 }

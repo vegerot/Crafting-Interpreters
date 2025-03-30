@@ -59,6 +59,7 @@ void printValue(Value value) {
 }
 
 static bool compareLoxStrings(LoxString* a, LoxString* b) {
+	// TODO(perf): compare string.hash instead
 	if (a == b)
 		return true;
 	if (a->length != b->length)
