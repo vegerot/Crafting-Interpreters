@@ -493,8 +493,6 @@ static void stringComp() {
 		initChunk(&chunk);
 
 		compile("\"abc\" == \"def\"", &chunk);
-		freeChunk(&chunk);
-		return;
 
 		InterpretResult result = interpret_bytecode_(&chunk);
 
@@ -503,6 +501,7 @@ static void stringComp() {
 		VM* vm = getVM_();
 
 		LOX_ASSERT_VALUE_EQUALS(peekStack(vm, 0), BOOL_VAL(false));
+		freeChunk(&chunk);
 	}
 }
 

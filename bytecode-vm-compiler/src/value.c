@@ -59,9 +59,12 @@ void printValue(Value value) {
 }
 
 static bool compareLoxStrings(LoxString* a, LoxString* b) {
-	// TODO(perf): compare string.hash instead
+	return a == b;
+
+	// because strings are interned we don't need to compare their values
 	if (a == b)
 		return true;
+	return false;
 	if (a->length != b->length)
 		return false;
 

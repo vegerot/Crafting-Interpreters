@@ -6,6 +6,7 @@
 #include "lox_assert.h"
 #include "object.h"
 #include "scanner.h"
+#include "vm.h"
 
 #ifdef DEBUG_PRINT_CODE
 #include "debug.h"
@@ -79,24 +80,12 @@ static void error(char const* message) {
 	parser.had_error = true;
 }
 
+/** TODO: it makes me sad that the compiler is tied to the VM. I came up with a
+ * method to not use it, but my implementation got too far away from the book
+ * and the next chapters became too difficult*/
+static VM vm; // NOLINT
 LoxString* fromCString(char const* cString, size_t length) {
-	LoxString* str = malloc(sizeof(LoxString) + (length + 1) * sizeof(char));
-	str->obj.type = OBJ_STRING;
-	str->obj.next = currentChunk()->allocatorStart;
-
-	currentChunk()->allocatorStart = (LoxObj*)str;
-
-	strncpy(str->chars, cString, length);
-	// NOTE[why-LoxString-null-terminates]: This line does NOTHING because Lox
-	// only uses the string's `.length`. We only set the null terminator to make
-	// DEBUGGING IN GDB easier.
-	// I'm writing this note because I once confused myself into thinking this
-	// had a purpose other than improving GDB debugging
-	str->chars[length] = '\0';
-
-	str->length = length;
-	str->hash = computeHashOfCString(cString, length);
-	return str;
+	return newLoxStringFromCString(&vm, cString, length);
 }
 
 void advance() {
