@@ -183,7 +183,7 @@ static void collision(void) {
 int main(void) {
 	basic();
 	overwrite();
-	delete();
+	delete ();
 	deletenoinfiniteloop();
 	grow();
 
