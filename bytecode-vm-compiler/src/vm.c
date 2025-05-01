@@ -17,7 +17,7 @@ static VM vm; // NOLINT
 static void resetStack(void) { vm.stack.top = vm.stack.bottom; }
 
 static void runtimeError(char const* format, ...) {
-	va_list args;
+	va_list args = NULL;
 	va_start(args, format);
 	vfprintf( // NOLINT(clang-analyzer-valist.Uninitialized): bug in clang-tidy
 		stderr, format, args);
