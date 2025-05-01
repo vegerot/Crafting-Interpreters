@@ -12,7 +12,11 @@ lox: src/main.c $(SRC_FILES) src/*.h
 all: format lint ci
 ci: lox test clangd lint-check # do not run format-check because GH A uses an incompatible version of clang-format
 
-test: test/test-stack test/test-vm test/test-scanner test/test-compiler test/test-table
+test: test/test-stack test/test-vm test/test-scanner test/test-compiler test/test-table test/test-repl
+test/test-repl: $(COMMON_TEST_FILES) test/test-repl.c src/main.c $(SRC_FILES)
+	$(CC) $(CFLAGS) -fsanitize=address src/main.c $(SRC_FILES) -o test/lox
+	$(CC) -fsanitize=address $(CFLAGS)  -Wno-error test/test-repl.c $(SRC_FILES) -o test/test-repl
+	test/test-repl || (mv test/test-repl test/test-repl.failed && false)
 test/test-vm: $(COMMON_TEST_FILES) test/test-vm.c src/vm.h src/vm.c src/chunk.h src/chunk.c src/value.h src/value.c src/compiler.h src/compiler.c
 	$(CC) -fsanitize=address $(CFLAGS)  -Wno-error test/test-vm.c $(SRC_FILES) -o test/test-vm
 	test/test-vm || (mv test/test-vm test/test-vm.failed && false)
@@ -32,7 +36,7 @@ test/test-table: $(COMMON_TEST_FILES) src/table.* test/test-table.c test/test-vm
 # NOTE: if you're seeing a bunch of errors about unknown clang flags, make
 # sure `make clangd` uses the same llvm version as `make lint`
 lint: compile_commands.json .lint-stamp
-.lint-stamp: src/main.c $(SRC_FILES) src/*.h test/*.c .clang-tidy
+.lint-stamp: src/main.c $(SRC_FILES) src/*.h test/*.c .clang-tidy compile_commands.json
 	clang-tidy --warnings-as-errors='*' --fix-errors --checks="-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling" src/main.c $(SRC_FILES) src/*.h test/*.c
 	touch .lint-stamp
 	touch .lint-check-stamp
