@@ -56,6 +56,7 @@ void freeVM(void) {
 	tableFree(&vm.strings);
 	freeObjects(&vm);
 	freeStack(&vm.stack);
+	vm = (VM){0};
 }
 
 /**
@@ -248,6 +249,7 @@ InterpretResult interpret_bytecode_(Chunk* chunk) {
 }
 
 InterpretResult interpret(char const* source) {
+	initVM();
 	Chunk chunk;
 	initChunk(&chunk);
 

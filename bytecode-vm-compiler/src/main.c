@@ -25,7 +25,6 @@ static void repl(void) {
 	}
 }
 int main(int argc, char* argv[]) {
-	initVM();
 	if (argc == 1) {
 		repl();
 	} else if (argc == 2) {
@@ -34,6 +33,7 @@ int main(int argc, char* argv[]) {
 		interpret(argv[2]);
 	} else {
 		fprintf(stderr, "Usage: clox [path]\n");
+		return 1;
 	}
 	return 0;
 }
